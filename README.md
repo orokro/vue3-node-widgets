@@ -1,35 +1,11 @@
 # vue3-node-widgets
 
-This template should help get you started developing with Vue 3 in Vite.
+Note:
 
-## Recommended IDE Setup
+If you're reading this, you're in the 'master' branch before this project was converted to a vue3 plugin.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+I'm developing this system in a working vue3 project.
 
-## Customize configuration
+Later, I will move this branch to some other name, and extract just the logic for the plugin.
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
-npm run dev
-```
-
-### Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+Once the plugin works and is on NPM, this readme will be updated and relevant.
