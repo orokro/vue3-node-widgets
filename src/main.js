@@ -1,6 +1,16 @@
-import './assets/main.css'
+/*
+	main.js
+	-------
 
-import { createApp } from 'vue'
-import App from './App.vue'
+	The main JavaScript entry point to mount our app.
+*/
 
-createApp(App).mount('#app')
+// include our basic / default styles
+import './assets/style.css';
+
+// vue
+import { createApp } from 'vue';
+import App from './App.vue';
+
+// mount our app
+createApp(App).mount('#app');
