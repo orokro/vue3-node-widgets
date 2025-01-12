@@ -14,7 +14,7 @@
 import { ref, shallowRef, reactive } from 'vue';
 
 // our app
-import NodeWidget from './NodeWidget';
+import NodeWidget from './NWNode';
 import DevErrors from './DevErrors';
 
 // external libs/misc

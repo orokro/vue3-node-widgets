@@ -1,0 +1,12 @@
+
+Ideas.txt
+---------
+
+Random ideas I think of for the project
+
+
+Add on/off toggle, and slider as special inline nodes.
+
+Add a round-robin style switcher node.
+
+Random nodes have an option for every-evaluation, or once per entire network evaluation.

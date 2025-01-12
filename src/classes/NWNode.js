@@ -1,9 +1,11 @@
 /*
-	NodeWidget.js
-	-------------
+	NWNode.js
+	---------
 
 	This file provides the base class for all the different kinds of nodes that can be added to the NodeWidget editor.
 
+	NOTE: we use NW prefix for the node widget system.
+	So, this is "NWNode" or "Node Widget Node", lol.
 	Each node class must extend this class and implement the necessary methods to define it's behavior.
 
 	Developers can create their own node classes by extending this class and implementing the necessary methods.
@@ -15,10 +17,10 @@
 import { ref } from 'vue';
 
 // main export class
-export default class NodeWidget {
+export default class NWNode {
 
 	// static properties for the class
-	static nodeName = 'NodeWidget';
+	static nodeName = 'unnamed node';
 	static icon = null;
 
 	/**

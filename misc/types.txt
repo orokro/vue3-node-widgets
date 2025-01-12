@@ -1,0 +1,62 @@
+Types.txt
+---------
+
+While I will build a system to make custom types for whomever is implementing the nodes,
+we will have a number of built-in types, as follows:
+
+- Number - this is the same as a double/float, etc. In other words, it's any positive or negative number
+- Integer - like number, but limited to whole Ints
+- Vector2 - two component numbers named X, and Y respectively (i.e. a Vector2 as you would expect)
+- Vector3 - three component numbers named X, Y, and Z respectively (i.e. a Vector3 as you would expect)
+- Angles - same as a Vector3, but as Euler angles labeled Pitch/Yaw/Roll with slightly different UI graphics
+- Color3 - same as a Vector3, but R, G, and B instead of X, Y, and Z.
+- Color4 - same as a Color3, but with an extra value (channel) for Alpha (i.e. RGBA)
+- Boolean - T/F or 1/0 like you would expect in any normal language
+
+
+Coalescence:
+------------
+
+Some types can automatically be converted between types
+
+Vector3 <-> Angles <-> Color3 will all be interchangeable, and X/Y/Z, R/G/B, and P/Y/R will map 1:1
+Number -> will round to Integer
+Integer -> will convert to Number with no changes
+Color4 -> Color3/Vector3/Angles, dropping the Alpha Channel
+Boolean -> Number/Integer T/F maps to 1/0
+Number/Integer -> Boolean, any non 0 value will be True
+Vector2/Vector3/Angels/Color3/Color4 -> Boolean, any non 0 component will render the entire thing true
+
+
+Type Details:
+-------------
+
+Types will have a name (as listed above)
+
+They will also have a socket styles to render on the nodes.
+By default all sockets will be circles, but since we can, we will provide some provisions for changing them
+
+- color - the color background fill of the socket
+- gradient - this will replace color if provided gradients will basically be css, stops, rotation, 
+- corners - basically border-radius for the socket, so you could make circles, or squares, or some other
+            combination of rounded corner radii
+- rotation - spins the socket by default. E.g. if your corners are all 0 you have a square, or a diamond rotated 45°
+- custom shape - a list of Bezier points and handles to define a custom shape
+
+So, the user can recognize types via their socket shape / color / gradient fill, etc.
+
+In addition to socket details, types will also provide details for drawing the wires
+So for example, if a Vector3 is a purple circle, then the wire connecting to/from vector3 sockets will be drawn as purple
+
+The wires will be rendered as SVG bezier curves, so we will use that for styling, including:
+- color - the color of the wire
+- width - the thickness of the wire
+- pattern - solid, dashed, dots, etc
+- spacing - pattern spacing
+- border - optional, off by default
+- border color - color of the border if it's enabled
+- border width - the border will just be a line drawn under the main line color
+                 so, if the main line is 2px wide, and the border width is 1px
+				 then a 3px line will be drawn under the main 2px line.
+				 i.e. border lines are just the width + border drawn below the main line
+
