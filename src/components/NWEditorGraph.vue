@@ -25,6 +25,12 @@
 			<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
 			<div class="ui-container fill-parent">
 
+				<!-- if the user wants to see dev errors, they can enable this component -->
+				<DevErrors
+					v-if="ctxRef!=null && showDevErrors"
+					:nwSystem="ctx"
+				/>
+
 			</div>
 
 		</div>
@@ -35,6 +41,9 @@
 
 // vue
 import { ref, onMounted } from 'vue';
+
+// components
+import DevErrors from './DevErrors.vue';
 
 // our app
 import NWEditor from '../classes/NWEditor.js';
@@ -48,10 +57,17 @@ const props = defineProps({
 		default: null
 	},
 
+	// show the dev errors component
+	showDevErrors: {
+		type: Boolean,
+		default: false
+	}
+
 });
 
 // our context will either be passed in via the props, or one we made locally
 let ctx = null;
+const ctxRef = ref(null);
 
 // on mounted, initialize the component and optionally, state
 onMounted(()=>{
@@ -63,6 +79,7 @@ onMounted(()=>{
 	}else{
 		ctx = new NWEditor();
 	}
+	ctxRef.value = ctx;
 
 });
 
@@ -114,7 +131,12 @@ defineExpose({
 
 		// the UI layer itself shouldn't have any pointer interactions, though it's children may.
 		.ui-container {
+
 			pointer-events: none;
+
+			& > * {
+				pointer-events: initial;
+			}
 		}// .ui-container
 
 		// the editor container where we spawn nodes, allow editing etc

@@ -12,6 +12,7 @@
 			<NWEditorGraph
 				ref="myGraph"
 				class="my-graph"
+				:showDevErrors="true"
 			/>
 		</div>
 

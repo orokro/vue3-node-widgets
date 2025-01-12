@@ -83,7 +83,7 @@ export default class NWEditor {
 	addAvailableNodes(nodesList){
 
 		// coalesce to an array
-		if(!t.isArray(nodesList))
+		if(!Array.isArray(nodesList))
 			nodesList = [nodesList];
 
 		// loop through the list & call our private method
