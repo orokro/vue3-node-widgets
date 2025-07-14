@@ -1,0 +1,198 @@
+/* 
+
+	This file primarily specifies styles for the paint shop window / tab.
+
+*/
+
+/* main container in the paint shop area */
+.divPaintShopContainer {
+
+	/* general style */
+	border: 1px outset #555;
+	background: #191B25;
+	min-height: 600px;
+}
+
+.divPaintShopContainer table {
+	min-height: 600px;
+}
+
+
+
+/* the main work area for the pain shop, where the canvas is located */
+.paintShopWorkArea {
+
+	/* so it's children / the canvas can be positioned absolutely */
+	position: relative;
+
+	/* dont show overlap */
+	overflow: hidden;
+
+	/* nice dark background */
+	background: #183A41;
+
+	/* give this container a sexy inset shadow so it give's an illusion of depth to the workspace */
+	-webkit-box-shadow: inset 2px 2px 19px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 2px 2px 19px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 2px 2px 19px 0px rgba(0,0,0,0.75);
+
+}
+	
+/* wrapper container for the canvase so we can absolutely position it */
+.paintShopWorkArea .canvasContainer {
+
+	/* default position for the canvase is 30, 30 px */
+	position: absolute;
+	top: 30px;
+	left: 30px;
+}
+
+/* settings for the canvas itself */
+.paintShopWorkArea canvas {
+
+	/* so children can be placed absolutely */
+	position: relative;
+
+	/* give the canvas a border */
+	border: 1px solid #000;
+
+	/* white background until the code provides this */
+	background: #ccc;
+
+	/* make sure the canvas has a sexy drop shadow */
+	-webkit-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+	box-shadow: 2px 2px 2px 0px rgba(0,0,0,0.75);
+}
+
+
+
+/* TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX */
+/* TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX +++ TOOL BOX */
+
+/* the tool box on the left side */
+.paintShopTools{
+
+	/* font settings */
+	color: #999;
+	font-size: 12px;
+
+	padding: 6px;
+
+	border-right: 1px solid #333;
+
+	/* super dark background for tool box */
+	background: #12171F;
+}
+
+/* the list box with node logic rules listed */
+.toolNodeLogicBox{
+
+	border: 1px solid #999;
+	background: #2F3642;
+
+	padding: 2px;
+
+	min-height: 100px;
+
+	overflow-y: scroll;
+}
+
+.toolNodeLogicRow {
+	border-bottom: 1px solid #12171F;
+
+	padding: 3px 4px;
+
+	color: #EFEFEF;
+}
+
+.toolNodeLogicSelected {
+
+	color: #111;
+
+	/* delicious gradient */
+	background: #7bb2a7; /* Old browsers */
+	background: -moz-linear-gradient(top,  #7bb2a7 1%, #7bb2a7 39%, #7bb2a7 41%, #4c7c7a 99%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#7bb2a7), color-stop(39%,#7bb2a7), color-stop(41%,#7bb2a7), color-stop(99%,#4c7c7a)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* IE10+ */
+	background: linear-gradient(to bottom,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7bb2a7', endColorstr='#4c7c7a',GradientType=0 ); /* IE6-9 */
+}
+
+.settingsPayne {
+
+	padding-left: 20px;
+
+	font-size: 10px;
+}
+
+/* TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS */
+/* TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS +++ TOOL ICONS */
+
+/* tool icons */
+.divPSTool {
+
+	cursor: pointer;
+
+	display: inline-block;
+
+	width: 59px;
+	height: 59px;
+
+	border: 1px solid #303030;
+
+	/* margin: 0px -1px -1px 0px; */
+}
+
+.divPSTool:hover {
+	background-position: 0 -59 !important;
+}
+
+.selectedToolIcon {
+
+	/* always on top, with orange border */
+	z-index: 10000;
+	border: 1px solid #F78F37;
+
+	/* use the lighter half of the css sprite backgrounbd */
+	background-position: 0 -59 !important;
+}
+
+
+
+/* RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES */
+/* RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES +++ RESIZE HANDLES */
+
+/* the wrapper that will contain the resize handles */
+.canvasResizeWrapper {
+	position: relative;
+}
+
+/* every resize handle will have these settings in common */
+.resizeHandle {
+
+	/* positioned absolutely */
+	position: absolute;
+
+	/* always the same width and height */
+	width: 6px;
+	height: 6px;
+
+	/* not TOO bright */
+	background: #CCC;
+
+	/* nice black border */
+	border: 1px solid #000;
+}
+
+/* specific corners need specific settings */
+.resizeHandleNW {		top: -8px;	left: 	-8px;	cursor: nw-resize; 	}
+.resizeHandleN  {		top: -8px;	left:  	 50%;	cursor: n-resize; 	}
+.resizeHandleNE {		top: -8px;	right: 	-8px;	cursor: ne-resize; 	}
+.resizeHandleE 	{		top:  50%;	right: 	-8px;	cursor: e-resize; 	}
+.resizeHandleSE {	 bottom: -8px;	right:  -8px;	cursor: se-resize; 	}
+.resizeHandleS  {	 bottom: -8px;	left:    50%;	cursor: s-resize; 	}
+.resizeHandleSW {	 bottom: -8px;	left: 	-8px;	cursor: sw-resize; 	}
+.resizeHandleW  {		top:  50%;	left: 	-8px;	cursor: w-resize; 	}

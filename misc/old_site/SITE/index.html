@@ -1,0 +1,165 @@
+<!-- I'm too good for DOCTYPES. Either that or I forgot to go back and add one. Oh well. -->
+<html>
+<head>
+
+	<!-- required scripts -->
+		<!-- external -->
+			<script type="text/javascript" src="js/external/jquery.js"></script>
+			<script type="text/javascript" src="js/external/jscolor/jscolor.js"></script>
+			<script type="text/javascript" src="js/external/webgl-utils.js"></script>
+			<script type="text/javascript" src="js/external/prototypeCloneMethod.js"></script>
+
+		<!-- app -->
+			<!-- utilities -->
+			<script type="text/javascript" src="js/app/colorMath.js"></script>
+
+			<!-- node creation menu: note this must come before the "specific nodes" section so nodes can register themselves upon load -->
+			<script type="text/javascript" src="js/app/node_system_objects/objNodeCreationMenu.js"></script>
+
+			<!-- main node class -->
+			<script type="text/javascript" src="js/app/clsNode.js"></script>
+
+			<!-- node controls -->
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_ColorPicker.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_FloatSlider.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_IntSlider.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_FloatValue.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_IntValue.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_DropBox.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_CheckBox.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_TextBox.js"></script>
+			<script type="text/javascript" src="js/app/node_controls/clsNodeCRTL_HTML.js"></script>
+
+			<!-- specific nodes -->
+			<script type="text/javascript" src="js/app/nodes/clsNode_ColorPicker.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_ColorMixer.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_MathTrig.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_MathLogic.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_MathRound.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_MathABOps.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Math_RandomInt.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Math_Expression.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Math_ValueMixer.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Output_PaintBucket.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Input_Polar.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Input_Cartesian.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Input_CanvasInfo.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Input_PixelNumber.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Texture_Checker.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Texture_PixelDiamonds.js"></script>
+			<script type="text/javascript" src="js/app/nodes/clsNode_Texture_Image.js"></script>
+
+			<!-- system objects -->
+			<script type="text/javascript" src="js/app/system_objects/objDragHandler.js"></script>
+
+			<!-- node system -->
+			<script type="text/javascript" src="js/app/node_system_objects/objNodeManager.js"></script>
+			<script type="text/javascript" src="js/app/node_system_objects/objNodeGridHandler.js"></script>
+			<script type="text/javascript" src="js/app/node_system_objects/objNodeWireHandler.js"></script>
+			<script type="text/javascript" src="js/app/node_system_objects/clsNodeNetworkModel.js"></script>
+
+			<!-- paint tools -->
+			<script type="text/javascript" src="js/app/paint_tools/clsTool_PaintBucket.js"></script>
+			<script type="text/javascript" src="js/app/paint_tools/clsTool_Pencil.js"></script>
+			<script type="text/javascript" src="js/app/paint_tools/clsTool_Eraser.js"></script>
+
+			<!-- paint application system -->
+			<script type="text/javascript" src="js/app/paint_system_objects/clsPaintApplication.js"></script>
+			<script type="text/javascript" src="js/app/paint_system_objects/clsPaintCanvas.js"></script>
+			<script type="text/javascript" src="js/app/paint_system_objects/clsPaintToolBox.js"></script>
+
+			<!-- initialization script -->
+			<script type="text/javascript" src="js/app/start_up.js"></script>
+
+			<!-- other -->
+			<script type="text/javascript" src="js/app/tabs.js"></script>
+
+	<!-- delicious CSS -->
+
+		<!-- main web page CSS rules -->
+		<link rel="stylesheet" type="text/css" href="css/style.css"/>
+
+		<!-- CSS rules for the node editor and for nodes -->
+		<link rel="stylesheet" type="text/css" href="css/nodes.css"/>
+		
+		<!-- CSS rules for the paint shop screen -->
+		<link rel="stylesheet" type="text/css" href="css/paintShop.css"/>
+
+</head>
+<body> <!-- oncontextmenu="return false"> -->
+
+<!-- HEADER -->
+<div id="divHeader" class="cornersTheme">
+
+	<!-- social icons boxxy -->
+	<div class="socialIconsBox">
+		<a href="https://www.facebook.com/StuffGregBuilds" class="socialIcon" target="blank"><img src="img//soc_icons/32/facebook.png" width="32" height="32"></a><a href="https://twitter.com/StuffIBuild" class="socialIcon" target="blank"><img src="img//soc_icons/32/twitter.png" width="32" height="32"></a><a href="https://www.youtube.com/channel/UCkiNOlf_W1HWykAnPhtYC1Q" class="socialIcon" target="blank"><img src="img//soc_icons/32/youtube.png" width="32" height="32"></a><a href="http://www.flickr.com/photos/101073308@N06/" class="socialIcon" target="blank"><img src="img//soc_icons/32/flickr.png" width="32" height="32"></a><a href="http://www.linkedin.com/profile/view?id=203202014" class="socialIcon" target="blank"><img src="img//soc_icons/32/linkedin.png" width="32" height="32"></a><a href="http://instagram.com/hypurban" class="socialIcon" target="blank"><img src="img//soc_icons/32/instagram.png" width="32" height="32"></a><br>
+		
+		By <a href="http://www.gmiller.net" target="_blank">Greg Miller</a>
+	</div>
+
+<!-- /header -->
+</div>
+
+<!-- MAIN CONTENT AREA -->
+<div id="divContent">
+
+	<!-- box with content editors -->
+	<div id="divFormMain" class="cornersTheme">
+
+		<!-- tabs -->
+		<ul id="ulTabs">
+			<li class="tab1 selectedTab">Node Editor</li>
+			<li class="tab2">Paint Shop</li>
+		</ul>
+
+		<!-- TAB AREA: Node Grid -->
+		<div id="divTabNodes" class="divTab tab1" style="display:block;">
+
+			<!--  div class="divTabHeader">&nbsp;</div -->
+
+			<div id="divNodeEditor">
+
+				<!-- the canvas that we'll use to draw the node-wires! -->
+				<canvas id="canvasNodeLines"></canvas>
+
+				<!-- toop tip text for connecting nodes -->
+				<div id="divToopTipText" class="toolTip_warning">Tool Tip Text</div>
+
+				<!-- node container that will translate when dragged -->
+				<!-- all node htmls will be children of this element -->
+				<div id="divNodeContainer"></div>
+
+			</div>
+		</div>
+
+		<!-- TAB AREA: Paint Shop -->
+		<div id="divTabPaintShop" class="divTab tab2">
+			<div class="divPaintWindow">
+
+				<!--  div class="divTabHeader">&nbsp;</div -->
+
+				<div class="divPaintShopContainer">
+
+					<!-- tables because CSS columns are whack. Deal with it 8) -->
+					<table width="100%">
+						<tr>
+							<td width="185" valign="top" class="paintShopTools">
+							</td>
+							<td width="auto" valign="top" class="paintShopWorkArea">
+							</td>
+						</tr>
+					</table>
+
+				</div>
+			</div>
+		</div>
+
+		
+
+	</div>
+
+</div>
+
+</body>
+</html>

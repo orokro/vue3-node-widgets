@@ -1,0 +1,228 @@
+/*
+	
+	This is the main CSS file for the Node Bucket webpage.
+
+	This file doesn't really specifcy details of the application components such as nodes and the paint window.
+
+
+*/
+
+/* BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL */
+/* BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL +++ BODY / GENERAL */
+body {
+	background: #000;
+	font-family: sans-serif, Tahoma;
+}
+
+/* make sure that images that are links don't have a border on old browsers like IE6 */
+img { border: none; }
+
+/* This hack makes sure there's always a scroll bar drawn, even when the page doesn't need to be scrolled.
+	This will make page transitions look nicer, between pages that have and dont have the need to be scrolled. */
+html {
+    overflow: -moz-scrollbars-vertical;
+    overflow: scroll;
+}
+
+/* general body styles */
+body {
+	position: relative;
+	 margin: 0px 0px 0px 0px; 
+	 padding: 0px 0px 0px 0px;
+
+	/* font settings */
+	font-family: Tahoma, sans-serif;
+	font-size: 14px;
+	color: #EFEFEF;
+
+	/* not too dark gray for a easy-on-the-eyes background */
+	background: #000;
+}
+
+/* no nasty surprise margins on our headers */
+h1, h2, h3, h4, h5 {
+	color: #13ADCE;
+	margin:2px;
+}
+
+/* links */
+a 			{ color: #D62E9D; text-decoration: none;}
+a:visited 	{ color: #D62E9D;}
+a:hover 	{ color: #13ADCE; text-decoration: underline;}
+a:active 	{ color: #13ADCE;}
+
+/* corners theme */
+.cornersTheme {
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px; 
+
+	overflow: hidden;
+
+
+	border: 1px outset #2C233C;
+}
+
+
+
+/* HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER */
+/* HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER +++ HEADER */
+#divHeader {
+
+	/* so we can have absolutely positioned children */
+	position: relative;
+
+	/* always this high */
+	height: 70px;
+
+	/* sexy background */
+	background: url('../img/site/header.png') top left no-repeat;
+
+	overflow: hidden;
+
+	margin-bottom: 3px;
+}
+
+#divHeader h1, a {
+	color: #EFEFEF;
+}
+
+/* boxxy of social icons .. always ont he right */
+.socialIconsBox {
+
+	/* always on the right */
+	position: absolute;
+	top: 12px;
+	right: 10px;
+
+	/* align on the right */
+	text-align: right;
+}
+
+.socialIcon {
+	margin-left: 4px;
+
+	/* slightly transparent until hover over */
+	-moz-opacity: 0.80;
+	-khtml-opacity: 0.80;
+	opacity: 0.80;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=80);
+}
+
+.socialIcon:hover {
+	/* slightly transparent until hover over */
+	-moz-opacity: 1.0;
+	-khtml-opacity: 1.0;
+	opacity: 1.0;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha"(Opacity=100);
+}
+
+
+
+
+/* CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA */
+/* CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA +++ CONTENT AREA */
+
+/* the main "form" that will house the node editor and the paint-screen, help, gallery and random other tabs as they are made necessary */
+#divFormMain {
+
+	color: #696786;
+	padding: 8px;
+	min-height: 600px;
+
+	/* style */
+	background: #221D24;
+
+	/* put some space on the sides */
+
+}
+
+
+/* make sure the tabs are from left-to-right */
+#ulTabs, #ulTabs li {
+	
+	/* get rid of the default ul styles and make them sort from left to right */
+	list-style: none;
+	display: inline-block;
+
+	/* no more margins or padding */
+	margin: 0px 0px 0px 0px !important;
+	padding: 0px;
+
+	overflow: hidden;
+
+}
+
+/* stylize the tabs themselves and not the list */
+#ulTabs li {
+	
+	position: relative;
+	top: 5px;
+
+	/* nice pointer icon */
+	cursor: pointer;
+
+	/* make sure they stack on the left */
+	float: left;
+
+	/* give them a decent margin and padding*/
+	margin-right: -1px !important;
+	padding: 5px 10px !important;
+
+	/* slightly ligher than divFormMain background */
+	background-color: #312B33;
+
+	/* only round the top-right */
+	border-radius: 0px 10px 0px 0px; 
+	-moz-border-radius: 0px 10px 0px 0px;  
+	-webkit-border-radius: 0px 10px 0px 0px;
+
+	/* no need for a border on the bottom */
+	border-style: solid;
+	border-color: #000;
+	border-width: 1px 1px 0px 1px;
+
+}
+
+#ulTabs li:hover {
+	background-color: #3B343E !important;
+}
+
+.divTab {
+	display: none;
+}
+
+.divTabHeader {
+
+	background: #191B25;
+
+	border-width: 1px 1px 0px 1px;
+	border-style: solid;
+	border-color: #555;
+}
+
+.selectedTab {
+
+	/* move it up */
+	position: relative;
+	top: 1px !important;
+
+	/* always on top */
+	z-index: 9011;
+
+	/* bright font */
+	color: #EFEFEF;
+
+	/* nice purple gradient background */
+	border-color: #555555 !important;
+
+	background: #5d4483; /* Old browsers */
+	background: -moz-linear-gradient(top,  #5d4483 0%, #503775 41%, #492f71 42%, #47314e 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#5d4483), color-stop(41%,#503775), color-stop(42%,#492f71), color-stop(100%,#47314e)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #5d4483 0%,#503775 41%,#492f71 42%,#47314e 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #5d4483 0%,#503775 41%,#492f71 42%,#47314e 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #5d4483 0%,#503775 41%,#492f71 42%,#47314e 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #5d4483 0%,#503775 41%,#492f71 42%,#47314e 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5d4483', endColorstr='#47314e',GradientType=0 ); /* IE6-9 */
+
+}

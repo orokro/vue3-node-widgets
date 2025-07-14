@@ -1,0 +1,834 @@
+/* 
+
+	This file primarily specifies styles for nodes and node-accessories.
+
+*/
+
+
+/* NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF */
+/* NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF +++ NODE STUFF */
+
+/* the main node editor grid */
+#divNodeEditor {
+
+	/* required so the node container can have an absolute position */
+	position: relative;
+
+	/* so we can create a scrollable div feild */
+	overflow: hidden;
+
+	/* general style */
+	border: 1px outset #555;
+	background: #191B25 url('../img/nodes/node_grid_bg_loop.gif') repeat 0 0; /*   */
+	/* min-height: 600px; */
+
+	/* give this container a sexy inset shadow so it give's an illusion of depth to the workspace */
+	-webkit-box-shadow: inset 2px 2px 19px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 2px 2px 19px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 2px 2px 19px 0px rgba(0,0,0,0.75);
+}
+
+/* the parent element that contains all the node elements! */
+#divNodeContainer {
+
+	/* for now it will always be absolutely positioned. */
+	position: absolute;
+	top: 0px;
+	left: 0px;
+
+	/* so it doesn't interfere with mouse move events, we don't really need to see it anyway */
+	width: 1px;
+	height: 1px;
+
+	/* since children nodes can be placed anywhere, I suppose they should always be visible */
+	overflow: visible;
+}
+
+/* general style for all nodes */
+.node {
+
+	/* all nodes will be absolutely placed */
+	position: absolute;
+
+	/* make sure theres ZERO padding so the width and height will always be pixel exact */
+	padding: 0px !important;
+
+	/* they should always be at least this big */
+	/* min-width: 119px; */
+
+	/* should have sexy corners */
+	border-radius: 8px 0px 8px 0px; 
+	-moz-border-radius: 8px 0px 8px 0px;  
+	-webkit-border-radius: 8px 0px 8px 0px;
+
+	/* make sure it has a sleek border */
+	border: 1px solid #000; /* #39465E; */
+
+	/* make sure nodes all have a sexy drop shadow */
+	-webkit-box-shadow: 2px 2px 19px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 2px 2px 19px 0px rgba(0,0,0,0.75);
+	box-shadow: 2px 2px 19px 0px rgba(0,0,0,0.75);
+}
+
+/* the resize handle for the node */
+.nodeResizeHandle {
+
+	/* always have a resize cursor on the resize handle */
+	cursor: nw-resize;
+
+	/* always in the bottom right */
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+
+	/* always this size */
+	width: 18px;
+	height: 18px;
+
+	/* simple resize lines */
+	background: url('../img/nodes/node_resize_handle.png') bottom right no-repeat;
+
+}
+
+/* node titles */
+.nodeTitle {
+
+	overflow: hidden;
+	height: 14px;
+	white-space:nowrap;
+	
+	/* so children elemetns can be positioned absolutely */
+	position: relative;
+
+	/* make sure the cursor looks like a drag-handle when the mouse is over the title of the node */
+	cursor: move;
+
+	/* extra padding on the left so the title sticks in a bit */
+	padding: 4px 7px;
+
+	/* font settings */
+	font-size: 12px;
+	color: #CCC;
+	text-shadow: 1px 1px 1px #000;
+
+	/* nice clean border on the bottom */
+	border-bottom: 1px solid #000;
+
+	/* nice clean border on the top */
+	/* border-top: 1px solid #505050;
+	border-right: 1px solid #505050; */
+
+	/* should have sexy corners */
+	border-radius: 8px 0px 0px 0px; 
+	-moz-border-radius: 8px 0px 0px 0px;  
+	-webkit-border-radius: 8px 0px 0px 0px;
+
+	/* nice gradient for node titles */
+	background: #2a2d2d; /* Old browsers */
+	background: -moz-linear-gradient(top,  #2a2d2d 0%, #36373a 50%, #0a0e0a 51%, #0a0809 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#2a2d2d), color-stop(50%,#36373a), color-stop(51%,#0a0e0a), color-stop(100%,#0a0809)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #2a2d2d 0%,#36373a 50%,#0a0e0a 51%,#0a0809 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #2a2d2d 0%,#36373a 50%,#0a0e0a 51%,#0a0809 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #2a2d2d 0%,#36373a 50%,#0a0e0a 51%,#0a0809 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #2a2d2d 0%,#36373a 50%,#0a0e0a 51%,#0a0809 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2a2d2d', endColorstr='#0a0809',GradientType=0 ); /* IE6-9 */
+}
+
+/* close button on nodes */
+.nodeCloseButton {
+
+	/* dont show re-size cursor for close button */
+	cursor: default;
+
+	/* always in the top-right corner */
+	position: absolute;
+	top: 3px;
+	right: 4px;
+
+	/* always 15x15 */
+	width: 15px;
+	height: 15px;
+
+	/* make it a circle */
+	border-radius: 8px; 
+	-moz-border-radius: 8px; 
+	-webkit-border-radius: 8px; 
+
+	/* nice gray background with x-picture */
+	background: #707070 url('../img/nodes/node_close_icon.png') top left no-repeat;
+
+	/* give it the illusion of depth */
+	-webkit-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.35);
+	-moz-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.35);
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.35);
+}
+
+/* make sure the close button is red when hovered over ... */
+.nodeCloseButton:hover {
+	background: #db4848 url('../img/nodes/node_close_icon.png') top left no-repeat !important;
+}
+
+/* the content area of nodes */
+.nodeBody {
+
+	/* to make sure certain children elements can be positioned absolutely */
+	position: relative;
+
+	/* font settings */
+	font-size: 10px;
+	color: #EFEFEF;
+	text-shadow: 1px 1px 1px #000;
+
+	/* nice clean border on the top */
+	border-top: 1px solid #525B72;
+
+	/* make sure the controls inside the node fit nicely */
+	/* padding: 3px 7px ; */
+	padding: 0px 0px 12px 0px !important;
+
+	/* make sure there's a good minimum size for the node */
+	/* min-height: 79px; */
+
+	/* should have sexy corners */
+	border-radius: 0px 0px 8px 0px; 
+	-moz-border-radius: 0px 0px 8px 0px;  
+	-webkit-border-radius: 0px 0px 8px 0px;
+
+	/* nice suble gradient for node backgrounds */
+	background: #474b5b; /* Old browsers */
+	background: -moz-linear-gradient(top,  #474b5b 0%, #202a3d 100%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#474b5b), color-stop(100%,#202a3d)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #474b5b 0%,#202a3d 100%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #474b5b 0%,#202a3d 100%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #474b5b 0%,#202a3d 100%); /* IE10+ */
+	background: linear-gradient(to bottom,  #474b5b 0%,#202a3d 100%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#474b5b', endColorstr='#202a3d',GradientType=0 ); /* IE6-9 */
+
+}
+
+/* a single row on a node. It can have optionaly have an input and/or output. */
+.nodeRow {
+
+	/* required so the node can have absolute positioned children */
+	position: relative;
+
+	/* padding so the contents look nice */
+	padding: 2px 10px;
+}
+
+/* the optional title above a nodeRow */
+.nodeRowCaption {
+	margin-left: 18px;
+	position: relative;
+	top: 2px;
+	color: #9198A2;
+}
+
+/* generic style that applies for both inputs and outouts */
+.nodeIOHandle {
+
+	/* node inputs / outputs will always be absoluteion positioned on one of the edges */
+	position: absolute;
+
+	/* always the same size circle */
+	width: 9px;
+	height: 9px;
+	top: 8px;
+
+	/* give it a nice border */
+	border: 1px solid #000; /* #EFEFEF; */
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px;
+
+	/* background image file for the node */
+	background: #000 url('../img/nodes/node_output_styles.png') no-repeat -11 -11;
+
+}
+
+/* different background styles depending on IO type */
+.nodeIOHandle_color { background-position: -11 -11  !important; }
+.nodeIOHandle_int { background-position: -11 -43  !important; }
+.nodeIOHandle_red   { background-position: -11 -75  !important; }
+.nodeIOHandle_green { background-position: -11 -107 !important; }
+.nodeIOHandle_blue  { background-position: -11 -139 !important; }
+.nodeIOHandle_float { background-position: -11 -171 !important; }
+
+
+/* the generic styles for a node INPUT handle */
+.nodeInput {
+	/* always overlapping on the LEFT edge */
+	left: -6px;
+}
+
+/* the generic styles for a node OUTPUT handle */
+.nodeOutput {
+	/* always overlapping on the RIGHT edge */
+	right: -6px;
+}
+
+
+#canvasNodeLines {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	/*width: 100%;
+	height: 800px;*/
+
+}
+
+/* floating update notification for nodes! */
+.nodeTitleUpdateToast {
+	
+	/* always absolutely positioned */
+	position: absolute;
+	top: 2px;
+	left: 6px;
+
+	/* font settings */
+	font-size: 12px;
+	color: #FF0000;
+
+}
+
+
+
+/* NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU */
+/* NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU +++ NODE MENU */
+
+/* the main / parent menu div */
+#divNodeCreationMenu{
+
+	/* hidden by default until shown with a keypress */
+	display: none;
+
+	/* always absolutely positioned, so we can move it under the cursor */
+	position: absolute;
+	top: 0px;
+	left: 0px;
+
+	/* should have a nice border */
+	border: 1px solid #333;
+}
+
+/* the search bar on top */
+#divNodeCreationMenu .searchBar {
+
+	/* should have a dark, transparent background */
+	background: url('../img/trans_bg.png') repeat;
+
+	/* should always have the same width */
+	width: 150px;
+
+	/* nice padding for the text box */
+	padding: 5px;
+
+}
+
+/* search input */
+#divNodeCreationMenu .searchBar input {
+
+	/* give it the illusion of depth */
+	-webkit-box-shadow: inset 2px 2px 2px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 2px 2px 2px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 2px 2px 2px 0px rgba(0,0,0,0.75);
+
+	/* allways fill out the menu */
+	width: 100%;
+
+	/* minimal padding */
+	padding: 3px 3px 3px 25px;
+
+	/* no margin at all! */
+	margin: 0px !important;
+
+	/* nice dark background with a search icon */
+	background: #555 url('../img/nodes/search_icon.png') top left no-repeat;
+
+	/* light text */
+	color: #EFEFEF;
+
+	/* nice border */
+	border: 1px solid #000;
+	
+	/* nice corners */
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px;
+}
+
+/* remove yucky webkit etc outline on text fields */
+#divNodeCreationMenu .searchBar input:focus { outline: 0; }
+
+/* for the header above the menu / search resutls */
+#divNodeCreationMenu .nodeCreationMenuHeader {
+	background: url('../img/trans_bg.png') repeat;
+	padding: 0px 0px 2px 6px;
+	font-size: 12px;
+}
+
+/* general menu item styles */
+.nodeCreationMenuItem {
+
+	/* always have a pointer, no need for text-carets */
+	cursor: pointer;
+
+	/* brighter text */
+	color: #EFEFEF;
+
+	/* nice borders */
+	border-top: 1px solid #424242;
+	border-bottom: 1px solid #000;
+
+	/* required so so submenus can be positioned correctly */
+	position: relative;
+
+	/* should always have the same width */
+	width: 100px;
+
+	padding: 5px 20px 5px 40px;
+
+}
+
+.nodeCreationMenuItem:hover, .nodeCreationMenuItemSelected{
+	background-color: #FFF !important;
+}
+
+/* use CSS to make the sub menus appear! no need for JS */
+.nodeCreationMenuItem:hover .subMenuContainer{
+
+	display: block;
+}
+
+/* this container is embeded into menu items, but positioned overlapping outside ont he right. It contains submenu items */
+.nodeCreationMenuItem .subMenuContainer {
+
+	/* not visible */
+	display: none;
+
+	/* always floating on the right */
+	position: absolute;
+	top: -1px;
+	right: -150px;
+
+	/* should always have the same width */
+	width: 150px;
+}
+
+/* special style for node items */
+.nodeCreationMenuItem.menuItem_NODE {
+	background: url('../img/nodes/nodeMenu_Node.png') top left;
+}
+
+/* special style for submenu items */
+.nodeCreationMenuItem.menuItem_MENU {
+	background: url('../img/nodes/nodeMenu_Menu.png') top left;
+}
+
+/* styles for search results */
+.nodeCreationMenuItem .searchItemPath {
+	
+	/* subltly colored small font */
+	color: #999;
+	font-size: 8px;
+
+	/* make sure it doesn't take up too much space */
+	line-height: 6px;
+	height: 4px;
+	
+	/* move it up a bit */
+	position: relative;
+	top: -2px;
+}
+
+.nodeCreationMenuItem .searchItemName {
+	color: #EFEFEF;
+	font-size: 14px;
+	height: 14px;
+}
+
+
+
+/* NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS */
+/* NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS +++ NODE CONTROLS */
+
+/* COLOR PICKER +++ COLOR PICKER +++ COLOR PICKER +++ */
+.NC_colorPicker {
+
+	/* always center the HEX codes */
+	text-align: center;
+
+	/* always fill out the width */
+	width: 100%;
+
+	/* give it a sexy border */
+	border: 1px solid #333;
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px;
+}
+
+.NC_colorPicker.locked {
+	/* give a locked value a bright border to imply it's being controlled by something else */
+	border: 1px solid #EFEFEF !important;
+
+	/* make sure the cursor tells a story */
+	cursor: not-allowed !important;
+
+	/* locked values should look flat */
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
+
+	/* make the background the sameish color as the node iteself, to help the illusion of it being flat */
+	/* background: #474b5b !important; */
+}
+
+
+
+
+
+/* FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER */
+/* FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER +++ FLOAT / INT SLIDER */
+
+.NC_floatSlider, .NC_intSlider {
+
+	background: #221D24;
+	color: #EFEFEF;
+	padding: 2px 0px;
+
+	/* give it the illusion of depth */
+	-webkit-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+
+	/* the cursor should look like a resize handle to imply it can be dragged */
+	cursor: e-resize;
+
+	/* always center the HEX codes */
+	text-align: center;
+
+	/* always fill out the width */
+	width: 100%;
+
+	/* give it a sexy border */
+	border: 1px solid #123;
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px;
+
+}
+
+.NC_floatSlider.locked, .NC_intSlider.locked {
+	/* give a locked value a bright border to imply it's being controlled by something else */
+	border: 1px solid #EFEFEF !important;
+
+	/* make sure the cursor tells a story */
+	cursor: not-allowed !important;
+
+	/* locked values should look flat */
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
+
+	/* make the background the sameish color as the node iteself, to help the illusion of it being flat */
+	/* background: #474b5b !important; */
+}
+
+
+
+.NC_floatSlider input[type="text"], .NC_intSlider input[type="text"]{
+
+	/* text should be centered, like the control itself */
+	text-align: center;
+
+	/* gotta have a right color */
+	color: #EFEFEF;
+
+	/* gotta be smaller */
+	font-size: 10px;
+
+	/* not too much padding */
+	padding: 2px 0px;
+
+	/* absolutey no margin on this */
+	margin: 0px !important;
+
+	/* hidden by default, since it's only for the controls 'edit mode' */
+	display: none;
+
+	/* should let the background of the control show through completely */
+	background: transparent;
+	border: 0px none;
+
+	/* should fill out the entire CRTL node */
+	width: 100%;
+}
+
+.nodeIOHandleTop_FLOAT_SLIDER, .nodeIOHandleTop_INT_SLIDER { top: 5px; }
+
+
+/* FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE */
+/* FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE +++ FLOAT/INT VALUE */
+
+.NC_floatValue, .NC_intValue {
+
+	background: #221D24;
+	color: #EFEFEF;
+	padding: 2px 0px;
+
+	/* give it the illusion of depth */
+	-webkit-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+
+	/* the cursor should look like a resize handle to imply it can be dragged */
+	cursor: e-resize;
+
+	/* always center the HEX codes */
+	text-align: center;
+
+	/* always fill out the width */
+	width: 100%;
+
+	/* give it a sexy border */
+	border: 1px solid #123;
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px;
+
+}
+
+.NC_floatValue:hover, .NC_intValue:hover { background: #312C33 !important;}
+
+.NC_floatValue.locked, .NC_intValue.locked {
+
+	/* give a locked value a bright border to imply it's being controlled by something else */
+	border: 1px solid #EFEFEF !important;
+
+	/* make sure the cursor tells a story */
+	cursor: not-allowed !important;
+
+	/* locked values should look flat */
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
+
+	/* make the background the sameish color as the node iteself, to help the illusion of it being flat */
+	background: #474b5b !important;
+}
+
+.NC_floatValue input[type="text"], .NC_intValue input[type="text"]{
+
+	/* text should be centered, like the control itself */
+	text-align: center;
+
+	/* gotta have a right color */
+	color: #EFEFEF;
+
+	/* gotta be smaller */
+	font-size: 10px;
+
+	/* not too much padding */
+	padding: 2px 0px;
+
+	/* absolutey no margin on this */
+	margin: 0px !important;
+
+	/* hidden by default, since it's only for the controls 'edit mode' */
+	display: none;
+
+	/* should let the background of the control show through completely */
+	background: transparent;
+	border: 0px none;
+
+	/* should fill out the entire CRTL node */
+	width: 100%;
+}
+
+.nodeIOHandleTop_FLOAT_VALUE, .nodeIOHandleTop_INT_VALUE { top: 5px; }
+
+
+
+/* DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX */
+/* DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX +++ DROPBOX */
+.NC_DropBox {
+
+	/*  background: #4C7C7A; */
+	color: #EFEFEF;
+	padding: 2px 10px;
+
+	/* give it the illusion of depth */
+	/* -webkit-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75); */
+
+	/* always center the HEX codes */
+	text-align: center;
+
+	/* smaller font! */
+	font-size: 10px;
+
+	/* absolutey no margin on this */
+	margin: 0px !important;
+
+	/* always fill out the width */
+	width: 100%;
+
+	/* give it a sexy border */
+	border: 1px solid #123;
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 10px; 
+	-moz-border-radius: 10px;  
+	-webkit-border-radius: 10px;
+
+	/* delicious gradient */
+	background: #7bb2a7; /* Old browsers */
+	background: -moz-linear-gradient(top,  #7bb2a7 1%, #7bb2a7 39%, #7bb2a7 41%, #4c7c7a 99%); /* FF3.6+ */
+	background: -webkit-gradient(linear, left top, left bottom, color-stop(1%,#7bb2a7), color-stop(39%,#7bb2a7), color-stop(41%,#7bb2a7), color-stop(99%,#4c7c7a)); /* Chrome,Safari4+ */
+	background: -webkit-linear-gradient(top,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* Chrome10+,Safari5.1+ */
+	background: -o-linear-gradient(top,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* Opera 11.10+ */
+	background: -ms-linear-gradient(top,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* IE10+ */
+	background: linear-gradient(to bottom,  #7bb2a7 1%,#7bb2a7 39%,#7bb2a7 41%,#4c7c7a 99%); /* W3C */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#7bb2a7', endColorstr='#4c7c7a',GradientType=0 ); /* IE6-9 */
+
+
+}
+
+.NC_DropBox:hover { background: #7BB2A7 !important; /* #5D898F !important;*/ }
+.NC_DropBox option { background: #000; }
+
+.NC_DropBox.locked {
+
+	/* give a locked value a bright border to imply it's being controlled by something else */
+	border: 1px solid #EFEFEF !important;
+
+	/* make sure the cursor tells a story */
+	cursor: not-allowed !important;
+
+	/* locked values should look flat */
+	-webkit-box-shadow: none !important;
+	-moz-box-shadow: none !important;
+	box-shadow: none !important;
+
+	/* make the background the sameish color as the node iteself, to help the illusion of it being flat */
+	background: #474b5b !important;
+}
+
+.nodeIOHandleTop_DROPBOX { top: 5px; }
+
+
+
+/* CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX */
+/* CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX +++ CHECKBOX */
+
+.NC_CheckBox span {
+	position: relative;
+	top: -3px;
+}
+
+
+
+/* TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX */
+/* TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX +++ TEXT BOX */
+.NC_TextBox input {
+	background: #97BBC9;
+	color: #333;
+	padding: 2px 6px;
+
+	/* give it the illusion of depth */
+	-webkit-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+
+	/* always fill out the width */
+	width: 100%;
+
+	/* give it a sexy border */
+	border: 1px solid #123;
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 4px; 
+	-moz-border-radius: 4px;  
+	-webkit-border-radius: 4px;
+}
+
+
+
+
+
+
+
+
+
+
+#divToopTipText {
+
+	/* hidden until displayed */
+	display: none;
+
+	/* absolute positioning because it needs to be positioned next to the mouse */
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	z-index: 9001;
+
+	/* font styles */
+	font-size: 10px;
+	color: #333;
+
+	/* nice amount of padding */
+	padding: 2px 4px;
+
+	/* make sure nodes all have a sexy drop shadow */
+	-webkit-box-shadow: 2px 2px 4px 0px rgba(0,0,0,0.85);
+	-moz-box-shadow: 2px 2px 4px 0px rgba(0,0,0,0.85);
+	box-shadow: 2px 2px 4px 0px rgba(0,0,0,0.85);
+}
+
+.toolTip_default {
+	border: 1px solid #FFF;
+	background: #EFEFEF;
+}
+
+.toolTip_warning {
+	border: 1px solid #F7CF7C;
+	background: #EAE3A9;
+}
+
+.toolTip_error {
+	border: 1px solid #C71313;
+	background: #EEC1C1;
+}
+
+
+.fileInput {
+		background: #97BBC9;
+	color: #333;
+	padding: 2px 6px;
+
+	/* give it the illusion of depth */
+	-webkit-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,0.75);
+
+	/* always fill out the width */
+	width: 100%;
+
+	/* give it a sexy border */
+	border: 1px solid #123;
+
+	/* This should make it a circle because the radiouses are bigger than it's width and height */
+	border-radius: 4px; 
+	-moz-border-radius: 4px;  
+	-webkit-border-radius: 4px;
+}
