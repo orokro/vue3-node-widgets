@@ -9,18 +9,14 @@
 		<div class="positioning-box">
 
 			<!-- our main node-editor system -->
-			<NWEditorGraph
-				ref="myGraph"
-				class="my-graph"
-				:showDevErrors="true"
-			/>
+			<NWEditorGraph ref="myGraph" class="my-graph" :showDevErrors="true" />
 		</div>
 
 		<!-- test junk -->
 		<div v-if="false" class="testJunk">
 			<h1>{{ myValueA }}</h1>
-			<button @click="myValueA=5">Set A 5</button>
-			<button @click="myValueB=10">Set B 10</button>
+			<button @click="myValueA = 5">Set A 5</button>
+			<button @click="myValueB = 10">Set B 10</button>
 		</div>
 
 	</main>
@@ -40,36 +36,36 @@ const myGraph = ref(null);
 const myValueA = ref(0);
 const myValueB = myValueA;
 
-onMounted(()=>{
+onMounted(() => {
 	// expose our graph to the window for debugging
 	window.mg = myGraph.value;
 });
 
 </script>
 <style lang="scss" scoped>
+// box to test positioning / layout of our component
+.positioning-box {
 
-	// box to test positioning / layout of our component
-	.positioning-box {
+	// fill the parent container
+	position: absolute;
+	top: 30px;
+	left: 60px;
+	width: 1000px;
+	height: 800px;
 
-		// fill the parent container
-		position: absolute;
-		top: 30px;
-		left: 60px;
-		width: 1000px;
-		height: 800px;
+}
 
-	}// .positioning-box
+// .positioning-box
 
-	.testJunk {
+.testJunk {
 
-		border: 2px solid black;
+	border: 2px solid black;
 
-		// fill the parent container
-		position: absolute;
-		top: 30px;
-		left: 1160px;
-		width: 400px;
-		height: 800px;
-	}
-
+	// fill the parent container
+	position: absolute;
+	top: 30px;
+	left: 1160px;
+	width: 400px;
+	height: 800px;
+}
 </style>
