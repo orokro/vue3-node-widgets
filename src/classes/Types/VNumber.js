@@ -6,12 +6,13 @@
 	This is the default numeric type used in the system.
 */
 import VType from '../VType.js';
-import { VInteger } from './VInteger.js';
-import { VBoolean } from './VBoolean.js';
-import { VText } from './VText.js';
 
 export class VNumber extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Number';
 

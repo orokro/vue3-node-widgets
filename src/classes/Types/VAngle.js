@@ -6,11 +6,13 @@
 	Functionally identical to VNumber, but rendered differently in the UI.
 */
 import VType from '../VType.js';
-import { VNumber } from './VNumber.js';
-import { VText } from './VText.js';
 
 export class VAngle extends VType {
 
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Angle';
 
@@ -34,7 +36,7 @@ export class VAngle extends VType {
 
 	/** @type {(a: any, b: any) => boolean} */
 	static compareFn = (a, b) => Math.abs(a - b) < 1e-9;
-	
+
 	/** Custom string representation */
 	toString() {
 		return `${this.constructor.typeName}(${this.value.toFixed(2)}°)`;

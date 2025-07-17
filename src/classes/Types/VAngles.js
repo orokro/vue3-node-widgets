@@ -6,12 +6,13 @@
 	Structurally identical to VVector3 but semantically different.
 */
 import VType from '../VType.js';
-import { VAngle } from './VAngle.js';
-import { VVector3 } from './VVector3.js';
-import { VText } from './VText.js';
 
 export class VAngles extends VType {
 
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Angles';
 

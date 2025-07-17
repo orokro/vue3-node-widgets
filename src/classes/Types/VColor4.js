@@ -5,11 +5,13 @@
 	Represents a color using red, green, blue, and alpha floating-point components.
 */
 import VType from '../VType.js';
-// Removed circular import: import { VColor3 } from './VColor3.js';
-import { VText } from './VText.js';
 
 export class VColor4 extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Color4';
 

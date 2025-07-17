@@ -5,10 +5,13 @@
 	Represents a string of one or more characters.
 */
 import VType from '../VType.js';
-import { VCharacter } from './VCharacter.js';
 
 export class VText extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Text';
 

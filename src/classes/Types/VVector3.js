@@ -5,13 +5,13 @@
 	Represents a 3D vector with x, y, and z components.
 */
 import VType from '../VType.js';
-import { VNumber } from './VNumber.js';
-import { VVector2 } from './VVector2.js';
-import { VText } from './VText.js';
-import { VColor3 } from './VColor3.js';
 
 export class VVector3 extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Vector3';
 

@@ -5,12 +5,13 @@
 	Represents a true/false logical value.
 */
 import VType from '../VType.js';
-import { VInteger } from './VInteger.js';
-import { VNumber } from './VNumber.js';
-import { VText } from './VText.js';
 
 export class VBoolean extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Boolean';
 

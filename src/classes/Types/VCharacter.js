@@ -5,12 +5,13 @@
 	Represents a single character.
 */
 import VType from '../VType.js';
-// Removed circular imports for safe late registration:
-// import { VText } from './VText.js';
-// import { VInteger } from './VInteger.js';
 
 export class VCharacter extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Character';
 

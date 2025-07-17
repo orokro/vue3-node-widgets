@@ -27,6 +27,7 @@ const registry = new VTypeRegistry(types);
 function logResult(fromType, toType, input, output) {
 	console.log(`\n[${fromType.typeName} -> ${toType.typeName}]`);
 	console.log(`Input:  ${input.toString()}`);
+	// console.log('result value is', output?.value);
 	console.log(`Output: ${output?.toString?.() ?? output}`);
 }
 

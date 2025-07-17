@@ -5,13 +5,13 @@
 	Represents a whole number without decimal places.
 */
 import VType from '../VType.js';
-import { VNumber } from './VNumber.js';
-import { VBoolean } from './VBoolean.js';
-// Removed circular import: import { VCharacter } from './VCharacter.js';
-import { VText } from './VText.js';
 
 export class VInteger extends VType {
-
+	
+	static {
+		this.init();
+	}
+	
 	/** @type {string} Human-readable name */
 	static typeName = 'Integer';
 
