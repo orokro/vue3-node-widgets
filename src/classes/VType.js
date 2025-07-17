@@ -93,4 +93,9 @@ export default class VType {
 		return this.value;
 	}
 
+	/** Custom string representation */
+	toString() {
+		return `${this.constructor.typeName}(${JSON.stringify(this.value)})`;
+	}
+
 }
