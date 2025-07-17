@@ -45,18 +45,6 @@ export class VAngles extends VType {
 		Math.abs(a.z - b.z) < 1e-6
 	);
 
-	/** Static block to register known coalescers */
-	static {
-		// Vector3 -> Angles
-		this.addFromCoalescer(VVector3, (val) => ({ x: val.x, y: val.y, z: val.z }));
-
-		// Angles -> Vector3
-		this.addToCoalescer(VVector3, (val) => ({ x: val.x, y: val.y, z: val.z }));
-
-		// Angles -> Text
-		this.addToCoalescer(VText, (val) => JSON.stringify(val));
-	}
-
 	/** Custom string representation */
 	toString() {
 		return `${this.constructor.typeName}({ pitch: ${this.value.x}, yaw: ${this.value.y}, roll: ${this.value.z} })`;

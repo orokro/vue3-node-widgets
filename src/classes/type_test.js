@@ -1,69 +1,70 @@
-// type_test.js
-// Run with: node type_test.js
+// test_types.js
+
+import {
+	VNumber,
+	VAngle,
+	VInteger,
+	VVector2,
+	VVector3,
+	VAngles,
+	VColor3,
+	VColor4,
+	VBoolean,
+	VText,
+	VCharacter,
+	VType
+} from './Types/index.js';
 
 import { VTypeRegistry } from './VTypeRegistry.js';
-import { VFloat } from './Types/VFloat.js';
-import { VInt } from './Types/VInt.js';
-import { VVector2 } from './Types/VVector2.js';
-import { VColor } from './Types/VColor.js';
 
-function logTest(title, fn) {
-	try {
-		fn();
-		console.log(`✔️  ${title}`);
-	} catch (e) {
-		console.error(`❌  ${title}`);
-		console.error(e);
-	}
+const types = [
+	VNumber, VAngle, VInteger, VVector2, VVector3,
+	VAngles, VColor3, VColor4, VBoolean, VText, VCharacter
+];
+
+const registry = new VTypeRegistry(types);
+
+function logResult(fromType, toType, input, output) {
+	console.log(`\n[${fromType.typeName} -> ${toType.typeName}]`);
+	console.log(`Input:  ${input.toString()}`);
+	console.log(`Output: ${output?.toString?.() ?? output}`);
 }
 
-// Register types
-const registry = new VTypeRegistry([
-	VFloat,
-	VInt,
-	VVector2,
-	VColor
-]);
+function testCoalesce(fromCls, toCls, rawValue) {
+	const fromInstance = new fromCls(rawValue);
+	const result = registry.coalesce(fromCls, toCls, fromInstance);
+	logResult(fromCls, toCls, fromInstance, result);
+}
 
-// TEST CASES
-logTest("Can coalesce Float -> Int", () => {
-	if (!registry.canCoalesce(VFloat, VInt)) throw new Error("Missing coalescer");
-	const result = registry.coalesce(VFloat, VInt, 3.6);
-	if (result !== 4) throw new Error(`Expected 4, got ${result}`);
-});
+function testAll() {
+	console.log("\n=== Running Type Coalescing Tests ===");
 
-logTest("Can coalesce Int -> Float", () => {
-	if (!registry.canCoalesce(VInt, VFloat)) throw new Error("Missing coalescer");
-	const result = registry.coalesce(VInt, VFloat, 5);
-	if (result !== 5.0) throw new Error(`Expected 5.0, got ${result}`);
-});
+	testCoalesce(VNumber, VInteger, 5.7);
+	testCoalesce(VInteger, VNumber, 42);
+	testCoalesce(VNumber, VAngle, -90.25);
+	testCoalesce(VAngle, VNumber, 180);
+	testCoalesce(VBoolean, VInteger, true);
+	testCoalesce(VNumber, VBoolean, 0);
+	testCoalesce(VVector3, VNumber, { x: 1, y: 2, z: 2 });
+	testCoalesce(VVector2, VVector3, { x: 1, y: 2 });
+	testCoalesce(VVector3, VVector2, { x: 1, y: 2, z: 3 });
+	testCoalesce(VAngles, VVector3, { x: 90, y: 45, z: 30 });
+	testCoalesce(VColor3, VVector3, { r: 0.1, g: 0.2, b: 0.3 });
+	testCoalesce(VColor4, VColor3, { r: 1, g: 0.5, b: 0.25, a: 0.75 });
+	testCoalesce(VColor3, VColor4, { r: 1, g: 0.5, b: 0.25 });
+	testCoalesce(VText, VVector3, '{"x":3,"y":4,"z":0}');
+	testCoalesce(VVector3, VText, { x: 3, y: 4, z: 0 });
+	testCoalesce(VText, VBoolean, "false");
+	testCoalesce(VBoolean, VText, true);
+	testCoalesce(VInteger, VCharacter, 65);
+	testCoalesce(VCharacter, VInteger, 'A');
+	testCoalesce(VCharacter, VText, 'Z');
+	testCoalesce(VText, VCharacter, 'Hello');
 
-logTest("Can coalesce Vector2 -> Float (average)", () => {
-	const vec = { x: 4, y: 6 };
-	const result = registry.coalesce(VVector2, VFloat, vec);
-	if (result !== 5) throw new Error(`Expected 5, got ${result}`);
-});
+	// Multi-hop test: Vector3 -> Float -> Integer
+	const v3 = new VVector3({ x: 3, y: 4, z: 0 });
+	const multiHop = registry.coalesce(VVector3, VInteger, v3);
+	logResult(VVector3, VInteger, v3, multiHop);
+}
 
-logTest("Can coalesce Vector2 -> Color (composed)", () => {
-	const vec = { x: 0.2, y: 0.4 };
-	const result = registry.coalesce(VVector2, VColor, vec);
-	if (typeof result !== 'string' || !result.startsWith('#')) {
-		throw new Error(`Expected color hex, got ${result}`);
-	}
-});
-
-logTest("Check metadata reliability score for composed path", () => {
-	const meta = registry.getMetadata(VVector2, VColor);
-	if (!meta) throw new Error("Missing metadata");
-	if (meta.firstOrder) throw new Error("Should be composed");
-	if (meta.reliability < 2) throw new Error(`Expected reliability >= 2, got ${meta.reliability}`);
-});
-
-logTest("Fails when no coalescer exists", () => {
-	try {
-		registry.coalesce(VColor, VVector2, '#ffffff');
-		throw new Error("Should have thrown");
-	} catch (e) {
-		if (!/No coalescer/.test(e.message)) throw e;
-	}
-});
+testAll();

@@ -35,28 +35,6 @@ export class VBoolean extends VType {
 	/** @type {(a: any, b: any) => boolean} */
 	static compareFn = (a, b) => a === b;
 
-	/** Static block to register known coalescers */
-	static {
-		// Integer -> Boolean (0 = false, else true)
-		this.addFromCoalescer(VInteger, (val) => val !== 0);
-
-		// Number -> Boolean (0 = false, else true)
-		this.addFromCoalescer(VNumber, (val) => val !== 0);
-
-		// Text -> Boolean (non-empty truthy except special falsey cases)
-		this.addFromCoalescer(VText, (val) => {
-			if (typeof val !== 'string') return true;
-			const lower = val.toLowerCase();
-			return !(val === '' || lower === 'false' || lower === '0' || lower === '0.0');
-		});
-
-		// Boolean -> Integer
-		this.addToCoalescer(VInteger, (val) => (val ? 1 : 0));
-
-		// Boolean -> Text
-		this.addToCoalescer(VText, (val) => JSON.stringify(val));
-	}
-
 	/** Custom string representation */
 	toString() {
 		return `${this.constructor.typeName}(${this.value})`;

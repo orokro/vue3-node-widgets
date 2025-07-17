@@ -1,6 +1,6 @@
 /*
-	VText.js
-	--------
+	VText
+	-----
 
 	Represents a string of one or more characters.
 */
@@ -33,20 +33,8 @@ export class VText extends VType {
 	/** @type {(a: any, b: any) => boolean} */
 	static compareFn = (a, b) => a === b;
 
-	/** Static block to register known coalescers */
-	static {
-		// Character -> Text (wrap single char as string)
-		this.addFromCoalescer(VCharacter, (val) => val);
-
-		// Text -> Character (first character only)
-		this.addToCoalescer(VCharacter, (val) => val.charAt(0));
-
-		// Anything -> Text (fallback, stringify .value only)
-		this.addFromCoalescer(VType, (val) => JSON.stringify(val));
-	}
-
 	/** Custom string representation */
 	toString() {
-		return `${this.constructor.typeName}("${this.value}")`;
+		return `${this.constructor.typeName}(\"${this.value}\")`;
 	}
 }

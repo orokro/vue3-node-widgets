@@ -1,12 +1,12 @@
 /*
-	VColor3.js
-	----------
-	
+	VColor3
+	-------
+
 	Represents a color using red, green, and blue floating-point components.
 */
 import VType from '../VType.js';
 import { VVector3 } from './VVector3.js';
-import { VColor4 } from './VColor4.js';
+// Removed circular import: import { VColor4 } from './VColor4.js';
 import { VText } from './VText.js';
 
 export class VColor3 extends VType {
@@ -44,35 +44,4 @@ export class VColor3 extends VType {
 		Math.abs(a.b - b.b) < 1e-6
 	);
 
-	/** Static block to register known coalescers */
-	static {
-		// Vector3 -> Color3
-		this.addFromCoalescer(VVector3, (val) => ({ r: val.x, g: val.y, b: val.z }));
-
-		// Color4 -> Color3 (drop alpha)
-		this.addFromCoalescer(VColor4, (val) => ({ r: val.r, g: val.g, b: val.b }));
-
-		// Text -> Color3 (JSON with r/g/b)
-		this.addFromCoalescer(VText, (val) => {
-			try {
-				const obj = JSON.parse(val);
-				if (typeof obj.r === 'number' && typeof obj.g === 'number' && typeof obj.b === 'number') return obj;
-			} catch {}
-			return undefined;
-		});
-
-		// Color3 -> Vector3
-		this.addToCoalescer(VVector3, (val) => ({ x: val.r, y: val.g, z: val.b }));
-
-		// Color3 -> Color4 (default a = 1.0)
-		this.addToCoalescer(VColor4, (val) => ({ r: val.r, g: val.g, b: val.b, a: 1.0 }));
-
-		// Color3 -> Text
-		this.addToCoalescer(VText, (val) => JSON.stringify(val));
-	}
-
-	/** Custom string representation */
-	toString() {
-		return `${this.constructor.typeName}({ r: ${this.value.r}, g: ${this.value.g}, b: ${this.value.b} })`;
-	}
 }

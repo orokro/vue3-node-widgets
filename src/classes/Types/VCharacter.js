@@ -1,12 +1,13 @@
 /*
-	VCharacter.js
-	-------------
-	
+	VCharacter
+	----------
+
 	Represents a single character.
 */
 import VType from '../VType.js';
-import { VText } from './VText.js';
-import { VInteger } from './VInteger.js';
+// Removed circular imports for safe late registration:
+// import { VText } from './VText.js';
+// import { VInteger } from './VInteger.js';
 
 export class VCharacter extends VType {
 
@@ -33,21 +34,6 @@ export class VCharacter extends VType {
 
 	/** @type {(a: any, b: any) => boolean} */
 	static compareFn = (a, b) => a === b;
-
-	/** Static block to register known coalescers */
-	static {
-		// Integer -> Character (from char code)
-		this.addFromCoalescer(VInteger, (val) => String.fromCharCode(val));
-
-		// Text -> Character (use first char)
-		this.addFromCoalescer(VText, (val) => val.charAt(0));
-
-		// Character -> Integer (to char code)
-		this.addToCoalescer(VInteger, (val) => val.charCodeAt(0));
-
-		// Character -> Text (wrapped in string)
-		this.addToCoalescer(VText, (val) => val);
-	}
 
 	/** Custom string representation */
 	toString() {

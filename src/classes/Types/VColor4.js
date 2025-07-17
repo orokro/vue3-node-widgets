@@ -1,11 +1,11 @@
 /*
-	VColor4.js
-	----------
-	
-	Represents a color using red, green, blue, and alpha components.
+	VColor4
+	-------
+
+	Represents a color using red, green, blue, and alpha floating-point components.
 */
 import VType from '../VType.js';
-import { VColor3 } from './VColor3.js';
+// Removed circular import: import { VColor3 } from './VColor3.js';
 import { VText } from './VText.js';
 
 export class VColor4 extends VType {
@@ -27,7 +27,8 @@ export class VColor4 extends VType {
 
 	/** @type {(value: any) => boolean} */
 	static validateFn = (v) => typeof v === 'object' && v !== null &&
-		typeof v.r === 'number' && typeof v.g === 'number' && typeof v.b === 'number' && typeof v.a === 'number';
+		typeof v.r === 'number' && typeof v.g === 'number' &&
+		typeof v.b === 'number' && typeof v.a === 'number';
 
 	/** @type {(value: any) => any} */
 	static lintFn = (v) => ({
@@ -45,34 +46,4 @@ export class VColor4 extends VType {
 		Math.abs(a.a - b.a) < 1e-6
 	);
 
-	/** Static block to register known coalescers */
-	static {
-		// Color3 -> Color4 (add alpha = 1.0)
-		this.addFromCoalescer(VColor3, (val) => ({ r: val.r, g: val.g, b: val.b, a: 1.0 }));
-
-		// Text -> Color4 (JSON with r/g/b/a)
-		this.addFromCoalescer(VText, (val) => {
-			try {
-				const obj = JSON.parse(val);
-				if (
-					typeof obj.r === 'number' &&
-					typeof obj.g === 'number' &&
-					typeof obj.b === 'number' &&
-					typeof obj.a === 'number'
-				) return obj;
-			} catch {}
-			return undefined;
-		});
-
-		// Color4 -> Color3 (drop alpha)
-		this.addToCoalescer(VColor3, (val) => ({ r: val.r, g: val.g, b: val.b }));
-
-		// Color4 -> Text
-		this.addToCoalescer(VText, (val) => JSON.stringify(val));
-	}
-
-	/** Custom string representation */
-	toString() {
-		return `${this.constructor.typeName}({ r: ${this.value.r}, g: ${this.value.g}, b: ${this.value.b}, a: ${this.value.a} })`;
-	}
 }
