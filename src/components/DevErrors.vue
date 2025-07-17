@@ -14,6 +14,7 @@
 
 	<!-- don't even show anything if no errors -->
 	<template v-if="nwSystem.devErrors.errorsCount.value > 0">
+		
 		<div class="devErrorsBox">
 			<div
 				class="errorsList"
