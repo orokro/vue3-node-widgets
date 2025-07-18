@@ -142,23 +142,35 @@ defineExpose({
  * 
  * @param {WheelEvent} e - the wheel event
  */
-function handleWheelZoom(e){
-
-	// prevent default scrolling
+function handleWheelZoom(e) {
 	e.preventDefault();
 
-	// if shift key is pressed, allow normal scrolling
-	if (e.shiftKey)
-		return;
+	if (e.shiftKey) return;
 
-	// zoom in or out based on the wheel delta
 	const delta = e.deltaY < 0 ? 1 : -1;
-	const newZoom = zoomScale.value + (delta * 0.1);
+	const oldZoom = zoomScale.value;
+	const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, oldZoom + delta * 0.1));
 
-	// clamp the zoom to our min/max values
-	if (newZoom >= MIN_ZOOM && newZoom <= MAX_ZOOM) {
-		zoomScale.value = newZoom;
-	}
+	// No change? Skip
+	if (newZoom === oldZoom) return;
+
+	// Get bounding box of container
+	const container = e.currentTarget.getBoundingClientRect();
+
+	// Mouse position relative to the container
+	const mouseX = e.clientX - container.left;
+	const mouseY = e.clientY - container.top;
+
+	// Compute position within the zoomed/panned content (in virtual space)
+	const offsetX = (mouseX - panX.value) / oldZoom;
+	const offsetY = (mouseY - panY.value) / oldZoom;
+
+	// Update zoom scale
+	zoomScale.value = newZoom;
+
+	// Adjust pan so the content under the cursor stays in place
+	panX.value = mouseX - offsetX * newZoom;
+	panY.value = mouseY - offsetY * newZoom;
 }
 
 
