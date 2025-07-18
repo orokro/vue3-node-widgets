@@ -25,6 +25,10 @@ export default class NWNode {
 	static nodeName = 'unnamed node';
 	static icon = null;
 
+	// position of the node in the graph
+	x = ref(0);
+	y = ref(0);
+
 	/**
 	 * Constructor
 	 */
