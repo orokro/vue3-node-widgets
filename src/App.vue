@@ -5,7 +5,7 @@
 	Main entry point to the application
 -->
 <template>
-	<main>
+	<main @contextmenu="disableContextMenu">
 		<div class="positioning-box">
 
 			<!-- our main node-editor system -->
@@ -40,6 +40,18 @@ onMounted(() => {
 	// expose our graph to the window for debugging
 	window.mg = myGraph.value;
 });
+
+
+
+function disableContextMenu(e) {
+
+	// allow normal behavoir if shift key is pressed
+	if (e.shiftKey)
+		return;
+
+	// disable the context menu
+	e.preventDefault();
+}	
 
 </script>
 <style lang="scss" scoped>

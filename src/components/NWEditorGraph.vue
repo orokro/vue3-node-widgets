@@ -18,24 +18,34 @@
 		<div class="positioning-reset">
 
 			<!-- this is the actual scrollable area where nodes, wires, etc appear and are editable. This clips/clamps overflow -->
-			<div class="editor-container fill-parent">
+			<div class="editor-container fill-parent" @mousedown="startPanDrag" @wheel="handleWheelZoom" :style="{
+					fontSize: `${zoomScale}px`,
+					backgroundSize: `${zoomScale * 10}px ${zoomScale * 10}px`,
+					backgroundPosition: `${panX}px ${panY}px`,
+				}">
+
+				<!-- this container will host all the moveable elements, it will move with the pan -->
+				<div class="pan-container" :style="{
+						left: `${panX}px`,
+						top: `${panY}px`,
+					}">
+
+					<div class="a-test-box"><span>foo</span></div>
+					<div class="a-test-box b"><span>bar</span></div>
+				</div>
+
+				<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
+				<div class="ui-container fill-parent">
+
+					<!-- if the user wants to see dev errors, they can enable this component -->
+					<DevErrors v-if="ctxRef != null && showDevErrors" :nwSystem="ctx" />
+
+				</div>
 
 			</div>
-
-			<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
-			<div class="ui-container fill-parent">
-
-				<!-- if the user wants to see dev errors, they can enable this component -->
-				<DevErrors
-					v-if="ctxRef!=null && showDevErrors"
-					:nwSystem="ctx"
-				/>
-
-			</div>
-
 		</div>
-	</div>
 
+	</div>
 </template>
 <script setup>
 
@@ -47,6 +57,9 @@ import DevErrors from './DevErrors.vue';
 
 // our app
 import NWEditor from '../classes/NWEditor.js';
+
+// lib/misc
+import DragHelper from 'gdraghelper';
 
 // define some props
 const props = defineProps({
@@ -69,14 +82,24 @@ const props = defineProps({
 let ctx = null;
 const ctxRef = ref(null);
 
+// our pan & zoom variables
+const panX = ref(0);
+const panY = ref(0);
+const zoomScale = ref(1.0);
+const MAX_ZOOM = 5.0;
+const MIN_ZOOM = 0.1;
+
+// make a new DragHelper instance
+const dh = new DragHelper();
+
 // on mounted, initialize the component and optionally, state
-onMounted(()=>{
+onMounted(() => {
 
 	// if a context for our state was passed in, save it's reference, otherwise,
 	// we need to create our own state context
-	if(props.stateCtx){
+	if (props.stateCtx) {
 		ctx = props.stateCtx;
-	}else{
+	} else {
 		ctx = new NWEditor();
 	}
 	ctxRef.value = ctx;
@@ -94,7 +117,7 @@ onMounted(()=>{
  *
  * With just the context, they can manipulate / evaluate the graph as necessary.
  */
-function getContext(){
+function getContext() {
 	return ctx;
 }
 
@@ -103,6 +126,63 @@ function getContext(){
 defineExpose({
 	getContext
 });
+
+
+
+/**
+ * Handles zooming in and out of the editor container
+ * 
+ * @param {WheelEvent} e - the wheel event
+ */
+function handleWheelZoom(e){
+
+	// prevent default scrolling
+	e.preventDefault();
+
+	// if shift key is pressed, allow normal scrolling
+	if (e.shiftKey)
+		return;
+
+	// zoom in or out based on the wheel delta
+	const delta = e.deltaY < 0 ? 1 : -1;
+	const newZoom = zoomScale.value + (delta * 0.1);
+
+	// clamp the zoom to our min/max values
+	if (newZoom >= MIN_ZOOM && newZoom <= MAX_ZOOM) {
+		zoomScale.value = newZoom;
+	}
+}
+
+
+/**
+ * Handles dragging the pan container around
+ * 
+ * @param {MouseEvent} e - the mouse event
+ */
+function startPanDrag(e){
+	
+	// gtfo if not right-click
+	if (e.button !== 2)
+		return;
+	
+	// save our initial x/y
+	const startX = panX.value;
+	const startY = panY.value;
+
+	dh.dragStart(
+		(dx, dy)=>{
+
+			// update our pan x/y values
+			panX.value = startX - dx;
+			panY.value = startY - dy;
+
+		},
+		(dx, dy) => {
+
+		},
+
+	)
+}
 
 </script>
 <style lang="scss" scoped>
@@ -128,13 +208,14 @@ defineExpose({
 			inset: 0px 0px 0px 0px;
 
 		}// .fill-parent
+		
 
 		// the UI layer itself shouldn't have any pointer interactions, though it's children may.
 		.ui-container {
 
 			pointer-events: none;
 
-			& > * {
+			&>* {
 				pointer-events: initial;
 			}
 		}// .ui-container
@@ -146,7 +227,38 @@ defineExpose({
 			overflow: hidden;
 
 			// default styles
-			background: rgba(0,0,0,0.1);
+			background: rgb(133, 126, 151);
+			background-image: url(/img/grid_bg.png);
+			background-repeat: repeat;
+			
+			// this is the box that actually translates it's x/y to pan stuff
+			.pan-container {	
+
+				position: absolute;
+
+				// for debug
+				min-width: 640em;
+				min-height: 480em;
+				border: 1px solid red;
+
+				// test boxes
+				.a-test-box {
+					width: 100em;
+					height: 100em;
+					background: lightblue;
+
+					&.b {
+						position: relative;
+
+						left: 500em;
+					}
+
+					span {
+						font-size: 20em;;
+					}
+				}//.a-test-box
+
+			}// .pan-container
 
 		}// .editor-container
 

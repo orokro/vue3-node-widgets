@@ -84,10 +84,12 @@ watch(()=>props.nwSystem.devErrors.errorsCount.value, (newVal)=>{
 
 		// text styles
 		font-family: 'Courier New', Courier, monospace;
-
+		font-size: initial;
+		font-weight: bolder;
+		
 		// transparent red bg, with some space on on the bottom for absolute positioning
 		// the collapse bar
-		background-color: rgba(255,0,0,0.25);
+		background-color: rgba(255,0,0,0.35);
 		width: 300px;
 		padding-bottom: 25px;
 		box-shadow: 2px 2px 5px 1px rgba(0,0,0,0.15);
