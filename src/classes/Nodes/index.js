@@ -22,8 +22,8 @@ const defaultNodeList = [
 	{ class: MapRangeNode, menuPath: '/Math' },
 	{ class: RoundNode, menuPath: '/Math' },
 	{ class: TrigNode, menuPath: '/Math' },
-	{ class: RandomColorNode, menuPath: '/Random' },
-	{ class: RandomNumberNode, menuPath: '/Random' },
+	{ class: RandomColorNode, menuPath: '/Math/Random/' },
+	{ class: RandomNumberNode, menuPath: 'math/Random' },
 	{ class: ColorMixNode, menuPath: '/Color' },
 	{ class: ColorPickerNode, menuPath: '/Color' }
 ];
