@@ -5,6 +5,8 @@
 	This will be a node that provides some basic trigonometric operations, in the form of sin(A), cos(A), tan(A), etc.
 */
 
+import NWNode from '../NWNode.js';
+
 // main export
 export default class TrigNode extends NWNode {
 

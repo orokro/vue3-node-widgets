@@ -5,6 +5,8 @@
 	This will be a node that provides a random color within a specified range.
 */
 
+import NWNode from '../NWNode.js';
+
 // main export
 export default class RandomColorNode extends NWNode {
 

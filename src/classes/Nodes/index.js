@@ -1,9 +1,42 @@
+/*
+	index.js
+	--------
 
-export { default as MapRangeNode } from './MapRangeNode';
-export { default as RandomColorNode } from './RandomColorNode';
-export { default as RandomNumberNode } from './RandomNumberNode';
-export { default as RoundNode } from './RoundNode';
-export { default as TrigNode } from './TrigNode';
-export { default as ABMathNode } from './ABMathNode';
-export { default as ColorMixNode } from './ColorMixNode';
-export { default as ColorPickerNode } from './ColorPickerNode';
+	Import & provide some things for the NWEditor class.
+*/
+
+// import all our node types
+import ABMathNode from './ABMathNode';
+import MapRangeNode from './MapRangeNode';
+import RoundNode from './RoundNode';
+import TrigNode from './TrigNode';
+import RandomColorNode from './RandomColorNode';
+import RandomNumberNode from './RandomNumberNode';
+import ColorMixNode from './ColorMixNode';
+import ColorPickerNode from './ColorPickerNode';
+
+// make a reusalbe list of default nodes
+const defaultNodeList = [
+
+	{ class: ABMathNode, menuPath: '/Math' },
+	{ class: MapRangeNode, menuPath: '/Math' },
+	{ class: RoundNode, menuPath: '/Math' },
+	{ class: TrigNode, menuPath: '/Math' },
+	{ class: RandomColorNode, menuPath: '/Random' },
+	{ class: RandomNumberNode, menuPath: '/Random' },
+	{ class: ColorMixNode, menuPath: '/Color' },
+	{ class: ColorPickerNode, menuPath: '/Color' }
+];
+
+// export all the things
+export { 
+	defaultNodeList,
+	ABMathNode,
+	MapRangeNode,
+	RoundNode,
+	TrigNode,
+	RandomColorNode,
+	RandomNumberNode,
+	ColorMixNode,
+	ColorPickerNode
+};

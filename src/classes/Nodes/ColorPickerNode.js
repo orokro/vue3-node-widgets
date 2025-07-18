@@ -6,6 +6,8 @@
 	and provide color, RGBA, or hex values as output.
 */
 
+import NWNode from '../NWNode.js';
+
 // main export
 export default class ColorPickerNode extends NWNode {
 

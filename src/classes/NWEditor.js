@@ -32,7 +32,10 @@ import {
 	VText,
 	VCharacter,
 	VType
-} from './Types/index.js';
+} from '@Types/index.js';
+
+// import all default nodes
+import { defaultNodeList } from '@Nodes/index.js';
 
 // all defaults
 const types = [
@@ -101,6 +104,8 @@ export default class NWEditor {
 		// if we were passed in a list of nodes, add them to our available nodes list
 		if(t.isDefined(nodesList))
 			this.addAvailableNodes(nodesList);
+		else
+			this.addAvailableNodes(defaultNodeList);
 
 		// if we were passed in a graph to load, do so
 		if(t.isDefined(graphToLoad))
