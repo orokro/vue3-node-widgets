@@ -49,6 +49,11 @@ import t from 'typical';
 // main export class
 export default class NWEditor {
 
+	// menu vars
+	showMenu = ref(false);
+	menuX = ref(0);
+	menuY = ref(0);
+
 	/**
 	 * Constructor
 	 *
@@ -160,6 +165,23 @@ export default class NWEditor {
 	loadGraph(graph){
 
 		return true;
+	}
+
+
+	/**
+	 * Shows the menu to add a node at the specified position.
+	 * 
+	 * @param {Number} x - the x position to show the menu at
+	 * @param {Number} y - the y position to show the menu at
+	 */
+	showAddNodeMenu(x, y){
+
+		// set the menu position
+		this.menuX.value = x;
+		this.menuY.value = y;
+
+		// show the menu
+		this.showMenu.value = true;
 	}
 
 }

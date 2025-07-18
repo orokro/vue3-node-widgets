@@ -21,6 +21,7 @@
 			<div 
 				class="editor-container fill-parent" 
 				@mousedown="startPanDrag"
+				@mouseup="checkAddMenu"
 				@wheel="handleWheelZoom"
 				:style="{
 					fontSize: `${zoomScale}px`,
@@ -111,6 +112,9 @@ const ctxRef = ref(null);
 const panX = ref(0);
 const panY = ref(0);
 const zoomScale = ref(1.0);
+
+// true if the user right-moused-wn and moved the mouse
+const didPan = ref(false);
 const MAX_ZOOM = 5.0;
 const MIN_ZOOM = 0.1;
 
@@ -206,6 +210,9 @@ function startPanDrag(e){
 	const startX = panX.value;
 	const startY = panY.value;
 
+	// clear until we moved a bit
+	didPan.value = false;
+
 	dh.dragStart(
 		(dx, dy)=>{
 
@@ -213,12 +220,46 @@ function startPanDrag(e){
 			panX.value = startX - dx;
 			panY.value = startY - dy;
 
+			// use pythagorean theorem to see if we moved enough to consider it a pan
+			const panThreshold = 5;
+			if (!didPan.value && (dx * dx + dy * dy) > panThreshold * panThreshold) {
+				didPan.value = true;
+			}
 		},
 		(dx, dy) => {
 
 		},
 
 	)
+}
+
+
+/**
+ * If the user right-clicked, we want to show the add node menu
+ * 
+ * @param {MouseEvent} e - the mouse event
+ */
+function checkAddMenu(e) {
+
+	// if its not right click, gtfo
+	if (e.button !== 2)
+		return;
+	
+	// this function is bound to @mouseup, but there's a chance the user was right-click panning
+	// so if we see a pan happened, gtfo
+	if (didPan.value) {
+		didPan.value = false;
+		return;
+	}
+
+	// clear it either way
+	didPan.value = false;
+
+	// prevent default context menu
+	e.preventDefault();
+
+	// show the add node menu
+	ctx.showAddNodeMenu(e.clientX, e.clientY);
 }
 
 </script>
@@ -231,6 +272,8 @@ function startPanDrag(e){
 		// border: 2px solid black;
 		// border-radius: 4px;
 
+		font-family: sans-serif;
+		
 		// this will fill our parent container 100% width and height, with relative positioning
 		// this way, the main root element, NWEditorGraph, can be styled by the user and flow in their layout however they see fit
 		position: relative;
@@ -249,6 +292,9 @@ function startPanDrag(e){
 
 		// the UI layer itself shouldn't have any pointer interactions, though it's children may.
 		.ui-container {
+
+			// ui container doesn't respond to zooming, so this will have a normal font size
+			font-size: 20px;
 
 			pointer-events: none;
 
@@ -277,7 +323,7 @@ function startPanDrag(e){
 				// for debug
 				min-width: 640em;
 				min-height: 480em;
-				border: 1px solid red;
+				// border: 1px solid red;
 
 				// test boxes
 				.a-test-box {

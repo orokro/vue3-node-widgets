@@ -9,11 +9,26 @@
 	
 	<!-- outer most wrapper, fill parent div -->
 	<div 
-		v-show="menuOpen"
+		v-show="nwSystem.showMenu.value"
 		class="add-node-menu-layer"
+		@click="closeMenu"
 	>
 
-		
+		<div
+			class="menu-container"
+			@click.stop
+			:style="{
+				left: `${nwSystem.menuX.value}px`,
+				top: `${nwSystem.menuY.value}px`,
+			}"
+		>
+
+			<!-- this will spawn the list of menu items and sub-menu items -->
+			<AddMenuList 
+				:nwSystem="nwSystem"
+				:listItems="menuHeirarchy"
+			/>
+		</div>
 	</div>
 
 </template>
@@ -21,6 +36,9 @@
 
 // vue
 import { ref, shallowRef, watch } from 'vue';
+
+// components
+import AddMenuList from '@Components/AddMenuList.vue';
 
 // define some props
 const props = defineProps({
@@ -34,8 +52,6 @@ const props = defineProps({
 
 // store the heirarchy of the menu
 const menuHeirarchy = shallowRef([]);
-
-const menuOpen = ref(true);
 
 
 // loop over a flat array of items and build a nested object
@@ -95,6 +111,7 @@ function buildMenuHeirarchy(availableNodes) {
 	menuHeirarchy.value = buildMenuHierarchy(availableNodes);
 };
 
+
 // watch the available nodes on the NWSystem instance
 // while they probabaly wont change live at runtime, we still want to
 // build the menu heirarchy when the component is mounted
@@ -106,6 +123,13 @@ watch(() => props.nwSystem.availableNodes.value, (newVal) => {
 
 }, { immediate: true });
 
+
+/**
+ * Closes the menu
+ */
+function closeMenu() {
+	props.nwSystem.showMenu.value = false;
+}
 
 </script>
 <style lang="scss" scoped>
@@ -120,7 +144,20 @@ watch(() => props.nwSystem.availableNodes.value, (newVal) => {
 		inset: 0px 0px 0px 0px;
 
 		// for debug
-		background: rgba(0,0, 0, 0.5);
+		// background: rgba(0,0, 0, 0.5);
+
+		// the box where we'll spawn our menu list components.
+		// this is the box that is offset with the x/y coordinates
+		.menu-container {
+
+			position: absolute;
+
+			// for debug
+			min-width: 10px;
+			min-height: 10px;
+			// border: 1px solid red;
+
+		}// .menu-container
 
 	}// .add-node-menu-layer
 

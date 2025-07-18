@@ -12,5 +12,8 @@ import './assets/style.css';
 import { createApp } from 'vue';
 import App from './App.vue';
 
+// css
+import 'material-design-icons-iconfont/dist/material-design-icons.css';
+
 // mount our app
 createApp(App).mount('#app');
