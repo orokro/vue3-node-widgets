@@ -177,8 +177,8 @@ export default class NWEditor {
 	showAddNodeMenu(x, y){
 
 		// set the menu position
-		this.menuX.value = x;
-		this.menuY.value = y;
+		this.menuX.value = x-10;
+		this.menuY.value = y-10;
 
 		// show the menu
 		this.showMenu.value = true;

@@ -12,6 +12,8 @@
 		v-show="nwSystem.showMenu.value"
 		class="add-node-menu-layer"
 		@click="closeMenu"
+		@click.right="nwSystem.showMenu.value && closeMenu"
+		@mouseup.stop
 	>
 
 		<div
@@ -23,10 +25,25 @@
 			}"
 		>
 
+			<!-- search box -->
+			<div class="search-box">
+
+				<div class="icon-box">
+					<i class="material-icons">search</i>
+				</div>
+
+				<input 
+					ref="searchBoxEl"
+					type="text" 
+					placeholder="Search for a node..." 
+					v-model="searchQuery"
+				/>
+			</div>
+
 			<!-- this will spawn the list of menu items and sub-menu items -->
 			<AddMenuList 
 				:nwSystem="nwSystem"
-				:listItems="menuHeirarchy"
+				:listItems="rootMenuItems"
 			/>
 		</div>
 	</div>
@@ -35,7 +52,7 @@
 <script setup>
 
 // vue
-import { ref, shallowRef, watch } from 'vue';
+import { ref, shallowRef, watch, computed } from 'vue';
 
 // components
 import AddMenuList from '@Components/AddMenuList.vue';
@@ -53,6 +70,70 @@ const props = defineProps({
 // store the heirarchy of the menu
 const menuHeirarchy = shallowRef([]);
 
+// search query
+const searchQuery = ref('');
+
+// reference to our search box
+const searchBoxEl = ref(null);
+
+// compute either the results of a search query, or the full menu heirarchy
+const rootMenuItems = computed(() => {
+
+	// if the search query is empty, return the full menu heirarchy
+	if (searchQuery.value.trim() === '') {
+		return menuHeirarchy.value;
+	}
+
+	// otherwise, filter the menu heirarchy based on the search query
+	return filterMenuItems(props.nwSystem.availableNodes.value, searchQuery.value);
+});
+
+
+/**
+ * Filters the menu items based on the search query
+ * 
+ * @param {Array} items - The menu items to filter
+ * @param {string} query - The search query
+ * @returns {Array} - The filtered menu items
+ */
+function filterMenuItems(items, query) {
+	const sanitizedQuery = query.trim().toLowerCase();
+
+	/*
+		props.nwSystem.availableNodes.value
+		will be an array of objects with the following structure:
+		{
+			menuPath: 'Path/To/Node',
+			class: NodeClassReference
+		}
+
+		filter this array into a new array,
+		where we do a match based on it's class.nodeName
+	*/	
+	let filteredItems = items.filter(item => {
+		return item.class.nodeName.toLowerCase().includes(sanitizedQuery);
+	});
+	console.log('filteredItems', filteredItems);
+
+	// convert the flat array into a nested object
+	return buildMenuHierarchy(filteredItems);
+}
+
+// watch when the menu becomes visible & focus the search box
+watch(() => props.nwSystem.showMenu.value, (newVal) => {
+
+	
+	// if the menu is shown, focus the search box
+	if (newVal && searchBoxEl.value) {
+
+		console.log('focusing search box');
+		// delay focus to allow the menu to render
+		setTimeout(() => {
+			searchBoxEl.value.focus();
+			searchQuery.value = '';
+		}, 100);
+	}
+});
 
 // loop over a flat array of items and build a nested object
 function buildMenuHierarchy(flatArray) {
@@ -145,6 +226,48 @@ function closeMenu() {
 
 		// for debug
 		// background: rgba(0,0, 0, 0.5);
+		
+		// search box on top
+		.search-box {
+
+			position: relative;
+			background: rgba(0, 0, 0, 0.5);
+			padding: 8px;
+			border-radius: 8px;
+			height: 25px;
+
+			margin-bottom: 8px;
+
+			// search icon
+			.icon-box {
+
+				position: absolute;
+				inset: 0px auto 0px 0px;
+				width: 45px;
+				color: white;
+
+				i {
+					position: absolute;
+					top: 50%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+					font-size: 28px;
+				}// i
+
+			}// .icon-box
+
+			// the input box
+			input {
+				position: absolute;
+				inset: 6px 6px 6px 45px;
+
+				padding: 4px;
+				border-radius: 4px;
+				border: 1px solid #ccc;
+				background: rgba(255, 255, 255, 0.8);
+			}// input
+
+		}// .search-box
 
 		// the box where we'll spawn our menu list components.
 		// this is the box that is offset with the x/y coordinates
@@ -153,7 +276,7 @@ function closeMenu() {
 			position: absolute;
 
 			// for debug
-			min-width: 10px;
+			min-width: 300px;
 			min-height: 10px;
 			// border: 1px solid red;
 
