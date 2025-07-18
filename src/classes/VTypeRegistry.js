@@ -40,7 +40,7 @@ export class VTypeRegistry {
 		this._buildComposedCoalescers(maxPasses);
 
 		// for debug, print all the coalescers we have built
-		this.printInfo();
+		// this.printInfo();
 	}
 
 
@@ -223,10 +223,7 @@ export class VTypeRegistry {
 					continue;
 
 				// compose the two functions
-				const composedFn = (val) => {
-					const mid = this.coalesce(From, Mid, val);
-					return this.coalesce(Mid, To, mid);
-				};
+				const composedFn = (val) => (c2.apply(c1.apply(val)));
 
 				// create a new coalescer for From->To
 				const composedCoalescer = new VCoalescer(composedFn, {
