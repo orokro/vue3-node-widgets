@@ -18,17 +18,25 @@
 		<div class="positioning-reset">
 
 			<!-- this is the actual scrollable area where nodes, wires, etc appear and are editable. This clips/clamps overflow -->
-			<div class="editor-container fill-parent" @mousedown="startPanDrag" @wheel="handleWheelZoom" :style="{
+			<div 
+				class="editor-container fill-parent" 
+				@mousedown="startPanDrag"
+				@wheel="handleWheelZoom"
+				:style="{
 					fontSize: `${zoomScale}px`,
 					backgroundSize: `${zoomScale * 10}px ${zoomScale * 10}px`,
 					backgroundPosition: `${panX}px ${panY}px`,
-				}">
+				}"
+			>
 
 				<!-- this container will host all the moveable elements, it will move with the pan -->
-				<div class="pan-container" :style="{
+				<div 
+					class="pan-container" 
+					:style="{
 						left: `${panX}px`,
 						top: `${panY}px`,
-					}">
+					}"
+				>
 
 					<div class="a-test-box"><span>foo</span></div>
 					<div class="a-test-box b"><span>bar</span></div>
@@ -218,6 +226,7 @@ function startPanDrag(e){
 			&>* {
 				pointer-events: initial;
 			}
+			
 		}// .ui-container
 
 		// the editor container where we spawn nodes, allow editing etc
