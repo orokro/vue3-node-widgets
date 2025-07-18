@@ -63,11 +63,14 @@ function disableContextMenu(e) {
 .positioning-box {
 
 	// fill the parent container
-	position: absolute;
-	top: 30px;
-	left: 60px;
-	width: 1000px;
-	height: 800px;
+	// position: absolute;
+	// top: 30px;
+	// left: 60px;
+	// width: 1000px;
+	// height: 800px;
+
+	position: fixed;
+	inset: 0px;
 
 }
 

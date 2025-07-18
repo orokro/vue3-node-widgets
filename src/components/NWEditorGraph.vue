@@ -217,8 +217,8 @@ function startPanDrag(e){
 	.NWEditorGraph {
 
 		// some default styles
-		border: 2px solid black;
-		border-radius: 4px;
+		// border: 2px solid black;
+		// border-radius: 4px;
 
 		// this will fill our parent container 100% width and height, with relative positioning
 		// this way, the main root element, NWEditorGraph, can be styled by the user and flow in their layout however they see fit
