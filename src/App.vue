@@ -70,8 +70,7 @@ function disableContextMenu(e) {
 	// height: 800px;
 
 	position: fixed;
-	inset: 0px;
-
+	inset: 0px 0px 0px 0px;
 }
 
 // .positioning-box

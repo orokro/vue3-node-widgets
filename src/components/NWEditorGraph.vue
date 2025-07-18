@@ -46,7 +46,17 @@
 				<div class="ui-container fill-parent">
 
 					<!-- if the user wants to see dev errors, they can enable this component -->
-					<DevErrors v-if="ctxRef != null && showDevErrors" :nwSystem="ctx" />
+					<DevErrors 
+						v-if="ctxRef != null && showDevErrors" 
+						:nwSystem="ctx"
+					/>
+
+					<!-- this is both a menu that pops up, but also and entire layer
+					 that overlaps everything. Mostly invisible. -->
+					<AddNodeMenu
+						v-if="ctxRef != null"
+						:nwSystem="ctx"
+					/>
 
 				</div>
 
@@ -61,7 +71,8 @@
 import { ref, onMounted } from 'vue';
 
 // components
-import DevErrors from './DevErrors.vue';
+import DevErrors from '@Components/DevErrors.vue';
+import AddNodeMenu from '@Components/AddNodeMenu.vue';
 
 // our app
 import NWEditor from '../classes/NWEditor.js';
