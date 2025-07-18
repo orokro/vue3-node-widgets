@@ -51,10 +51,11 @@ export class VTypeRegistry {
 		// loop over our provided types & extract their built-in coalescers functions
 		this._buildFirstOrder();
 
-		this.printInfo();
-
 		// build composed coalescers recursively
-		// this._buildRecursiveChains(maxHops);
+		this._buildComposedCoalescers(maxHops);
+
+		// for debug, print all the coalescers we have built
+		// this.printInfo();
 	}
 
 
@@ -67,9 +68,17 @@ export class VTypeRegistry {
 		console.log('-------------------');
 
 		// print all the keys in our coalescers map & if their first order
-		for (const [key, coalescer] of this.coalescers.entries())
-			console.log(`[${coalescer.firstOrder ? 'First Order' : 'Composed'}] \t ${key}`);
+		for (const [key, coalescer] of this.coalescers.entries()){
 		
+			const isFirstOrder = coalescer.firstOrder;
+			const kindString = `[${isFirstOrder ? 'First Order' : 'Composed'}]`;
+
+			const getPathFromHops = (coalescer)=>{
+				return coalescer.hops.map(h => h.typeName).join(' -> ');
+			}
+			const path = isFirstOrder ? key : getPathFromHops(coalescer);
+			console.log(`${kindString} \t ${path}`);
+		}
 	}
 
 
@@ -139,50 +148,126 @@ export class VTypeRegistry {
 	}// [ToType, fn]
 
 
-	/**
-	 * Build composed coalescers recursively.
-	 * @param {number} maxHops
-	 */
-	_buildRecursiveChains(maxHops) {
-		let hops = 2;
-		let added;
 
-		return;
+	_buildComposedCoalescers(maxHops = 4) {
 
-		do {
-			added = false;
-			for (const From of this.types) {
-				for (const Mid of this.types) {
-					const c1 = this.getCoalescer(From, Mid);
-					if (!c1) continue;
+		// right, so, in our map we have keys like "VNumber->VInteger", 
+		// and so far, in _buildFirstOrder() we've stored the coalescers
+		// we got provided from the Types themselves.
 
-					for (const To of this.types) {
-						if (From === To || this.hasCoalescer(From, To)) continue;
+		// But now we can build out composed coalescers, using the existing
+		// ones we have as building blocks.
 
-						const c2 = this.getCoalescer(Mid, To);
-						if (!c2) continue;
+		// lets first build a hypothetical list of every Type->Type pair
 
-						const testMid = Mid.defaultValue;
-						const result = c2.apply(testMid);
-						if (result === undefined) continue;
+		let allPairs = [];
+		for (const From of this.types) {
 
-						const composedFn = (val) => {
-							const mid = c1.apply(val);
-							return c2.apply(mid);
-						};
+			for (const To of this.types) {
 
-						this._setCoalescer(From, To, new VCoalescer(composedFn, {
-							firstOrder: false,
-							origin: [],
-							hops: [...c1.hops, To]
-						}));
-						added = true;
-					}
+				if (From !== To) {
+
+					const key = this._getFromToKey(From, To);
+
+					// only add if we don't have it from first order already
+					if(!this.coalescers.has(key))
+						allPairs.push({key, from: From, to: To});
+				}
+
+			}// next To
+
+		}// next From
+
+		// function to get all the current types we can current go from to
+		const getFroms = (FromType)=>{
+
+			let froms = [];
+			for (const To of this.types){
+
+				const key = this._getFromToKey(FromType, To);
+				if (this.coalescers.has(key)) {
+					froms.push(To);
 				}
 			}
-			hops++;
-		} while (added && hops <= maxHops);
+			return froms;
+		}
+
+		// function to get all Tos for this type
+		const getTos = (ToType)=>{
+			let tos = [];
+			for (const From of this.types){
+
+				const key = this._getFromToKey(From, ToType);
+				if (this.coalescers.has(key)) {
+					tos.push(From);
+				}
+			}
+			return tos;
+		}
+		
+		// loop until done
+		let done = false;
+		while(!done){
+
+			// get the total number of pairs we have 
+			const potentialPairsCount = allPairs.length;
+
+			// clone array so we can mutate original
+			const allPairsClone = [...allPairs];
+
+			// loop over allPairs & see if we can compose any of them
+			for( const {key, from: From, to: To} of allPairsClone) {
+
+				// get all the froms and tos
+				const froms = getFroms(From);
+				const tos = getTos(To);
+
+				// make new array that is the intersection of both froms and tos
+				const common = froms.filter(f => tos.includes(f));
+
+				// no common types, skip
+				if (common.length === 0)
+					continue; 
+
+				// otherwise, we'll compose with the first one we found
+				const Mid = common[0]; // take the first common type
+
+				// get the coalescers for From->Mid and Mid->To
+				const c1 = this.getCoalescer(From, Mid);
+				const c2 = this.getCoalescer(Mid, To);
+
+				// if we don't have both, skip
+				if (!c1 || !c2)
+					continue;
+
+				// compose the two functions
+				const composedFn = (val) => {
+					const mid = this.coalesce(From, Mid, val);
+					return this.coalesce(Mid, To, mid);
+				};
+
+				// create a new coalescer for From->To
+				const composedCoalescer = new VCoalescer(composedFn, {
+					firstOrder: false,
+					origin: [From, Mid, To],
+					hops: [...c1.hops, ...c2.hops.filter(i=>c1.hops.indexOf(i) === -1)]
+				});
+
+				// store the composed coalescer
+				this._setCoalescer(From, To, composedCoalescer);
+
+				// remove this key from the allPairs list
+				allPairs = allPairs.filter(i => i.key !== key);
+
+			}// next {key, from, to}
+
+			// if the total number of pairs didn't change, we're done
+			if (allPairs.length === potentialPairsCount)
+				done = true;
+		}// wend
+
 	}
+
 
 	/**
 	 * Generate a key to user for our map
