@@ -9,21 +9,6 @@
 	but developers can also instantiate their own VTypeRegistry and provide it to the component.
 */
 
-import {
-	VNumber,
-	VAngle,
-	VInteger,
-	VVector2,
-	VVector3,
-	VAngles,
-	VColor3,
-	VColor4,
-	VBoolean,
-	VText,
-	VCharacter,
-	VType
-} from './Types/index.js';
-
 /**
  * Registry for all VType definitions and coalescing logic.
  * Builds and stores first-order and composed coalescers.
@@ -38,9 +23,9 @@ export class VTypeRegistry {
 	 * 
 	 * @param {Function[]} typeList - Array of VType classes to register.
 	 * @param {Object} [options]
-	 * @param {number} [options.maxHops=4] - Maximum depth to build composed coalescers.
+	 * @param {number} [options.maxPasses=4] - Maximum depth to build composed coalescers.
 	 */
-	constructor(typeList, { maxHops = 4 } = {}) {
+	constructor(typeList, { maxPasses = 10 } = {}) {
 
 		// store our list of Types to manage & coalesce between
 		this.types = typeList;
@@ -52,10 +37,10 @@ export class VTypeRegistry {
 		this._buildFirstOrder();
 
 		// build composed coalescers recursively
-		this._buildComposedCoalescers(maxHops);
+		this._buildComposedCoalescers(maxPasses);
 
 		// for debug, print all the coalescers we have built
-		// this.printInfo();
+		this.printInfo();
 	}
 
 
@@ -87,20 +72,12 @@ export class VTypeRegistry {
 	 */
 	_buildFirstOrder() {
 
-		let showLogs = true;
-		showLogs = false;
-
 		// loop over the list of Types we have passed in
 		for (const T of this.types) {
-
-			if(showLogs) console.log('\nBuilding coalescers for:', T.typeName);
 
 			// loop over the from-coalescers defined by this type
 			// i.e. how it defined how to convert from other types to itself
 			for (const [FromType, fn] of T.fromCoalescers || []) {
-
-				// log the from to description
-				if(showLogs) console.log(`\tFrom ${FromType.typeName} to ${T.typeName}: ${fn.toString()}`);
 
 				const ToType = T;
 				this._setCoalescer(
@@ -118,9 +95,6 @@ export class VTypeRegistry {
 			// loop over the to-coalescers defined by this type
 			// i.e. how it defined how to convert from itself to other types
 			for (const [ToType, fn] of T.toCoalescers || []) {
-
-				// log the from to description
-				if(showLogs) console.log(`\tTo ${ToType.typeName} from ${T.typeName}: ${fn.toString()}`);
 
 				// if the target type specifies how to convert from this type,
 				// we don't need to add a coalescer for it
@@ -148,8 +122,12 @@ export class VTypeRegistry {
 	}// [ToType, fn]
 
 
-
-	_buildComposedCoalescers(maxHops = 4) {
+	/**
+	 * Builds automatically composed coalescers based on existing first-order coalescers.
+	 * 
+	 * @param {Number} maxPasses - Maximum hops to build composed coalescers.
+	 */
+	_buildComposedCoalescers(maxPasses = 4) {
 
 		// right, so, in our map we have keys like "VNumber->VInteger", 
 		// and so far, in _buildFirstOrder() we've stored the coalescers
@@ -165,14 +143,13 @@ export class VTypeRegistry {
 
 			for (const To of this.types) {
 
-				if (From !== To) {
+				if (From == To)
+					continue;
 
-					const key = this._getFromToKey(From, To);
-
-					// only add if we don't have it from first order already
-					if(!this.coalescers.has(key))
-						allPairs.push({key, from: From, to: To});
-				}
+				// only add if we don't have it from first order already
+				const key = this._getFromToKey(From, To);
+				if(!this.coalescers.has(key))
+					allPairs.push({key, from: From, to: To});
 
 			}// next To
 
@@ -207,7 +184,12 @@ export class VTypeRegistry {
 		
 		// loop until done
 		let done = false;
+		let passes = 0;
 		while(!done){
+
+			// if we have passed the max passes, we're done
+			if (passes >= maxPasses)
+				break;
 
 			// get the total number of pairs we have 
 			const potentialPairsCount = allPairs.length;
@@ -264,6 +246,10 @@ export class VTypeRegistry {
 			// if the total number of pairs didn't change, we're done
 			if (allPairs.length === potentialPairsCount)
 				done = true;
+
+			// we completed a pass
+			passes++;
+
 		}// wend
 
 	}
