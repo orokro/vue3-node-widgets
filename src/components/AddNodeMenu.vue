@@ -93,7 +93,6 @@ function buildMenuHierarchy(flatArray) {
 function buildMenuHeirarchy(availableNodes) {
 
 	menuHeirarchy.value = buildMenuHierarchy(availableNodes);
-	console.log('aids', menuHeirarchy.value);
 };
 
 // watch the available nodes on the NWSystem instance
