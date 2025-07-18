@@ -11,6 +11,8 @@
 	Developers can create their own node classes by extending this class and implementing the necessary methods.
 
 	Instances of this class provide state for the Vue3 components, and can also (de)serialize themselves to/from JSON.
+
+	The system will provide a menu to add nodes to the scene. Therefore, 
 */
 
 // vue

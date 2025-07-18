@@ -16,6 +16,29 @@ import { ref, shallowRef, reactive } from 'vue';
 // our app
 import NodeWidget from './NWNode';
 import DevErrors from './DevErrors';
+import { VTypeRegistry } from './VTypeRegistry';
+
+// import default types
+import {
+	VNumber,
+	VAngle,
+	VInteger,
+	VVector2,
+	VVector3,
+	VAngles,
+	VColor3,
+	VColor4,
+	VBoolean,
+	VText,
+	VCharacter,
+	VType
+} from './Types/index.js';
+
+// all defaults
+const types = [
+	VNumber, VAngle, VInteger, VVector2, VVector3,
+	VAngles, VColor3, VColor4, VBoolean, VText, VCharacter
+];
 
 // external libs/misc
 import t from 'typical';
@@ -26,10 +49,12 @@ export default class NWEditor {
 	/**
 	 * Constructor
 	 *
-	 * @param {Array<Constructor|Object>} nodesList - OPTIONAL; an array of NodeWidget node classes to be used in the editor, or an array of objects like {class: NodeClass, menuPath: 'path/to/node/in/menu'}
-	 * @param {String} graphToLoad - OPTIONAL; a JSON string representing a graph to load into the editor
+	 *	@param {Object} options - Options for the editor.
+	 *	@param {Array<NodeWidget|Object>} [options.nodesList] - An array of NodeWidget classes or objects with class and menuPath.
+	 *	@param {VTypeRegistry} [options.typeRegistry] - An instance of VTypeRegistry to use for type management and coalescing.
+	 *	@param {Object} [options.graphToLoad] - An object representing a graph to load into the editor.
 	 */
-	constructor(nodesList, graphToLoad){
+	constructor({nodesList, typeRegistry, graphToLoad} = {}){
 
 		// true once we have at least one available node
 		this.isReady = ref(false);
@@ -64,6 +89,14 @@ export default class NWEditor {
 		// that represents the entire graph, and can be called with inputs to get outputs
 		// this function will be stored here
 		this.compiledComputeFN = ()=>{};
+
+		// use or build a default VTypeRegistry
+		if(t.isDefined(typeRegistry) && t.isInstanceOf(typeRegistry, VTypeRegistry)){
+			this.typeRegistry = typeRegistry;
+		}
+		else {
+			this.typeRegistry = new VTypeRegistry(types);
+		}
 
 		// if we were passed in a list of nodes, add them to our available nodes list
 		if(t.isDefined(nodesList))
