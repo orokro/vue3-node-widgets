@@ -24,7 +24,7 @@
 				@wheel="handleWheelZoom"
 				:style="{
 					fontSize: `${zoomScale}px`,
-					backgroundSize: `${zoomScale * 10}px ${zoomScale * 10}px`,
+					backgroundSize: `${zoomScale * backgroundScale}px ${zoomScale * backgroundScale}px`,
 					backgroundPosition: `${panX}px ${panY}px`,
 				}"
 			>
@@ -82,7 +82,13 @@ const props = defineProps({
 	showDevErrors: {
 		type: Boolean,
 		default: false
-	}
+	},
+
+	// allow the background to have some auto-scale applied by component
+	backgroundScale: {
+		type: Number,
+		default: 25
+	},
 
 });
 

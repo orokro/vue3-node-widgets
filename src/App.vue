@@ -37,12 +37,16 @@ const myValueA = ref(0);
 const myValueB = myValueA;
 
 onMounted(() => {
+	
 	// expose our graph to the window for debugging
 	window.mg = myGraph.value;
 });
 
 
-
+/**
+ * Disables the context menu from appearing
+ * @param {MouseEvent} e - The mouse event that triggered this function
+ */
 function disableContextMenu(e) {
 
 	// allow normal behavoir if shift key is pressed
