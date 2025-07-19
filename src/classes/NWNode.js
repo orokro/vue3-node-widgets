@@ -21,9 +21,15 @@ import { ref } from 'vue';
 // main export class
 export default class NWNode {
 
+	// id counter for nodes
+	static idCounter = 0;
+
 	// static properties for the class
 	static nodeName = 'unnamed node';
 	static icon = null;
+
+	// unique id for this node
+	id = `node_${++NWNode.idCounter}`;
 
 	// position of the node in the graph
 	x = ref(0);
@@ -37,12 +43,17 @@ export default class NWNode {
 	}
 
 
+	/**
+	 * Sets the position of the node	
+	 * @param {Number} x - horizontal position 
+	 * @param {Number} y - vertical position
+	 */
 	setPosition(x, y) {
 
 		// snap to units of 10
 		x = Math.round(x / 10) * 10;
 		y = Math.round(y / 10) * 10;
-		
+
 		// set the position of the node
 		this.x.value = x;
 		this.y.value = y;

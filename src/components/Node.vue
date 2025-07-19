@@ -31,8 +31,11 @@
 			</span>
 
 			<!-- close button -->
-			<div class="delete-button">
-				<i class="material-icons" @click="nwSystem.graph.removeNode(node)">close</i>
+			<div 
+				class="delete-button"
+				@click.stop.prevent="nwSystem.removeNode(node)"
+			>
+				<i class="material-icons">close</i>
 			</div>
 		</div>
 
@@ -48,7 +51,6 @@
 
 </template>
 <script setup>
-
 
 // vue imports
 import { ref } from 'vue';
@@ -89,11 +91,8 @@ function startDrag(e) {
 	// dh.setScaleMultiplier(zoomScale);
 
 	dh.dragStart(
-		(dx, dy) => {
 
-			// update our node's position
-			// props.node.x.value = initialX - dx / zoomScale;
-			// props.node.y.value = initialY - dy / zoomScale;
+		(dx, dy) => {
 
 			props.node.setPosition(
 				initialX - dx / zoomScale,
@@ -106,7 +105,6 @@ function startDrag(e) {
 	);
 
 }
-
 
 </script>
 <style lang="scss" scoped>

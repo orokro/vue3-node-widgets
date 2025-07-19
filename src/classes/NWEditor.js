@@ -196,6 +196,7 @@ export default class NWEditor {
 		this.showMenu.value = true;
 	}
 
+
 	// adds a node to our graph at the specified position
 	addNode(nodeClass, x = 0, y = 0){
 
@@ -234,4 +235,24 @@ export default class NWEditor {
 		this.graph.nodes.value = [...this.graph.nodes.value, newNode];
 	}
 
+
+	/**
+	 * Removes a node from the graph.
+	 * @param {*} nodeOrNodeID - The node or node ID to remove.
+	 * @returns {Boolean} - True if the node was removed, false otherwise.
+	 */
+	removeNode(nodeOrNodeID){
+
+		// find the node by id or reference
+		const node = t.isDefined(nodeOrNodeID) ? this.graph.nodes.value.find(n => n.id === nodeOrNodeID || n === nodeOrNodeID) : null;
+
+		// if we found the node, remove it
+		if(node){
+			this.graph.nodes.value = this.graph.nodes.value.filter(n => n !== node);
+			return true;
+		}
+
+		// if we didn't find the node, return false
+		return false;
+	}
 }
