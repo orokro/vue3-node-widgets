@@ -21,7 +21,9 @@
 						<i class="material-icons">{{ t.isDefined(item.item) ? 'polyline' : 'folder' }}</i>
 					</div>
 
-					{{ item.name }}
+					<span class="item-name">
+						{{ item.name }}
+					</span>
 
 					<!-- if it's a menu, we should show an arrow also -->
 					<div class="menu-arrow" v-if="t.isDefined(item.items)">
@@ -82,10 +84,13 @@ const props = defineProps({
 			// width: max-content;
 
 			&:first-child {
-				border-radius: 8px 8px 0px 0px;
+				border-radius: 8em 8em 0em 0em;
 			}
 			&:last-child {
-				border-radius: 0px 0px 8px 8px;
+				border-radius: 0em 0em 8em 8em;
+			}
+			&:only-child {
+				border-radius: 8em;
 			}
 
 			// so we can position children abso-lutely
@@ -97,30 +102,42 @@ const props = defineProps({
 				background: rgba(0, 0, 0, 0.65);
 			}
 
+			.item-name {
+				font-size: 20em;
+			}
+
 			backdrop-filter: blur(5px);
 
 			color: white;
 			font-weight: bolder;
 
-			padding: 5px 45px 5px 45px;
+			padding: 5em 45em 5em 45em;
 			cursor: pointer;
 
 			// icon box fixed on left, before text
 			.icon-box {
 				position: absolute;
-				left: 10px;
+				left: 10em;
 				top: 50%;
 				transform: translateY(-50%);
-				font-size: 20px;
+				
+				i {
+					font-size: 20em;
+				}
 			}// .icon-box
 
 			// menu arrow fixed on right, after text
 			.menu-arrow {
+
+				padding-top:4em;
 				position: absolute;
-				right: 10px;
+				right: 10em;
 				top: 50%;
 				transform: translateY(-50%);
-				font-size: 20px;
+				i {
+					font-size: 20em;
+				}
+
 			}// .menu-arrow
 
 			// fix submneu on the right
@@ -130,8 +147,8 @@ const props = defineProps({
 				display: none;
 
 				position: absolute;
-				right: 5px;
-				top: 0px;
+				right: 5em;
+				top: 0em;
 				// width: 200px; // fixed width for sub-menus
 				width: max-content;
 				transform: translateX(100%);

@@ -6,24 +6,15 @@
 
 -->
 <template>
-	
-	<!-- outer most wrapper, fill parent div -->
-	<div 
-		v-show="nwSystem.showMenu.value"
-		class="add-node-menu-layer"
-		@click="closeMenu"
-		@click.right="nwSystem.showMenu.value && closeMenu"
-		@mouseup.stop
-	>
 
-		<div
-			class="menu-container"
-			@click.stop
-			:style="{
+	<!-- outer most wrapper, fill parent div -->
+	<div v-show="nwSystem.showMenu.value" class="add-node-menu-layer" @click="closeMenu"
+		@click.right="nwSystem.showMenu.value && closeMenu" @mouseup.stop>
+
+		<div class="menu-container" @click.stop :style="{
 				left: `${nwSystem.menuX.value}px`,
 				top: `${nwSystem.menuY.value}px`,
-			}"
-		>
+			}">
 
 			<!-- search box -->
 			<div class="search-box">
@@ -32,19 +23,13 @@
 					<i class="material-icons">search</i>
 				</div>
 
-				<input 
-					ref="searchBoxEl"
-					type="text" 
-					placeholder="Search for a node..." 
-					v-model="searchQuery"
-				/>
+				<div class="search-input-wrapper">
+					<input ref="searchBoxEl" type="text" placeholder="Search for a node..." v-model="searchQuery" />
+				</div>
 			</div>
 
 			<!-- this will spawn the list of menu items and sub-menu items -->
-			<AddMenuList 
-				:nwSystem="nwSystem"
-				:listItems="rootMenuItems"
-			/>
+			<AddMenuList :nwSystem="nwSystem" :listItems="rootMenuItems" />
 		</div>
 	</div>
 
@@ -226,46 +211,65 @@ function closeMenu() {
 
 		// for debug
 		// background: rgba(0,0, 0, 0.5);
-		
+		font-size: 1px;
+
 		// search box on top
 		.search-box {
 
 			position: relative;
 			background: rgba(0, 0, 0, 0.5);
-			padding: 8px;
-			border-radius: 8px;
-			height: 25px;
+			padding: 8em;
+			border-radius: 8em;
+			height: 25em;
 
-			margin-bottom: 8px;
+			margin-bottom: 8em;
 
 			// search icon
 			.icon-box {
 
 				position: absolute;
-				inset: 0px auto 0px 0px;
-				width: 45px;
+				inset: 0em auto 0em 0em;
+				width: 45em;
 				color: white;
-
+				
 				i {
 					position: absolute;
 					top: 50%;
 					left: 50%;
 					transform: translate(-50%, -50%);
-					font-size: 28px;
+					font-size: 28em;
 				}// i
 
 			}// .icon-box
 
-			// the input box
-			input {
-				position: absolute;
-				inset: 6px 6px 6px 45px;
+			// wrapper so we can use em for the box, but keep its
+			// font size larger/intact
+			.search-input-wrapper {
 
-				padding: 4px;
-				border-radius: 4px;
-				border: 1px solid #ccc;
-				background: rgba(255, 255, 255, 0.8);
-			}// input
+				// fixed area
+				position: absolute;
+				inset: 5em 5em 5em 45em;
+				
+				// camp corners of box
+				padding: 4em;
+				border-radius: 4em;
+				overflow: hidden;
+
+				border: 1em solid #ccc;
+
+				// the input box	
+				input {
+					position: absolute;
+					inset: 0px 0px 0px 0px;
+
+					outline: none;
+					border: 0px none;
+					background: rgba(255, 255, 255, 0.8);
+
+					font-size: 15em;
+				}// input
+
+			}// .search-input-wrapper
 
 		}// .search-box
 
@@ -276,8 +280,8 @@ function closeMenu() {
 			position: absolute;
 
 			// for debug
-			min-width: 300px;
-			min-height: 10px;
+			min-width: 300em;
+			min-height: 10em;
 			// border: 1px solid red;
 
 		}// .menu-container
