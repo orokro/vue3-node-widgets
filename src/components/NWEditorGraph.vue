@@ -34,13 +34,17 @@
 				<div 
 					class="pan-container" 
 					:style="{
-						left: `${ctxRef?.panX?.value}px`,
-						top: `${ctxRef?.panY?.value}px`,
+						left: `${ctxRef.panX.value}px`,
+						top: `${ctxRef.panY.value}px`,
 					}"
 				>
-
-					<div class="a-test-box"><span>foo</span></div>
-					<div class="a-test-box b"><span>bar</span></div>
+					<!-- loop through all the nodes and render them -->
+					<Node 
+						v-for="(node, index) in ctxRef.graph.nodes.value" 
+						:key="index" 
+						:nwSystem="ctxRef"
+						:node="node"
+					/>
 				</div>
 
 				<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
@@ -68,12 +72,18 @@
 </template>
 <script setup>
 
+function a(a){
+	console.log('a', a);
+	return a;
+}
+
 // vue
 import { ref, shallowRef, onMounted } from 'vue';
 
 // components
 import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
+import Node from '@Components/Node.vue';
 
 // our app
 import NWEditor from '../classes/NWEditor.js';
@@ -258,6 +268,11 @@ function checkAddMenu(e) {
 }
 
 </script>
+<style lang="scss">
+	.NWEditorGraph * {
+		box-sizing: border-box;
+	}
+</style>
 <style lang="scss" scoped>
 
 	// main outer wrapper for the entire node-graph system

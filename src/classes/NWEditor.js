@@ -18,6 +18,9 @@ import NodeWidget from './NWNode';
 import DevErrors from './DevErrors';
 import { VTypeRegistry } from './VTypeRegistry';
 
+// lib/misc
+import DragHelper from 'gdraghelper';
+
 // import default types
 import {
 	VNumber,
@@ -60,6 +63,9 @@ export default class NWEditor {
 	panY = ref(0);
 	zoomScale = ref(1.0);
 	
+	// reusable drag helper
+	dragHelper = new DragHelper();
+
 	/**
 	 * Constructor
 	 *
@@ -195,27 +201,38 @@ export default class NWEditor {
 
 		// console.log('Attempting to add node: ' + nodeClass.nodeName);
 
-		// 
+		// if x and y are 0, use the current menu position
+		if(x === 0 && y === 0){
+			x = this.menuX.value;
+			y = this.menuY.value;
+		}
+
+		// now using the pan & zoom values, adjust the x and y positions
+		x = (x - this.panX.value) / this.zoomScale.value;
+		y = (y - this.panY.value) / this.zoomScale.value;
+
 		// hide the menu if it's open
 		if(this.showMenu.value)
 			this.showMenu.value = false;
 
+		let newNode = null;
+
 		// if we were passed in a class, instantiate it
 		if(t.isClass(nodeClass)){
-			nodeClass = new nodeClass();
+			newNode = new nodeClass();
 		}
 
 		// if we were passed in an object, instantiate the class from the object
 		else if(t.isObject(nodeClass) && t.isDefined(nodeClass.class)){
-			nodeClass = new nodeClass.class();
+			newNode = new nodeClass.class();
 		}
 
 		// set the position of the node
-		nodeClass.x.value = x;
-		nodeClass.y.value = y;
+		newNode.x.value = x;
+		newNode.y.value = y;
 
 		// add the node to our graph
-		this.graph.nodes.value.push(nodeClass);
+		this.graph.nodes.value = [...this.graph.nodes.value, newNode];
 	}
 
 }

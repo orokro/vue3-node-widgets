@@ -217,7 +217,7 @@ function closeMenu() {
 			background: rgba(0, 0, 0, 0.5);
 			padding: 8em;
 			border-radius: 8em;
-			height: 25em;
+			height: 40em;
 
 			margin-bottom: 8em;
 
