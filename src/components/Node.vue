@@ -22,7 +22,10 @@
 		}">
 
 		<!-- title -->
-		<div class="title-bar">
+		<div 
+			class="title-bar"
+			@mousedown.stop="startDrag"
+		>
 			<span>
 				{{ node.constructor.nodeName }}
 			</span>
@@ -66,6 +69,45 @@ const props = defineProps({
 	}
 });
 
+
+/**
+ * Handles the start of dragging the node
+ * 
+ * @param e - The mouse event that triggered this function
+ */
+function startDrag(e) {
+
+	// save our nodes initial position
+	const initialX = props.node.x.value;
+	const initialY = props.node.y.value;
+
+	// get the zoom scale from the NWEditor instance
+	const zoomScale = props.nwSystem.zoomScale.value;
+
+	// get the drag helper instances from the NWEditor instance &  ste the drag helpers zoom scale
+	const dh = props.nwSystem.dragHelper;
+	// dh.setScaleMultiplier(zoomScale);
+
+	dh.dragStart(
+		(dx, dy) => {
+
+			// update our node's position
+			// props.node.x.value = initialX - dx / zoomScale;
+			// props.node.y.value = initialY - dy / zoomScale;
+
+			props.node.setPosition(
+				initialX - dx / zoomScale,
+				initialY - dy / zoomScale
+			);
+		},
+		(dx, dy) => {
+
+		},
+	);
+
+}
+
+
 </script>
 <style lang="scss" scoped>
 
@@ -101,8 +143,8 @@ const props = defineProps({
 			background: rgba(0, 0, 0, 0.5);
 
 			// same rounded corners at the top
-			border-top-left-radius: 10em;
-			border-top-right-radius: 10em;
+			border-top-left-radius: 7em;
+			border-top-right-radius: 7em;
 
 			// look draggable
 			cursor: move;
@@ -169,7 +211,7 @@ const props = defineProps({
 			// background color
 			background: rgba(255, 255, 255, 0.8);
 
-			border-radius: 0em 0em 10em 10em;
+			border-radius: 0em 0em 7em 7em;
 
 			span {
 				font-size: 16em;

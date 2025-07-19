@@ -228,8 +228,7 @@ export default class NWEditor {
 		}
 
 		// set the position of the node
-		newNode.x.value = x;
-		newNode.y.value = y;
+		newNode.setPosition(x, y);
 
 		// add the node to our graph
 		this.graph.nodes.value = [...this.graph.nodes.value, newNode];

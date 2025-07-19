@@ -36,4 +36,16 @@ export default class NWNode {
 
 	}
 
+
+	setPosition(x, y) {
+
+		// snap to units of 10
+		x = Math.round(x / 10) * 10;
+		y = Math.round(y / 10) * 10;
+		
+		// set the position of the node
+		this.x.value = x;
+		this.y.value = y;
+	}
+
 }

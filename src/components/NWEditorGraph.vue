@@ -109,7 +109,7 @@ const props = defineProps({
 	// allow the background to have some auto-scale applied by component
 	backgroundScale: {
 		type: Number,
-		default: 25
+		default: 20
 	},
 
 });
@@ -268,15 +268,19 @@ function checkAddMenu(e) {
 }
 
 </script>
-<style lang="scss">
-	.NWEditorGraph * {
-		box-sizing: border-box;
-	}
-</style>
+
 <style lang="scss" scoped>
 
 	// main outer wrapper for the entire node-graph system
 	.NWEditorGraph {
+
+		* {
+			box-sizing: border-box;
+			user-select: none;
+
+			// for debug
+			// text-decoration: underline !important;
+		}
 
 		// some default styles
 		// border: 2px solid black;
