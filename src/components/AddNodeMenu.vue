@@ -98,7 +98,6 @@ function filterMenuItems(items, query) {
 	let filteredItems = items.filter(item => {
 		return item.class.nodeName.toLowerCase().includes(sanitizedQuery);
 	});
-	console.log('filteredItems', filteredItems);
 
 	// convert the flat array into a nested object
 	return buildMenuHierarchy(filteredItems);
@@ -106,12 +105,10 @@ function filterMenuItems(items, query) {
 
 // watch when the menu becomes visible & focus the search box
 watch(() => props.nwSystem.showMenu.value, (newVal) => {
-
 	
 	// if the menu is shown, focus the search box
 	if (newVal && searchBoxEl.value) {
 
-		console.log('focusing search box');
 		// delay focus to allow the menu to render
 		setTimeout(() => {
 			searchBoxEl.value.focus();

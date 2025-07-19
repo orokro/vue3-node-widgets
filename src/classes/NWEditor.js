@@ -54,6 +54,12 @@ export default class NWEditor {
 	menuX = ref(0);
 	menuY = ref(0);
 
+	// pan & zoom
+	// we gotta save these here, so we can do math on them when adding nodes and the link
+	panX = ref(0);
+	panY = ref(0);
+	zoomScale = ref(1.0);
+	
 	/**
 	 * Constructor
 	 *
@@ -182,6 +188,34 @@ export default class NWEditor {
 
 		// show the menu
 		this.showMenu.value = true;
+	}
+
+	// adds a node to our graph at the specified position
+	addNode(nodeClass, x = 0, y = 0){
+
+		// console.log('Attempting to add node: ' + nodeClass.nodeName);
+
+		// 
+		// hide the menu if it's open
+		if(this.showMenu.value)
+			this.showMenu.value = false;
+
+		// if we were passed in a class, instantiate it
+		if(t.isClass(nodeClass)){
+			nodeClass = new nodeClass();
+		}
+
+		// if we were passed in an object, instantiate the class from the object
+		else if(t.isObject(nodeClass) && t.isDefined(nodeClass.class)){
+			nodeClass = new nodeClass.class();
+		}
+
+		// set the position of the node
+		nodeClass.x.value = x;
+		nodeClass.y.value = y;
+
+		// add the node to our graph
+		this.graph.nodes.value.push(nodeClass);
 	}
 
 }

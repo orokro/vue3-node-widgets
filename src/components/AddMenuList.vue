@@ -14,7 +14,7 @@
 			<!-- loop over the list items and display them -->
 			<template v-for="(item, index) in listItems" :key="index">
 
-				<div class="list-item">
+				<div class="list-item" @click.stop="addNode(item)">
 
 					<!-- the icon box -->
 					<div class="icon-box">
@@ -67,6 +67,23 @@ const props = defineProps({
 	},
 
 });
+
+
+/**
+ * Adds a node to the graph (if its an item and not a menu)
+ * @param item - The item to add
+ */
+function addNode(item){
+
+	// if it doesn't have the item key, it was probably a menu item
+	if (!t.isDefined(item.item)) {
+		// console.warn('Tried to add a menu item, but it does not have an item key:', item);
+		return;
+	}
+
+	// add the item!	
+	props.nwSystem.addNode(item.item);
+}
 
 </script>
 <style lang="scss" scoped>

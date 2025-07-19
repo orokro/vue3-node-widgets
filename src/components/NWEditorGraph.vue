@@ -15,7 +15,7 @@
 
 		<!-- wrapper used to reset the relative/absolute positioning for the component
 		  (the user might style our outer .NWEditorGraph element via style attrs/props and/or css, etc )-->
-		<div class="positioning-reset">
+		<div class="positioning-reset" v-if="ctxRef != null">
 
 			<!-- this is the actual scrollable area where nodes, wires, etc appear and are editable. This clips/clamps overflow -->
 			<div 
@@ -24,9 +24,9 @@
 				@mouseup="checkAddMenu"
 				@wheel="handleWheelZoom"
 				:style="{
-					fontSize: `${zoomScale}px`,
-					backgroundSize: `${zoomScale * backgroundScale}px ${zoomScale * backgroundScale}px`,
-					backgroundPosition: `${panX}px ${panY}px`,
+					fontSize: `${ctxRef.zoomScale.value}px`,
+					backgroundSize: `${ctxRef.zoomScale.value * backgroundScale}px ${ctxRef.zoomScale.value * backgroundScale}px`,
+					backgroundPosition: `${ctxRef.panX.value}px ${ctxRef.panY.value}px`,
 				}"
 			>
 
@@ -34,8 +34,8 @@
 				<div 
 					class="pan-container" 
 					:style="{
-						left: `${panX}px`,
-						top: `${panY}px`,
+						left: `${ctxRef?.panX?.value}px`,
+						top: `${ctxRef?.panY?.value}px`,
 					}"
 				>
 
@@ -69,7 +69,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted } from 'vue';
+import { ref, shallowRef, onMounted } from 'vue';
 
 // components
 import DevErrors from '@Components/DevErrors.vue';
@@ -106,12 +106,7 @@ const props = defineProps({
 
 // our context will either be passed in via the props, or one we made locally
 let ctx = null;
-const ctxRef = ref(null);
-
-// our pan & zoom variables
-const panX = ref(0);
-const panY = ref(0);
-const zoomScale = ref(1.0);
+const ctxRef = shallowRef(null);
 
 // true if the user right-moused-wn and moved the mouse
 const didPan = ref(false);
@@ -169,7 +164,7 @@ function handleWheelZoom(e) {
 	if (e.shiftKey) return;
 
 	const delta = e.deltaY < 0 ? 1 : -1;
-	const oldZoom = zoomScale.value;
+	const oldZoom = ctx.zoomScale.value;
 	const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, oldZoom + delta * 0.1));
 
 	// No change? Skip
@@ -183,15 +178,15 @@ function handleWheelZoom(e) {
 	const mouseY = e.clientY - container.top;
 
 	// Compute position within the zoomed/panned content (in virtual space)
-	const offsetX = (mouseX - panX.value) / oldZoom;
-	const offsetY = (mouseY - panY.value) / oldZoom;
+	const offsetX = (mouseX - ctx.panX.value) / oldZoom;
+	const offsetY = (mouseY - ctx.panY.value) / oldZoom;
 
 	// Update zoom scale
-	zoomScale.value = newZoom;
+	ctx.zoomScale.value = newZoom;
 
 	// Adjust pan so the content under the cursor stays in place
-	panX.value = mouseX - offsetX * newZoom;
-	panY.value = mouseY - offsetY * newZoom;
+	ctx.panX.value = mouseX - offsetX * newZoom;
+	ctx.panY.value = mouseY - offsetY * newZoom;
 }
 
 
@@ -207,8 +202,8 @@ function startPanDrag(e){
 		return;
 	
 	// save our initial x/y
-	const startX = panX.value;
-	const startY = panY.value;
+	const startX = ctxRef.value.panX.value;
+	const startY = ctxRef.value.panY.value;
 
 	// clear until we moved a bit
 	didPan.value = false;
@@ -217,8 +212,8 @@ function startPanDrag(e){
 		(dx, dy)=>{
 
 			// update our pan x/y values
-			panX.value = startX - dx;
-			panY.value = startY - dy;
+			ctxRef.value.panX.value = startX - dx;
+			ctxRef.value.panY.value = startY - dy;
 
 			// use pythagorean theorem to see if we moved enough to consider it a pan
 			const panThreshold = 5;
