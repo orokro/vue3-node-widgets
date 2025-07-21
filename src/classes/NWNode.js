@@ -209,6 +209,7 @@ export const FIELD_TYPE = {
 	LABEL: 'label', // just a label, no input/output
 	INPUT: 'input', // has both left & right sockets
 	OUTPUT: 'output', // has only right socket
+	PROP: 'prop', // has no sockets, but can show a UI widget to control node state
 	CUSTOM: 'custom', // uses a custom component for rendering
 };
 
