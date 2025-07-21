@@ -236,6 +236,23 @@ export default class NWNode {
 	static inputs = {};
 	static outputs = {};
 	
+	// resets the static properties of the class for subclasses
+	static init(){
+
+		// set the node type to unset by default
+		this.nodeType = NODE_TYPE.UNSET;
+
+		// reset the fields
+		this.fields = [];
+
+		// reset the inputs and outputs maps
+		this.inputs = {};
+		this.outputs = {};
+
+		// reset the eval function
+		this.evalFn = null;
+	}
+
 	/**
 	 * Sets the node type for this class.
 	 * @param {string} nodeType - the type of node, one of NODE_TYPE constants
@@ -285,7 +302,8 @@ export default class NWNode {
 		// not all options will be used for every type, but we'll provide all defaults here
 		options = {
 			name: '',
-			title: '',
+			text: '', // for labels only
+			title: '', // line above the field
 			description: '', // optional description for tooltip
 			component: null,
 			type: null,
@@ -302,6 +320,7 @@ export default class NWNode {
 				
 				this.fields.push({
 					fieldType: FIELD_TYPE.LABEL,
+					text: options.text,
 					align: options.align,
 					title: options.title,
 					align: options.align,

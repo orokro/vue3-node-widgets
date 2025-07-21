@@ -32,14 +32,36 @@ import NWEditorGraph from './components/NWEditorGraph.vue';
 // ref to our graph, so we can expose to window for debugging
 const myGraph = ref(null);
 
+// import all our nodes
+import { 
+	ABMathNode,
+	ColorMixNode,
+	ColorPickerNode,
+	MapRangeNode,
+	RandomColorNode,
+	RandomNumberNode,
+	RoundNode,
+	TrigNode,
+	AllTypesNode,
+} from '@Nodes/index.js';
+
 // for vue testing
 const myValueA = ref(0);
 const myValueB = myValueA;
+
+let ctx = null;
 
 onMounted(() => {
 	
 	// expose our graph to the window for debugging
 	window.mg = myGraph.value;
+
+	ctx = mg.getContext();
+
+	// add some debug nodes so we can test UI
+	ctx.addNode(TrigNode, 100, 100);
+	ctx.addNode(AllTypesNode, 320, 100);
+
 });
 
 
@@ -59,31 +81,33 @@ function disableContextMenu(e) {
 
 </script>
 <style lang="scss" scoped>
-// box to test positioning / layout of our component
-.positioning-box {
 
-	// fill the parent container
-	// position: absolute;
-	// top: 30px;
-	// left: 60px;
-	// width: 1000px;
-	// height: 800px;
+	// box to test positioning / layout of our component
+	.positioning-box {
 
-	position: fixed;
-	inset: 0px 0px 0px 0px;
-}
+		// fill the parent container
+		// position: absolute;
+		// top: 30px;
+		// left: 60px;
+		// width: 1000px;
+		// height: 800px;
 
-// .positioning-box
+		position: fixed;
+		inset: 0px 0px 0px 0px;
+	}
 
-.testJunk {
+	// .positioning-box
 
-	border: 2px solid black;
+	.testJunk {
 
-	// fill the parent container
-	position: absolute;
-	top: 30px;
-	left: 1160px;
-	width: 400px;
-	height: 800px;
-}
+		border: 2px solid black;
+
+		// fill the parent container
+		position: absolute;
+		top: 30px;
+		left: 1160px;
+		width: 400px;
+		height: 800px;
+	}
+
 </style>

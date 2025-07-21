@@ -42,18 +42,38 @@
 		<!-- node content -->
 		<div class="content">
 
-			<span>
-				NODE CONTENT.
-			</span>
+			<!-- only render this if we don't provide a custom component -->
+			<template v-if="node.constructor.customComponent==null">
+				<span v-if="node.constructor.fields.length === 0">
+					NODE CONTENT.
+				</span>
+				<div v-else>
+					
+					<div 
+						class="node-field-row"
+						v-for="(field, index) in node.constructor.fields"
+					>
+						<NLabel 
+							v-if="field.fieldType == FIELD_TYPE.LABEL"
+							:key="index"
+							:text="field.text"
+							:align="field.align"/>
+					</div>
+				</div>
+			</template>
+
 		</div>
 	</div>
-
-
 </template>
 <script setup>
 
 // vue imports
 import { ref } from 'vue';
+
+// our app
+import { FIELD_TYPE, NODE_TYPE } from '@/classes/NWNode';
+// components
+import NLabel from './TypeWidgets/NLabel.vue';
 
 // props
 const props = defineProps({
@@ -204,14 +224,25 @@ function startDrag(e) {
 			height: 100%;
 
 			// padding for the content
-			padding: 30em;
+			/* padding: 30em; */
 
 			// background color
 			background: rgba(255, 255, 255, 0.8);
 
 			border-radius: 0em 0em 7em 7em;
 
+			.node-field-row {
+
+				background: rgba(0, 0, 0, 0.1);
+				&:nth-child(odd) {
+					background: rgba(0, 0, 0, 0.15);
+				}
+
+			}// .node-field-row
+
 			span {
+				display: block;
+				padding: 2em;
 				font-size: 16em;
 				color: black;
 			}
