@@ -15,6 +15,9 @@
 
 */
 
+// the default widget to use if the subclass does not specify one
+import NDefaultWidget from "@/components/TypeWidgets/NDefaultWidget.vue";
+
 // main export
 export default class VType {
 
@@ -38,6 +41,9 @@ export default class VType {
 
 	/** @type {*} Default value for this type */
 	static defaultValue = null;
+
+	/** @type {Function} the Vue component constructor to use for this type in default node UI */
+	static nodeWidgetComponent = NDefaultWidget;
 
 	/** @type {(value: any) => any} Lint function (e.g., auto-fix/normalize) */
 	static lintFn = (value) => value;
@@ -87,6 +93,16 @@ export default class VType {
 
 		this.fromCoalescers = new Map();
 		this.toCoalescers = new Map();
+		this.nodeWidgetComponent = NDefaultWidget;
+		this.lintFn = (value) => value;
+		this.validateFn = (value) => true;
+		this.compareFn = (a, b) => a === b;
+		this.defaultValue = null;
+		this.themeColor = '#000000';
+		this.socketStyle = 'circle';
+		this.typeName = 'UnnamedType';
+		this.description = '';
+		this.static = this.constructor;
 	}
 
 	/** Default constructor */

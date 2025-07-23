@@ -58,6 +58,17 @@
 							:key="index"
 							:text="field.text"
 							:align="field.align"/>
+
+						<template v-else-if="field.fieldType == FIELD_TYPE.INPUT">
+							<component
+								:is="field.valueType.nodeWidgetComponent"
+								:key="index"
+								:nwSystem="nwSystem"
+								:node="node"
+								:field="field"
+							/>
+						</template>
+
 					</div>
 				</div>
 			</template>
@@ -66,6 +77,11 @@
 	</div>
 </template>
 <script setup>
+
+function a(a){
+	console.log('a', a);
+	return a;
+}	
 
 // vue imports
 import { ref } from 'vue';

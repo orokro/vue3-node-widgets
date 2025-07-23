@@ -237,6 +237,8 @@ export default class NWNode {
 	static inputs = {};
 	static outputs = {};
 	
+	static = this.constructor;
+
 	// resets the static properties of the class for subclasses
 	static init(){
 

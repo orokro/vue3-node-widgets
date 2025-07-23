@@ -42,7 +42,22 @@ export default class AllTypesNode extends NWNode {
 		this.addField(FIELD_TYPE.LABEL, { text: 'Label B', align:'left' });
 		this.addField(FIELD_TYPE.LABEL, { text: 'Label 3', align:'right' });
 		this.addField(FIELD_TYPE.LABEL, { text: 'Label Next', align:'left' });
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'numberInput',
+			title: 'Number Test', 
+			description: "Tests numbers widget",
+			align: 'left',
+			type: VNumber,
+		});
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'intInput',
+			title: 'Int Number Test',
+			description: "Tests integer widget",
+			align: 'left',
+			type: VInteger,
+		});
 	}
+	
 
 	/**
 	 * Constructor
