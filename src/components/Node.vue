@@ -108,7 +108,6 @@ function startDrag(e) {
 
 	// get the drag helper instances from the NWEditor instance &  ste the drag helpers zoom scale
 	const dh = props.nwSystem.dragHelper;
-	// dh.setScaleMultiplier(zoomScale);
 
 	dh.dragStart(
 

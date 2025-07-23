@@ -200,8 +200,6 @@ export default class NWEditor {
 	// adds a node to our graph at the specified position
 	addNode(nodeClass, x = 0, y = 0){
 
-		// console.log('Attempting to add node: ' + nodeClass.nodeName);
-
 		// if x and y are 0, use the current menu position
 		if(x === 0 && y === 0){
 			x = this.menuX.value;
