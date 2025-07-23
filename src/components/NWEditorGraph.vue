@@ -78,7 +78,7 @@ function a(a){
 }
 
 // vue
-import { ref, shallowRef, onMounted } from 'vue';
+import { ref, shallowRef, onMounted, provide } from 'vue';
 
 // components
 import DevErrors from '@Components/DevErrors.vue';
@@ -125,6 +125,7 @@ const MIN_ZOOM = 0.1;
 
 // make a new DragHelper instance
 const dh = new DragHelper();
+provide('dh', dh);
 
 // on mounted, initialize the component and optionally, state
 onMounted(() => {
@@ -359,7 +360,7 @@ function checkAddMenu(e) {
 			// for debug
 			// text-decoration: underline !important;
 		}
-		
+
 	}// .NWEditorGraph
 
 </style>

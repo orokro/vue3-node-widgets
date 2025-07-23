@@ -66,7 +66,7 @@ onMounted(() => {
 });
 
 // we'll store the editable value here & run our state logic on it
-const numberValue = shallowRef(props.node.fieldState[props.field.name]);
+const numberValue = shallowRef(props.node.fieldState[props.field.name].value);
 
 
 
@@ -77,23 +77,18 @@ const numberValue = shallowRef(props.node.fieldState[props.field.name]);
 	.input-wrapper {
 		
 		// for debug
-		border: 1px solid red;
+		// border: 1px solid red;
 
 		.number-value-row {
 
 			// for debug
-			border: 1px solid blue;
-			padding: 1rem;
+			// border: 1px solid blue;
+			padding: 3em;
 			cursor: pointer;
-
-			// hover effect
-			&:hover {
-				background-color: #f0f0f0;
-			}
 
 			// text alignment
 			text-align: var(--align, left);
-
+			// background: red;
 		}// .number-value-row
 
 	}// .input-wrapper
