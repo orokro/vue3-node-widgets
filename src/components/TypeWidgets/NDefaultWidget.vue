@@ -54,6 +54,6 @@ const props = defineProps({
 			font-size: 16em;
 		}
 
-	}
+	}// .n-default-widget
 
-// .n-label</style>
+</style>

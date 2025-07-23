@@ -5,7 +5,9 @@
 	Represents any floating-point number (positive or negative).
 	This is the default numeric type used in the system.
 */
+
 import VType from '../VType.js';
+import NVNumberWidget from '@/components/TypeWidgets/NVNumberWidget.vue';
 
 export class VNumber extends VType {
 	
@@ -22,6 +24,9 @@ export class VNumber extends VType {
 	/** @type {string} Theme color */
 	static themeColor = '#3366cc';
 
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVNumberWidget;
+	
 	/** @type {string} Socket style */
 	static socketStyle = 'circle';
 
