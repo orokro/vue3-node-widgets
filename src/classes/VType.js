@@ -107,7 +107,7 @@ export default class VType {
 
 	/** Default constructor */
 	constructor(value) {
-		this.value = value;
+		this.value = value || this.constructor.defaultValue;
 	}
 
 	/** get the value */

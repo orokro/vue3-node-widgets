@@ -48,6 +48,7 @@ const types = [
 
 // external libs/misc
 import t from 'typical';
+import NWNode from './NWNode';
 
 // main export class
 export default class NWEditor {
@@ -197,7 +198,14 @@ export default class NWEditor {
 	}
 
 
-	// adds a node to our graph at the specified position
+	/**
+	 * Adds a node to our graph at the specified position.
+	 * 
+	 * @param {Function} nodeClass - The class of the node to add.
+	 * @param {Number} x - The x position to add the node at.
+	 * @param {Number} y - The y position to add the node at.
+	 * @returns {NWNode} - The newly created node.
+	 */
 	addNode(nodeClass, x = 0, y = 0){
 
 		// if x and y are 0, use the current menu position
@@ -231,6 +239,8 @@ export default class NWEditor {
 
 		// add the node to our graph
 		this.graph.nodes.value = [...this.graph.nodes.value, newNode];
+
+		return newNode
 	}
 
 

@@ -18,18 +18,8 @@
 </template>
 <script setup>
 
-function a(a){
-	console.log('a', a);
-	return a;
-}
-
-
 // vue
 import { ref, onMounted } from 'vue';
-
-onMounted(()=>{
-	console.log("asdasd:");
-});
 
 // props
 const props = defineProps({

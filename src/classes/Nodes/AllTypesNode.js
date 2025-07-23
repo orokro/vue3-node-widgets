@@ -39,9 +39,9 @@ export default class AllTypesNode extends NWNode {
 
 		// add our fields
 		this.addField(FIELD_TYPE.LABEL, { text: 'All Types Node', align:'center' });
-		this.addField(FIELD_TYPE.LABEL, { text: 'Label B', align:'left' });
-		this.addField(FIELD_TYPE.LABEL, { text: 'Label 3', align:'right' });
-		this.addField(FIELD_TYPE.LABEL, { text: 'Label Next', align:'left' });
+		// this.addField(FIELD_TYPE.LABEL, { text: 'Label B', align:'left' });
+		// this.addField(FIELD_TYPE.LABEL, { text: 'Label 3', align:'right' });
+		// this.addField(FIELD_TYPE.LABEL, { text: 'Label Next', align:'left' });
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'numberInput',
 			title: 'Number Test', 
@@ -57,7 +57,7 @@ export default class AllTypesNode extends NWNode {
 			type: VInteger,
 		});
 	}
-	
+
 
 	/**
 	 * Constructor

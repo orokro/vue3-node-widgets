@@ -237,6 +237,7 @@ export default class NWNode {
 	static inputs = {};
 	static outputs = {};
 	
+	// just a helpful shorthand
 	static = this.constructor;
 
 	// resets the static properties of the class for subclasses
@@ -255,6 +256,7 @@ export default class NWNode {
 		// reset the eval function
 		this.evalFn = null;
 	}
+
 
 	/**
 	 * Sets the node type for this class.
@@ -438,6 +440,17 @@ export default class NWNode {
 		// position of the node in the graph
 		this.x = ref(0);
 		this.y = ref(0);
+
+		// when we constructor a new instance of this node,
+		// we need to init the state for all the fields
+		this.fieldState = {};
+		for (const field of this.static.fields) {
+
+			if([FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)) {
+				
+				this.fieldState[field.name] = new field.valueType();
+			}
+		}
 	}
 
 
