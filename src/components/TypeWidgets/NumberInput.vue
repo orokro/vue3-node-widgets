@@ -17,7 +17,6 @@
 
 		<!-- just show the value if we don't have input enabled -->
 		<div 
-			v-if="!inputEnabled"
 			class="number-value"
 			@mousedown="startDrag"
 			@mouseup="showInput"
@@ -26,9 +25,9 @@
 		</div>
 
 		<input 
+			v-if="inputEnabled" 
 			ref="inputRef"
 			:disabled="readOnly"
-			v-if="inputEnabled" 
 			v-model="localValue"
 			type="text"
 			class="input-box"
@@ -102,6 +101,21 @@ const dh = inject('dh');
 let dragDidStart = false;
 
 
+watch(()=>localValue.value, (newVal) => {
+
+	// check if the value is valid
+	invalidValue.value = !isValidValue(newVal);
+});
+
+/**
+ * Built in lint function that checks if the value is valid
+ * 
+ * This will use both the props.lint and props.validate functions
+ * But it will also check if the value is a valid number, since
+ * we're dealing with numbers here.
+ * 
+ * @param value - The value to lint
+ */
 function lint(value){
 
 	// use built in lint function if not provided
@@ -111,12 +125,30 @@ function lint(value){
 	const validNumber = isValidNumber(value);
 	const valid = props.validate(value) && validNumber;
 	
-	console.log('aids', value, valid, lastValidValue);
 	if (!valid) {
 		value = lastValidValue;
 	}
 
+	// make sure the value is not a string ffs
+	if (typeof value === 'string') {
+		value = parseFloat(value);
+	}
+
 	return value;
+}
+
+
+/**
+ * Checks if the value is valid using the provided validate function
+ * 
+ * @param value - The value to check
+ * @returns {boolean} - True if the value is valid, false otherwise
+ */
+function isValidValue(value) {
+	const isValid = props.validate(value);
+	const isValidNum = isValidNumber(value);
+
+	return isValid && isValidNum;
 }
 
 
@@ -151,8 +183,7 @@ function isValidNumber(value) {
 function changeValue(newVal) {
 
 	// check if it's a valid new value
-	const isValidNum = isValidNumber(newVal);
-	const isValid = props.validate(newVal) && isValidNum;
+	const isValid = isValidValue(newVal);
 
 	// clean it up regardless
 	newVal = props.lint(newVal);
@@ -176,11 +207,15 @@ function cleanOnEnd(){
 	inputEnabled.value = false;
 
 	// check if it's valid
-	const isValidNum = isValidNumber(localValue.value);
-	const isValid = props.validate(localValue.value) && isValidNum;
+	const isValid = isValidValue(localValue.value);
 
 	// get value
-	const value = isValid ? localValue.value : lint(localValue.value);
+	let value = isValid ? localValue.value : lint(localValue.value);
+
+	// dont let value be a string
+	if (typeof value === 'string') {
+		value = parseFloat(value);
+	}
 
 	// update the model
 	localValue.value = value;
@@ -260,10 +295,25 @@ function showInput(){
 </script>
 <style lang="scss" scoped>
 
+	// main outer-wrapper for the number input
 	.number-input-wrapper {
+		
+		position: relative;
+
+		&.invalid-value {
+			background: red;
+
+			.number-value {
+				background: red;
+			}
+			input {
+				background: salmon
+			}
+
+		}// &.invalid-value
 
 		// padding: 0.5rem;
-		border: 1px solid #ccc;
+		// border: 1px solid #ccc;
 		border-radius: 4em;
 		width: 100%;
 		box-sizing: border-box;
@@ -284,6 +334,9 @@ function showInput(){
 		}// .number-value
 
 		input {
+			// fill the container
+			position: absolute;
+			inset: 0px 0px 0px 0px;
 			text-align: center
 		};
 	}// .number-input-wrapper

@@ -31,7 +31,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted, computed, shallowRef } from 'vue';
+import { ref, onMounted, computed, shallowRef, watch } from 'vue';
 
 // components
 import NumberInput from './NumberInput.vue';
@@ -68,7 +68,12 @@ onMounted(() => {
 // we'll store the editable value here & run our state logic on it
 const numberValue = shallowRef(props.node.fieldState[props.field.name].value);
 
+watch(()=>numberValue.value, (newVal) => {
 
+	// update the node's field state when the value changes
+	props.node.fieldState[props.field.name].value = newVal;
+	
+});
 
 
 </script>
