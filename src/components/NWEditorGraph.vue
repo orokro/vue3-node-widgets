@@ -274,14 +274,6 @@ function checkAddMenu(e) {
 	// main outer wrapper for the entire node-graph system
 	.NWEditorGraph {
 
-		* {
-			box-sizing: border-box;
-			user-select: none;
-
-			// for debug
-			// text-decoration: underline !important;
-		}
-
 		// some default styles
 		// border: 2px solid black;
 		// border-radius: 4px;
@@ -360,6 +352,14 @@ function checkAddMenu(e) {
 
 		}// .editor-container
 
+		* {
+			box-sizing: border-box;
+			user-select: none;
+
+			// for debug
+			// text-decoration: underline !important;
+		}
+		
 	}// .NWEditorGraph
 
 </style>
