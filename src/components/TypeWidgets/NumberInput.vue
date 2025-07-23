@@ -22,6 +22,19 @@
 			@mouseup="showInput"
 		>
 			<span>{{ localValue }}</span>
+
+			<div
+				class="btn decrement"
+				@mouseup.stop.prevent="changeValue(localValue - 1)"
+			>
+				<span>◀</span>
+			</div>
+			<div
+				class="btn increment"
+				@mouseup.stop.prevent="changeValue(localValue + 1)"
+			>
+				<span>▶</span>
+			</div>
 		</div>
 
 		<input 
@@ -300,11 +313,12 @@ function showInput(){
 		
 		position: relative;
 
+		// when the input value is invalid
 		&.invalid-value {
-			background: red;
+			background: salmon;
 
 			.number-value {
-				background: red;
+				background: salmon;
 			}
 			input {
 				background: salmon
@@ -339,6 +353,32 @@ function showInput(){
 			inset: 0px 0px 0px 0px;
 			text-align: center
 		};
+
+		// the increment/decrement buttons
+		.btn {
+
+			position: absolute;
+			top: 2px;
+			
+			&.decrement {
+				left: 2px;
+			}
+
+			&.increment {
+				right: 2px;
+			}
+
+			// appear clickable to user
+			cursor: pointer;
+
+			// slightly transparent by default until hovered
+			opacity: 0.5;
+			&:hover {
+				opacity: 1;
+			}
+
+		}// .btn
+
 	}// .number-input-wrapper
 
 </style>
