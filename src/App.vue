@@ -71,7 +71,7 @@ onMounted(() => {
  */
 function disableContextMenu(e) {
 
-	// allow normal behavoir if shift key is pressed
+	// allow normal behavior if shift key is pressed
 	if (e.shiftKey)
 		return;
 

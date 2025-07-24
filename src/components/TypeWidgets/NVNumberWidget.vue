@@ -3,9 +3,8 @@
 	------------------
 
 	This will be the component used to display the NVNumber type in the node UI.
-	This will also be reused in the VInteger type as well.
 
-	This will appear editing for input & props & readonly for outputs.
+	This will appear editing for input & props & readonly for outputs / wired inputs.
 -->
 <template>
 
@@ -21,6 +20,9 @@
 				<NumberInput 
 					v-model="numberValue"
 					@update:modelValue="numberValue = $event"
+					:lint="lint"
+					:validate="validate"
+					:step="10"
 				/>
 			</div>
 
@@ -56,7 +58,9 @@ const props = defineProps({
 		type: String,
 		default: 'left'
 	},
+	
 });
+
 
 onMounted(() => {
 	// console.log("NVNumberWidget mounted");
@@ -75,6 +79,24 @@ watch(()=>numberValue.value, (newVal) => {
 	
 });
 
+
+const lint = (value)=>{
+
+	// both the type itself has a lint fn,
+	// as well as field itself.
+	// run both:
+	value = props.field.valueType.lint(value);
+	value = props.field.lintFn(value);
+	return value;
+};
+
+const validate = (value)=>{
+
+	// both the type itself has a validate fn,
+	// as well as field itself.
+	// run both:
+	return props.field.valueType.validate(value) && props.field.validateFn(value);
+}
 
 </script>
 <style lang="scss" scoped>

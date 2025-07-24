@@ -9,9 +9,11 @@
 	<!-- by default we'll show a div with the value that has dragging-enabled, but 
 		we can also show an input box if we want to edit the value directly -->
 	<div
-		class="number-input-wrapper"
 		:class="{
+			'number-input-wrapper': true,
 			'invalid-value': invalidValue,
+			'read-only': readOnly,
+			...roundCss
 		}"
 	>
 
@@ -25,13 +27,13 @@
 
 			<div
 				class="btn decrement"
-				@mouseup.stop.prevent="changeValue(localValue - 1)"
+				@mouseup.stop.prevent="changeValue(localValue - step)"
 			>
 				<span>◀</span>
 			</div>
 			<div
 				class="btn increment"
-				@mouseup.stop.prevent="changeValue(localValue + 1)"
+				@mouseup.stop.prevent="changeValue(localValue + step)"
 			>
 				<span>▶</span>
 			</div>
@@ -54,7 +56,7 @@
 <script setup>
 
 // vue imports
-import { ref, watch, defineProps, defineEmits, inject, nextTick } from 'vue'
+import { ref, watch, defineProps, defineEmits, inject, nextTick, computed } from 'vue'
 
 // props for the input
 const props = defineProps({
@@ -80,6 +82,24 @@ const props = defineProps({
 	lint: {
 		type: Function,
 		default: (value) => value,
+	},
+
+	// step size for the buttons
+	step: {
+		type: Number,
+		default: 1, // default step size
+	},
+
+	// speed multiplier for dragging
+	dragSpeed: {
+		type: Number,
+		default: 1/50, // default drag speed
+	},
+
+	// the rounding style for the input
+	round: {
+		type: String,
+		default: 'both', // 'left', 'right', 'both', or 'neither'
 	},
 });
 
@@ -110,8 +130,18 @@ let lastValidValue = props.modelValue;
 const dh = inject('dh');
 
 // when a drag starts, we want to potentially cancel the mouse-up event
-// so we dont enable the input
+// so we don't enable the input
 let dragDidStart = false;
+
+// helper to see which side should have rounding CSS
+const roundCss = computed(()=>{
+
+	let classNames = {
+		'rounded-left': (props.round === 'left' || props.round === 'both'),
+		'rounded-right': (props.round === 'right' || props.round === 'both'),
+	};
+	return classNames;
+});
 
 
 watch(()=>localValue.value, (newVal) => {
@@ -119,6 +149,7 @@ watch(()=>localValue.value, (newVal) => {
 	// check if the value is valid
 	invalidValue.value = !isValidValue(newVal);
 });
+
 
 /**
  * Built in lint function that checks if the value is valid
@@ -205,8 +236,11 @@ function changeValue(newVal) {
 	localValue.value = newVal;
 
 	// if it's valid, update the model value
-	if (isValid) 
+	if (isValid){
 		updateModel(newVal);
+	}
+
+	cleanOnEnd();
 }
 
 
@@ -225,7 +259,7 @@ function cleanOnEnd(){
 	// get value
 	let value = isValid ? localValue.value : lint(localValue.value);
 
-	// dont let value be a string
+	// don't let value be a string
 	if (typeof value === 'string') {
 		value = parseFloat(value);
 	}
@@ -266,7 +300,7 @@ function startDrag(){
 		(dx, dy) => {
 
 			// update the local value based on the drag distance
-			let newValue = initialValue - dx/50;
+			let newValue = initialValue - dx * props.dragSpeed;
 			newValue = parseFloat(newValue.toFixed(2));
 			changeValue(newValue);
 
@@ -286,10 +320,16 @@ function startDrag(){
 
 
 /**
- * When clicked on we wanna show the input box, unless a drag happened inbetween
+ * When clicked on we wanna show the input box, unless a drag happened in between
  */
 function showInput(){
 	
+	// if we're read-only, gtfo
+	if (props.readOnly){
+		inputEnabled.value = false;
+		return;
+	}
+
 	// gtfo if we started a drag
 	if (dragDidStart){
 		return;
@@ -311,7 +351,23 @@ function showInput(){
 	// main outer-wrapper for the number input
 	.number-input-wrapper {
 		
+		// so we can position children abso-lutely
 		position: relative;
+
+		// border rounding	
+		&.rounded-left, &.rounded-left input {
+			border-radius: 20em 0em 0em 20em;
+		}
+		&.rounded-right, &.rounded-right input {
+			border-radius: 0em 20em 20em 0em;
+		}
+		&.rounded-left.rounded-right, &.rounded-left.rounded-right input {
+			border-radius: 20em;
+		}
+
+		// allow nothing to escape
+		border: 2px solid black;
+		overflow: clip;
 
 		// when the input value is invalid
 		&.invalid-value {
@@ -347,10 +403,12 @@ function showInput(){
 			}
 		}// .number-value
 
+		// the actual text input
 		input {
+
 			// fill the container
 			position: absolute;
-			inset: 0px 0px 0px 0px;
+			inset: 0em 0em 0em 0em;
 			text-align: center
 		};
 
@@ -358,14 +416,14 @@ function showInput(){
 		.btn {
 
 			position: absolute;
-			top: 2px;
+			top: 2em;
 			
 			&.decrement {
-				left: 2px;
+				left: 3em;
 			}
 
 			&.increment {
-				right: 2px;
+				right: 3em;
 			}
 
 			// appear clickable to user
@@ -378,6 +436,20 @@ function showInput(){
 			}
 
 		}// .btn
+
+		// override styles for read-only mode
+		&.read-only {
+			opacity: .5;
+			
+			.number-value {
+				font-style: italic;
+				cursor: not-allowed !important;
+			}
+			
+			.btn {
+				pointer-events: none;
+			}
+		}// &.read-only
 
 	}// .number-input-wrapper
 

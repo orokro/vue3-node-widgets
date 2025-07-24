@@ -44,10 +44,25 @@ export default class AllTypesNode extends NWNode {
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label Next', align:'left' });
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'numberInput',
-			title: 'Number Test', 
+			title: 'Positive Numbers', 
 			description: "Tests numbers widget",
 			align: 'left',
 			type: VNumber,
+			validateFn: (value) => {
+				try {
+					return parseFloat(value) >=0;
+				}catch(e){
+					return false
+				}
+			},
+			lintFn: (value) => {
+				try {
+					value = parseFloat(value);
+					return (value >= 0) ? value : 0; 
+				}catch(e){
+					return 0;
+				}
+			},
 		});
 		this.addField(FIELD_TYPE.INPUT, {
 			name: 'intInput',
