@@ -21,7 +21,7 @@
 			@mousedown="startDrag"
 			@mouseup="showInput"
 		>
-			<span>{{ localValue }}</span>
+			<span>{{ localValue==='' ? '_' : localValue }}</span>
 
 			<div
 				class="btn decrement"
