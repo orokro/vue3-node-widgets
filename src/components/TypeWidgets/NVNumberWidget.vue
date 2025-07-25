@@ -69,13 +69,14 @@ onMounted(() => {
 	// console.log("align", props.align);
 });
 
+
 // we'll store the editable value here & run our state logic on it
-const numberValue = shallowRef(props.node.fieldState[props.field.name].value);
+const numberValue = shallowRef(props.node.fieldState[props.field.name].val);
 
 watch(()=>numberValue.value, (newVal) => {
 
 	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].value = newVal;
+	props.node.fieldState[props.field.name].val = newVal;
 	
 });
 
@@ -89,6 +90,7 @@ const lint = (value)=>{
 	value = props.field.lintFn(value);
 	return value;
 };
+
 
 const validate = (value)=>{
 

@@ -61,6 +61,7 @@ onMounted(() => {
 	// add some debug nodes so we can test UI
 	ctx.addNode(TrigNode, 100, 100);
 	window.atn = ctx.addNode(AllTypesNode, 320, 100);
+	window.atn = ctx.addNode(AllTypesNode, 320, 300);
 
 });
 

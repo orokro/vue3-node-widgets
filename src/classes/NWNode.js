@@ -194,6 +194,7 @@
 */
 
 // vue
+import { Value } from 'sass';
 import { ref } from 'vue';
 
 // the kind of nodes
@@ -448,9 +449,62 @@ export default class NWNode {
 
 			if([FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)) {
 				
-				this.fieldState[field.name] = new field.valueType();
+				this.fieldState[field.name] = this.wrapFieldValue(
+					field.name, 
+					new field.valueType()
+				);
 			}
 		}
+	}
+
+
+	/**
+	 * Wraps a field value so we can track changes to it.
+	 * 
+	 * @param {String} name - the name of the field to wrap
+	 * @param {Value} value - the value to wrap
+	 * @returns {Object} - object with get & set that has side effect of calling requestComputeUpdate()
+	 */
+	wrapFieldValue(name, value) {
+
+		// create base object
+		const wrapped = { 
+			name,
+			_valueObj: value,
+		};
+
+		const node = this;
+
+		// add our val w/ getter & setter + side effect
+		Object.defineProperty(wrapped, 'val', {
+			get() {
+				return wrapped._valueObj.value;
+			},
+			set: (newValue) => {
+				wrapped._valueObj.value = newValue;
+				node.requestComputeUpdate(name, newValue);
+			},
+			enumerable: true,
+			configurable: true
+		});
+
+		return wrapped;
+	}
+
+
+	/**
+	 * When the user changes a value or we get a value from an upstream node,
+	 * we will call this function to update the node's state.
+	 * 
+	 * @param {string} name - optional, name of the field triggering the update
+	 * @param {any} value - optional, the value to set for the field
+	 */
+	requestComputeUpdate(name, value){
+
+		// for now, just print
+		if(false)
+			console.log(`Requesting compute update for node "${this.id}", field "${name}" as`, value);
+
 	}
 
 
