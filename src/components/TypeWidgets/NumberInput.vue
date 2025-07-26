@@ -445,11 +445,11 @@ function showInput(){
 			/* background: none; */
 		};
 
+		// the bar that fills the bg when it has a min/max
 		.slider-bg-bar {
-
 			position: absolute;
 			inset: 0px auto 0px 0px;
-			background: rgba(0, 0, 0, 0.25);
+			background: rgba(0, 0, 0, 0.3);
 		}
 
 		// the increment/decrement buttons
@@ -473,6 +473,10 @@ function showInput(){
 			opacity: 0.5;
 			&:hover {
 				opacity: 1;
+			}
+
+			span {
+				font-size: 16em;
 			}
 
 		}// .btn
