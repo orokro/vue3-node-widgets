@@ -5,6 +5,7 @@
 	Represents a 2D vector with x and y components.
 */
 import VType from '../VType.js';
+import NVVector2Widget from '@/components/TypeWidgets/NVVector2Widget.vue';
 
 export class VVector2 extends VType {
 	
@@ -20,6 +21,9 @@ export class VVector2 extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#44aa88';
+
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVVector2Widget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'vector';

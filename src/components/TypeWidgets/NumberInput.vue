@@ -16,10 +16,15 @@
 			'input-enabled': inputEnabled,
 			...roundCss
 		}"
+		:style="{
+			'border-width': props.border,
+			'border-style': 'solid',
+			'border-color': 'black',
+		}"
 	>	
 		<!-- just show the value if we don't have input enabled -->
 		<div 
-			class="number-value"
+			class="number-value"			
 			@mousedown="startDrag"
 			@mouseup="showInput"
 		>
@@ -34,12 +39,13 @@
 				/>
 			</template>
 
-			<span class="value-text">{{ localValue==='' ? '_' : localValue }}</span>
+			<span class="value-text">{{ formatLocalValue(localValue) }}</span>
 
 			<div
 				v-if="showButtons"
 				class="btn decrement"
 				:title="`Decrease by ${step}`"
+				@mousedown.stop
 				@mouseup.stop.prevent="changeValue(localValue - step)"
 			>
 				<span>◀</span>
@@ -48,6 +54,7 @@
 				v-if="showButtons"
 				class="btn increment"
 				:title="`Increase by ${step}`"
+				@mousedown.stop
 				@mouseup.stop.prevent="changeValue(localValue + step)"
 			>
 				<span>▶</span>
@@ -123,6 +130,12 @@ const props = defineProps({
 		default: true, // show buttons by default
 	},
 
+	// border property
+	border: {
+		type: String,
+		default: '0px', // default border
+	},
+
 	// ignored if max isn't also set, used to render the slider bg bar
 	min: {
 		type: Number,
@@ -176,6 +189,20 @@ const roundCss = computed(()=>{
 	return classNames;
 });
 
+/**
+ * Makes sure we never show more than 2 decimal places, but isn't always fixed, 
+ * and omits decimal places for whole numbers.
+ * 
+ * @param val - The value to format
+ */
+function formatLocalValue(val) {
+	if (val === '') return '_';
+
+	const num = Number(val);
+	if (Number.isNaN(num)) return val;
+
+	return Number.isInteger(num) ? num.toString() : num.toFixed(2).replace(/\.?0+$/, '');
+}
 
 watch(()=>localValue.value, (newVal) => {
 
@@ -400,7 +427,7 @@ function showInput(){
 		}
 
 		// allow nothing to escape
-		border: 2px solid black;
+		/* border: 2px solid black; */
 		overflow: clip;
 
 		// when the input value is invalid
@@ -424,7 +451,7 @@ function showInput(){
 
 		// padding: 0.5rem;
 		// border: 1px solid #ccc;
-		border-radius: 4em;
+		border-radius: 0em;
 		width: 100%;
 		box-sizing: border-box;
 
@@ -464,7 +491,7 @@ function showInput(){
 		}
 
 		// the increment/decrement buttons
-		.btn {
+		.btn {	
 
 			position: absolute;
 			top: 0em;
@@ -484,7 +511,7 @@ function showInput(){
 			cursor: pointer;
 
 			// slightly transparent by default until hovered
-			opacity: 0.5;
+			opacity: 0.0;
 			&:hover {
 				opacity: 1;
 			}
@@ -494,10 +521,15 @@ function showInput(){
 				top: 44%;
 				left: 50%;
 				transform: translate(-50%, -50%);
-				font-size: 15em;
+				font-size: 12em;
 			}
 
 		}// .btn
+
+		&:hover .btn {
+			// show the buttons on hover
+			opacity: 0.5;
+		}
 
 		// override styles for read-only mode
 		&.read-only {

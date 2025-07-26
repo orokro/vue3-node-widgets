@@ -125,7 +125,8 @@ export default class VType {
 	/** Default constructor */
 	constructor(value) {
 		this.static = this.constructor;
-		value = this.static.lintFn(value);
+		if(value)
+			value = this.static.lintFn(value);
 		this.value = value || this.constructor.defaultValue;
 	}
 

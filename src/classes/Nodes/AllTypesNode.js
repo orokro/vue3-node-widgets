@@ -78,6 +78,20 @@ export default class AllTypesNode extends NWNode {
 			align: 'left',
 			type: VInteger,
 		});
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'v2Input',
+			title: 'Vector 2 Input',
+			description: "Tests vector 2 widget",
+			align: 'right',
+			type: VVector2,
+		});
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'v3Input',
+			title: 'Vector 3 Input',
+			description: "Tests vector 3 widget",
+			align: 'right',
+			type: VVector3,
+		});
 	}
 
 

@@ -8,7 +8,7 @@
 -->
 <template>
 
-	<div class="n-number-widget" :style="{
+	<div class="n-integer-widget" :style="{
 		'text-align': align,
 	}">
 
@@ -113,21 +113,24 @@ const validate = (value)=>{
 </script>
 <style lang="scss" scoped>
 
-	.input-wrapper {
+	.n-integer-widget {
 		
-		.number-value-row {
+		.input-wrapper {
+			
+			.number-value-row {
 
-			// for debug
-			// border: 1px solid blue;
-			padding: 0em 0em 3em 0em;
-			cursor: pointer;
+				// for debug
+				// border: 1px solid blue;
+				padding: 0em 0em 3em 0em;
+				cursor: pointer;
 
-			// text alignment
-			text-align: var(--align, left);
+				// text alignment
+				text-align: var(--align, left);
 
-		}// .number-value-row
+			}// .number-value-row
 
-	}// .input-wrapper
+		}// .input-wrapper
 
+	}// .n-integer-widget
 
 </style>

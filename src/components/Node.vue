@@ -256,7 +256,7 @@ function startDrag(e) {
 			.node-field-row {
 
 				padding: 0em 8em;
-				
+
 				background: rgba(0, 0, 0, 0.1);
 				&:nth-child(odd) {
 					background: rgba(0, 0, 0, 0.15);

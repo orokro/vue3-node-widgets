@@ -5,14 +5,14 @@
 	All the built-in types will come with built-in widgets to display in the generic node UI.
 
 	However, if a user creates a type and doesn't provide a custom widget compenent, this
-	will render. It's essentually just a null/placeholder widget.
+	will render. It's essentially just a null/placeholder widget.
 -->
 <template>
 
 	<div class="n-default-widget" :style="{
 		'text-align': align,
 	}">
-		<span>{{node.static.nodeName }}</span>
+		<span>{{field.name }}</span>
 	</div>
 
 </template>
