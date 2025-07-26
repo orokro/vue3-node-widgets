@@ -34,7 +34,14 @@ export class VNumber extends VType {
 	static defaultValue = 0.0;
 
 	/** @type {(value: any) => boolean} */
-	static validateFn = (v) => typeof v === 'number' && isFinite(v);
+	static validateFn = (v) => {
+		try{
+			v = parseFloat(v);
+		}catch(e){
+			return false;
+		}
+		return typeof v === 'number' && isFinite(v)
+	};
 
 	/** @type {(value: any) => any} */
 	static lintFn = (v) => parseFloat(v);
@@ -60,7 +67,6 @@ export class VNumber extends VType {
 	}
 
 	static Min(min){
-
 		return this.addConstructorParam({min});
 	}
 

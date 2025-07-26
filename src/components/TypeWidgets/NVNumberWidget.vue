@@ -22,7 +22,9 @@
 					@update:modelValue="numberValue = $event"
 					:lint="lint"
 					:validate="validate"
-					:step="10"
+					:step="1"
+					:min="field.valueType.min"
+					:max="field.valueType.max"
 				/>
 			</div>
 

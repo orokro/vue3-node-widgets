@@ -13,17 +13,28 @@
 			'number-input-wrapper': true,
 			'invalid-value': invalidValue,
 			'read-only': readOnly,
+			'input-enabled': inputEnabled,
 			...roundCss
 		}"
-	>
-
+	>	
 		<!-- just show the value if we don't have input enabled -->
 		<div 
 			class="number-value"
 			@mousedown="startDrag"
 			@mouseup="showInput"
 		>
-			<span>{{ localValue==='' ? '_' : localValue }}</span>
+
+			<template v-if="min !== null && max !== null">
+				<!-- background bar for the slider -->
+				<div 
+					class="slider-bg-bar" 
+					:style="{
+						width: `${((localValue - min) / (max - min)) * 100}%`
+					}"
+				/>
+			</template>
+
+			<span class="value-text">{{ localValue==='' ? '_' : localValue }}</span>
 
 			<div
 				class="btn decrement"
@@ -100,6 +111,18 @@ const props = defineProps({
 	round: {
 		type: String,
 		default: 'both', // 'left', 'right', 'both', or 'neither'
+	},
+
+	// ignored if max isn't also set, used to render the slider bg bar
+	min: {
+		type: Number,
+		default: null, // no minimum by default
+	},
+
+	// ignored if min isn't also set, used to render the slider bg bar
+	max: {
+		type: Number,
+		default: null, // no maximum by default
 	},
 });
 
@@ -189,6 +212,7 @@ function lint(value){
  * @returns {boolean} - True if the value is valid, false otherwise
  */
 function isValidValue(value) {
+
 	const isValid = props.validate(value);
 	const isValidNum = isValidNumber(value);
 
@@ -377,10 +401,16 @@ function showInput(){
 				background: salmon;
 			}
 			input {
-				background: salmon
+				background: salmon;
 			}
 
 		}// &.invalid-value
+
+		&.input-enabled {
+			.number-value {
+				/* opacity: 0; */
+			}
+		}// &.input-enabled
 
 		// padding: 0.5rem;
 		// border: 1px solid #ccc;
@@ -398,7 +428,8 @@ function showInput(){
 
 			cursor: ew-resize;
 
-			span {
+			.value-text {
+				position: relative;
 				font-size: 16em;
 			}
 		}// .number-value
@@ -409,8 +440,17 @@ function showInput(){
 			// fill the container
 			position: absolute;
 			inset: 0em 0em 0em 0em;
-			text-align: center
+			text-align: center;
+
+			/* background: none; */
 		};
+
+		.slider-bg-bar {
+
+			position: absolute;
+			inset: 0px auto 0px 0px;
+			background: rgba(0, 0, 0, 0.25);
+		}
 
 		// the increment/decrement buttons
 		.btn {

@@ -69,7 +69,7 @@ export default class AllTypesNode extends NWNode {
 			title: 'Positive Numbers', 
 			description: "Tests numbers widget",
 			align: 'left',
-			type: VNumber.Max(7),
+			type: VNumber.Min(5).Max(20),
 		});
 		this.addField(FIELD_TYPE.INPUT, {
 			name: 'intInput',
