@@ -166,7 +166,7 @@ function startDrag(e) {
 		border: 2em solid black;
 
 		// padding on top for the title bar
-		padding-top: 30em;
+		padding-top: 22em;
 
 		// the title bar for the node that has the close button
 		//  & can drag the node around
@@ -175,7 +175,7 @@ function startDrag(e) {
 			// fixed position along the topo
 			position: absolute;
 			inset: 0em 0em auto 0em;
-			height: 30em;
+			height: 22em;
 			box-sizing: border-box;
 
 			// background color
@@ -188,14 +188,14 @@ function startDrag(e) {
 			// look draggable
 			cursor: move;
 
-			padding: 6em 20em 0em 7em;
+			padding: 3em 20em 0em 7em;
 			text-align: left;
 			text-wrap: nowrap;
 			text-overflow: ellipsis;
 			overflow: hidden;
 
 			span {
-				font-size: 15em;
+				font-size: 12em;
 				color: white;
 				font-weight: bold;
 			}
@@ -206,8 +206,8 @@ function startDrag(e) {
 				// red round circle
 				background	: rgba(0, 0, 0, 0.55);
 				border-radius: 50%;
-				width: 20em;
-				height: 20em;
+				width: 16em;
+				height: 16em;
 
 				// light up on hover
 				&:hover {
@@ -216,7 +216,7 @@ function startDrag(e) {
 
 				// position the close button
 				position: absolute;
-				inset: 4em 4em 4em auto;
+				inset: 3em 4em 4em auto;
 
 				// make it look like a button
 				cursor: pointer;
@@ -224,7 +224,7 @@ function startDrag(e) {
 
 				i {
 					color: white;
-					font-size: 16em;
+					font-size: 14em;
 					font-weight: bolder;;
 					position: absolute;
 					top: 50%;
@@ -252,8 +252,11 @@ function startDrag(e) {
 
 			border-radius: 0em 0em 7em 7em;
 
+			// the rows where we spawn the individual fields
 			.node-field-row {
 
+				padding: 0em 8em;
+				
 				background: rgba(0, 0, 0, 0.1);
 				&:nth-child(odd) {
 					background: rgba(0, 0, 0, 0.15);
@@ -261,11 +264,11 @@ function startDrag(e) {
 
 				.field-name {
 
-					padding: 10em 6em 0em;
-					
+					padding: 6em 6em 0em;
+
 					span {
 						padding: 0em;
-						font-size: 14em;
+						font-size: 12em;
 						font-style: italic;
 					}
 

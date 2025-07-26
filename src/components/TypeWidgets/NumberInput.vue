@@ -37,13 +37,17 @@
 			<span class="value-text">{{ localValue==='' ? '_' : localValue }}</span>
 
 			<div
+				v-if="showButtons"
 				class="btn decrement"
+				:title="`Decrease by ${step}`"
 				@mouseup.stop.prevent="changeValue(localValue - step)"
 			>
 				<span>◀</span>
 			</div>
 			<div
+				v-if="showButtons"
 				class="btn increment"
+				:title="`Increase by ${step}`"
 				@mouseup.stop.prevent="changeValue(localValue + step)"
 			>
 				<span>▶</span>
@@ -111,6 +115,12 @@ const props = defineProps({
 	round: {
 		type: String,
 		default: 'both', // 'left', 'right', 'both', or 'neither'
+	},
+
+	// true if we should show the increment buttons
+	showButtons: {
+		type: Boolean,
+		default: true, // show buttons by default
 	},
 
 	// ignored if max isn't also set, used to render the slider bg bar
@@ -424,13 +434,13 @@ function showInput(){
 			background: gray;
 			text-align: center;
 			color: white;
-			padding: 5em;
+			padding: 2em;
 
 			cursor: ew-resize;
 
 			.value-text {
 				position: relative;
-				font-size: 16em;
+				font-size: 12em;
 			}
 		}// .number-value
 
@@ -441,8 +451,9 @@ function showInput(){
 			position: absolute;
 			inset: 0em 0em 0em 0em;
 			text-align: center;
-
-			/* background: none; */
+			font-size: 12em;
+			border: 0px none;
+			outline: none
 		};
 
 		// the bar that fills the bg when it has a min/max
@@ -456,14 +467,17 @@ function showInput(){
 		.btn {
 
 			position: absolute;
-			top: 2em;
-			
+			top: 0em;
+			bottom: 0px;
+			width: 15em;
+
+			/* border: 1px solid red; */
 			&.decrement {
-				left: 3em;
+				left: 0em;
 			}
 
 			&.increment {
-				right: 3em;
+				right: 0em;
 			}
 
 			// appear clickable to user
@@ -476,7 +490,11 @@ function showInput(){
 			}
 
 			span {
-				font-size: 16em;
+				position: absolute;
+				top: 44%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				font-size: 15em;
 			}
 
 		}// .btn

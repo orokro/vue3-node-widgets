@@ -115,19 +115,16 @@ const validate = (value)=>{
 
 	.input-wrapper {
 		
-		// for debug
-		// border: 1px solid red;
-
 		.number-value-row {
 
 			// for debug
 			// border: 1px solid blue;
-			padding: 3em;
+			padding: 0em 0em 3em 0em;
 			cursor: pointer;
 
 			// text alignment
 			text-align: var(--align, left);
-			// background: red;
+
 		}// .number-value-row
 
 	}// .input-wrapper

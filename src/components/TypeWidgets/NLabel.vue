@@ -46,7 +46,7 @@ const props = defineProps({
 		padding: 3em 6em;
 		
 		span {
-			font-size: 16em;
+			font-size: 12em;
 		}
 
 	}// .n-label

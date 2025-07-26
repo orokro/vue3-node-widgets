@@ -51,7 +51,7 @@ export class VNumber extends VType {
 
 	/** Custom string representation */
 	toString() {
-		return `${this.constructor.typeName}(${this.value.toFixed(6)})`;
+		return `${this.constructor.typeName}(${this.value.toFixed(3)})`;
 	}
 
 	static min = null;

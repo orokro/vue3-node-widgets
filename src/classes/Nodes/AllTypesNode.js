@@ -65,8 +65,8 @@ export default class AllTypesNode extends NWNode {
 			},
 		});
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'numberInput',
-			title: 'Positive Numbers', 
+			name: 'rangeInput',
+			title: 'Ranged Numbers', 
 			description: "Tests numbers widget",
 			align: 'left',
 			type: VNumber.Min(5).Max(20),
@@ -86,6 +86,8 @@ export default class AllTypesNode extends NWNode {
 	 */
 	constructor() {
 		super();
+
+		this.fieldState.rangeInput.val = 10;
 	}
 
 }
