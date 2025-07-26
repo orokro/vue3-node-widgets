@@ -60,6 +60,12 @@
 							:align="field.align"/>
 
 						<template v-else-if="field.fieldType == FIELD_TYPE.INPUT">
+							<div 
+								class="field-name"
+								:title="field.description"
+							>
+								<span>{{ field.title }}</span>
+							</div>
 							<component
 								:is="field.valueType.nodeWidgetComponent"
 								:key="index"
@@ -252,6 +258,18 @@ function startDrag(e) {
 				&:nth-child(odd) {
 					background: rgba(0, 0, 0, 0.15);
 				}
+
+				.field-name {
+
+					padding: 10em 6em 0em;
+					
+					span {
+						padding: 0em;
+						font-size: 14em;
+						font-style: italic;
+					}
+
+				}// .field-name
 
 			}// .node-field-row
 

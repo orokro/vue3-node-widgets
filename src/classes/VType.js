@@ -105,9 +105,27 @@ export default class VType {
 		this.static = this.constructor;
 	}
 
+	// so we can do some kind of "currying" with the types
+	static addConstructorParam(param) {
+
+		// extend our self
+		const Subclass = class extends this {
+
+			// no change - just use the parent constructor
+			constructor(...args) { super(...args); }
+		};
+
+		// Merge in params
+		Subclass.params = {...(this.params || {}), ...param };
+
+		// return the subclass
+		return Subclass;
+	}
+
 	/** Default constructor */
 	constructor(value) {
 		this.value = value || this.constructor.defaultValue;
+		this.static = this.constructor;
 	}
 
 	/** get the value */

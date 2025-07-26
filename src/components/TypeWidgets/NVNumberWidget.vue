@@ -83,11 +83,19 @@ watch(()=>numberValue.value, (newVal) => {
 
 const lint = (value)=>{
 
+	const valueType = props.field.valueType;
 	// both the type itself has a lint fn,
 	// as well as field itself.
 	// run both:
-	value = props.field.valueType.lint(value);
+	value = valueType.lint(value);
 	value = props.field.lintFn(value);
+
+	// if the value type has a min/max apply them
+	if(valueType.min!==undefined && valueType.min!==null)
+		value = Math.max(value, valueType.min);
+	if(valueType.max!==undefined && valueType.max!==null)
+		value = Math.min(value, valueType.max);
+
 	return value;
 };
 

@@ -46,4 +46,26 @@ export class VNumber extends VType {
 	toString() {
 		return `${this.constructor.typeName}(${this.value.toFixed(6)})`;
 	}
+
+	static min = null;
+	static max = null;
+
+	/** Default constructor */
+	constructor(value) {
+
+		super(value);
+
+		this.static.min = this.static.params?.min ? this.static.params.min : null;
+		this.static.max = this.static.params?.max ? this.static.params.max : null;
+	}
+
+	static Min(min){
+
+		return this.addConstructorParam({min});
+	}
+
+	static Max(max){
+		return this.addConstructorParam({max});
+	}
+
 }

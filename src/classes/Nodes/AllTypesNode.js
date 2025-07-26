@@ -64,10 +64,17 @@ export default class AllTypesNode extends NWNode {
 				}
 			},
 		});
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'numberInput',
+			title: 'Positive Numbers', 
+			description: "Tests numbers widget",
+			align: 'left',
+			type: VNumber.Max(7),
+		});
 		this.addField(FIELD_TYPE.INPUT, {
 			name: 'intInput',
 			title: 'Int Number Test',
-			description: "Tests integer widget",
+			description: "Tests integer widget, with positive only validation",
 			align: 'left',
 			type: VInteger,
 		});
