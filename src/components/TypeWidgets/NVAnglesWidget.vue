@@ -71,7 +71,7 @@
 import { ref, onMounted, computed, shallowRef, watch } from 'vue';
 
 // components
-import NumberInput from './NumberInput.vue';
+import NumberInput from '../MiscWidgets/NumberInput.vue';
 
 // types + misc
 import { VNumber } from '@/classes/Types';

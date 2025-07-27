@@ -122,6 +122,15 @@ export default class AllTypesNode extends NWNode {
 			description: "Tests character widget",
 			type: VCharacter,
 		});
+
+		// boolean
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'booleanInput',
+			title: 'Boolean Input',
+			description: "Tests boolean widget",
+			type: VBoolean.OffLabel('No').OnLabel('Yes'),
+		});
+
 	}
 
 

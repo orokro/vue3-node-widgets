@@ -5,6 +5,7 @@
 	Represents a true/false logical value.
 */
 import VType from '../VType.js';
+import NVBooleanWidget from '@/components/TypeWidgets/NVBooleanWidget.vue';
 
 export class VBoolean extends VType {
 	
@@ -20,6 +21,9 @@ export class VBoolean extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#559966';
+
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVBooleanWidget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'boolean';
@@ -40,4 +44,25 @@ export class VBoolean extends VType {
 	toString() {
 		return `${this.constructor.typeName}(${this.value})`;
 	}
+
+	static offText = "False";
+	static onText = "True";
+
+	/** Default constructor */
+	constructor(value) {
+
+		super(value);
+
+		this.static.offText = this.static.params?.offText ? this.static.params.offText : "False";
+		this.static.onText = this.static.params?.onText ? this.static.params.onText : "True";
+	}
+
+	static OffLabel(offText){
+		return this.addConstructorParam({offText});
+	}
+
+	static OnLabel(onText){
+		return this.addConstructorParam({onText});
+	}
+
 }

@@ -26,7 +26,7 @@
 		<div 
 			class="number-value"			
 			@mousedown="startDrag"
-			@mouseup="showInput"
+			@click="showInput"
 		>
 
 			<template v-if="min !== null && max !== null">
@@ -42,7 +42,7 @@
 			<span class="value-text">{{ formatLocalValue(localValue) }}</span>
 
 			<div
-				v-if="showButtons"
+				v-if="showButtons && !isDragging"
 				class="btn decrement"
 				:title="`Decrease by ${step}`"
 				@mousedown.stop
@@ -51,7 +51,7 @@
 				<span>◀</span>
 			</div>
 			<div
-				v-if="showButtons"
+				v-if="showButtons && !isDragging"
 				class="btn increment"
 				:title="`Increase by ${step}`"
 				@mousedown.stop
@@ -184,7 +184,10 @@ const dh = inject('dh');
 
 // when a drag starts, we want to potentially cancel the mouse-up event
 // so we don't enable the input
-let dragDidStart = false;
+const dragDidStart = ref(false);
+
+// true whilst we're dragging the input
+const isDragging = ref(false);
 
 // helper to see which side should have rounding CSS
 const roundCss = computed(()=>{
@@ -361,7 +364,8 @@ function startDrag(){
 	if (props.readOnly) return;
 
 	// only if we meet the threshold
-	dragDidStart = false;
+	dragDidStart.value = false;
+	isDragging.value = true;
 
 	// set the local value to the model value
 	const initialValue = props.modelValue;
@@ -376,14 +380,15 @@ function startDrag(){
 
 			// use pythagorean theorem to see if we moved enough to consider it a drag
 			const dragThreshold = 5;
-			if (!dragDidStart && (dx * dx + dy * dy) > dragThreshold * dragThreshold) {
-				dragDidStart = true;
+			if (!dragDidStart.value && (dx * dx + dy * dy) > dragThreshold * dragThreshold) {
+				dragDidStart.value = true;
 			}
 
 		},
 		(dx, dy) => {
 
 			cleanOnEnd();
+			isDragging.value = false;			
 		},
 	);
 }
@@ -401,7 +406,8 @@ function showInput(){
 	}
 
 	// gtfo if we started a drag
-	if (dragDidStart){
+	if (dragDidStart.value){
+		dragDidStart.value = false;
 		return;
 	}
 

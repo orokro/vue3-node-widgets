@@ -38,7 +38,7 @@
 import { ref, onMounted, computed, shallowRef, watch } from 'vue';
 
 // components
-import NumberInput from './NumberInput.vue';
+import NumberInput from '../MiscWidgets/NumberInput.vue';
 
 // props
 const props = defineProps({

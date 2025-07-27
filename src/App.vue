@@ -63,6 +63,14 @@ onMounted(() => {
 	window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
 
+	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
+	window.addEventListener('keydown', (e) => {
+		if (e.key === 'Home') {
+			ctx.zoomScale.value = 1;
+			ctx.panX.value = 0;
+			ctx.panY.value = 0;
+		}
+	});
 });
 
 
