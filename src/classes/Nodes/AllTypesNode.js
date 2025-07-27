@@ -38,10 +38,14 @@ export default class AllTypesNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		// add our fields
+
+		// labels
 		this.addField(FIELD_TYPE.LABEL, { text: 'All Types Node', align:'center' });
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label B', align:'left' });
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label 3', align:'right' });
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label Next', align:'left' });
+
+		// scalar numbers
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'numberInput',
 			title: 'Positive Numbers', 
@@ -63,34 +67,46 @@ export default class AllTypesNode extends NWNode {
 					return 0;
 				}
 			},
-		});
+		});		
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'rangeInput',
 			title: 'Ranged Numbers', 
 			description: "Tests numbers widget",
-			align: 'left',
 			type: VNumber.Min(5).Max(20),
 		});
 		this.addField(FIELD_TYPE.INPUT, {
 			name: 'intInput',
 			title: 'Int Number Test',
 			description: "Tests integer widget, with positive only validation",
-			align: 'left',
 			type: VInteger,
 		});
+
+		// vectors
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'v2Input',
 			title: 'Vector 2 Input',
 			description: "Tests vector 2 widget",
-			align: 'right',
 			type: VVector2,
 		});
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'v3Input',
 			title: 'Vector 3 Input',
 			description: "Tests vector 3 widget",
-			align: 'right',
 			type: VVector3,
+		});
+
+		// angles
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'angleInput',
+			title: 'Angle Input',
+			description: "Tests angle widget",
+			type: VAngle,
+		});
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'anglesInput',
+			title: 'Angles Input',
+			description: "Tests angles widget",
+			type: VAngles,
 		});
 	}
 

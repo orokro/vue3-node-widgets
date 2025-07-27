@@ -1,14 +1,12 @@
 <!--
-	NVNumberWidget.vue
-	------------------
+	NVAngleWidget.vue
+	-----------------
 
-	This will be the component used to display the NVNumber type in the node UI.
-
-	This will appear editing for input & props & readonly for outputs / wired inputs.
+	This will be the component used to display the NVAngle type in the node UI.
 -->
 <template>
 
-	<div class="n-number-widget" :style="{
+	<div class="n-angle-widget" :style="{
 		'text-align': align,
 	}">
 
@@ -17,6 +15,9 @@
 
 			<!-- by default show value & click to enable the input -->
 			<div class="number-value-row">
+
+				<div class="icon"></div>
+
 				<NumberInput 
 					v-model="numberValue"
 					@update:modelValue="numberValue = $event"
@@ -25,6 +26,7 @@
 					:step="1"
 					:min="field.valueType.min"
 					:max="field.valueType.max"
+					:formatFn="f => `${f}°`"
 				/>
 			</div>
 
@@ -68,7 +70,7 @@ onMounted(() => {
 	// console.log("NVNumberWidget mounted");
 	// console.log("node", props.node);
 	// console.log("field", props.field);
-	// console.log("align", props.align);
+	// console.log("align", props.align); θ
 });
 
 
@@ -113,25 +115,40 @@ const validate = (value)=>{
 </script>
 <style lang="scss" scoped>
 
-	.n-number-widget {
-		
+	.n-angle-widget {
+			
 		.input-wrapper {
 			
-			// for debug
-			// border: 1px solid red;
+			// so we can position children abso-lutely
+			position: relative;
 
 			.number-value-row {
 
-				padding: 0em 0em 3em 0em;
+				padding: 0em 0em 3em 24em;
 				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);
 
+				// icon on left
+				.icon {
+					position: absolute;
+					inset: 2em 2em auto 2em;
+					width: 18em;
+					height: 18em;
+
+					// for debug
+					/* border: 1px solid red; */
+
+					// bg image for icon
+					background: url('/img/icons/angle.png') no-repeat center center;
+					background-size: 100% 100%;
+				}// icon
+
 			}// .number-value-row
 
 		}// .input-wrapper
 
-	}// .n-number-widget
+	} // .n-angle-widget
 
 </style>

@@ -147,6 +147,13 @@ const props = defineProps({
 		type: Number,
 		default: null, // no maximum by default
 	},
+
+	// add some formatting to the value when displayed
+	formatFn: {
+		type: Function,
+		default: (value) => value, // default format function
+	},
+
 });
 
 
@@ -201,7 +208,9 @@ function formatLocalValue(val) {
 	const num = Number(val);
 	if (Number.isNaN(num)) return val;
 
-	return Number.isInteger(num) ? num.toString() : num.toFixed(2).replace(/\.?0+$/, '');
+	const lv = Number.isInteger(num) ? num.toString() : num.toFixed(2).replace(/\.?0+$/, '');
+
+	return props.formatFn(lv);
 }
 
 watch(()=>localValue.value, (newVal) => {

@@ -6,6 +6,7 @@
 	Functionally identical to VNumber, but rendered differently in the UI.
 */
 import VType from '../VType.js';
+import NVAngleWidget from '@/components/TypeWidgets/NVAngleWidget.vue';
 
 export class VAngle extends VType {
 
@@ -22,6 +23,9 @@ export class VAngle extends VType {
 	/** @type {string} Theme color */
 	static themeColor = '#ffaa00';
 
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVAngleWidget;
+
 	/** @type {string} Socket style */
 	static socketStyle = 'angle';
 
@@ -29,7 +33,14 @@ export class VAngle extends VType {
 	static defaultValue = 0.0;
 
 	/** @type {(value: any) => boolean} */
-	static validateFn = (v) => typeof v === 'number' && isFinite(v);
+	static validateFn = (v) => {
+		try{
+			v = parseFloat(v);
+		}catch(e){
+			return false;
+		}
+		return typeof v === 'number' && isFinite(v)
+	};
 
 	/** @type {(value: any) => any} */
 	static lintFn = (v) => parseFloat(v);
@@ -39,6 +50,26 @@ export class VAngle extends VType {
 
 	/** Custom string representation */
 	toString() {
-		return `${this.constructor.typeName}(${this.value.toFixed(2)}°)`;
+		return `θ ${this.constructor.typeName}(${this.value.toFixed(2)}°)`;
+	}
+
+	static min = null;
+	static max = null;
+
+	/** Default constructor */
+	constructor(value) {
+
+		super(value);
+
+		this.static.min = this.static.params?.min ? this.static.params.min : null;
+		this.static.max = this.static.params?.max ? this.static.params.max : null;
+	}
+
+	static Min(min){
+		return this.addConstructorParam({min});
+	}
+
+	static Max(max){
+		return this.addConstructorParam({max});
 	}
 }

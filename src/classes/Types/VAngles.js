@@ -6,6 +6,7 @@
 	Structurally identical to VVector3 but semantically different.
 */
 import VType from '../VType.js';
+import NVAnglesWidget from '@/components/TypeWidgets/NVAnglesWidget.vue';
 
 export class VAngles extends VType {
 
@@ -21,6 +22,9 @@ export class VAngles extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#ddaa33';
+
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVAnglesWidget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'angles';
