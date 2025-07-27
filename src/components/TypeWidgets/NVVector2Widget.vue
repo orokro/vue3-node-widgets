@@ -85,14 +85,6 @@ const props = defineProps({
 });
 
 
-onMounted(() => {
-	// console.log("NVNumberWidget mounted");
-	// console.log("node", props.node);
-	// console.log("field", props.field);
-	// console.log("align", props.align);
-});
-
-
 // we'll store the editable value here & run our state logic on it
 const xValue = shallowRef(props.node.fieldState[props.field.name].val.x);
 const yValue = shallowRef(props.node.fieldState[props.field.name].val.y);
@@ -143,8 +135,8 @@ const validateFloat = (value)=>{
 				.icon {
 					position: absolute;
 					inset: 2em 2em auto 2em;
-					width: 18em;
-					height: 18em;
+					width: 16em;
+					height: 16em;
 
 					// for debug
 					/* border: 1px solid red; */

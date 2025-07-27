@@ -1,12 +1,12 @@
 <!--
-	NVAngleWidget.vue
-	-----------------
+	NVCharacterWidget.vue
+	---------------------
 
-	This will be the component used to display the NVAngle type in the node UI.
+	This will be the component used to display the NVText type in the node UI.
 -->
 <template>
 
-	<div class="n-angle-widget" :style="{
+	<div class="n-char-widget" :style="{
 		'text-align': align,
 	}">
 
@@ -18,15 +18,14 @@
 
 				<div class="icon"></div>
 
-				<NumberInput 
-					v-model="numberValue"
-					@update:modelValue="numberValue = $event"
+				<TextInput 
+					v-model="textValue"
+					@update:modelValue="textValue = $event"
 					:lint="lint"
 					:validate="validate"
-					:step="1"
-					:min="field.valueType.min"
-					:max="field.valueType.max"
-					:formatFn="f => `${f}°`"
+					:singleCharMode="true"
+					:minLength="field.valueType.minLength"
+					:maxLength="field.valueType.maxLength"
 				/>
 			</div>
 
@@ -41,6 +40,7 @@ import { ref, onMounted, computed, shallowRef, watch } from 'vue';
 
 // components
 import NumberInput from './NumberInput.vue';
+import TextInput from './TextInput.vue';
 
 // props
 const props = defineProps({
@@ -66,11 +66,10 @@ const props = defineProps({
 });
 
 
-
 // we'll store the editable value here & run our state logic on it
-const numberValue = shallowRef(props.node.fieldState[props.field.name].val);
+const textValue = shallowRef(props.node.fieldState[props.field.name].val);
 
-watch(()=>numberValue.value, (newVal) => {
+watch(()=>textValue.value, (newVal) => {
 
 	// update the node's field state when the value changes
 	props.node.fieldState[props.field.name].val = newVal;
@@ -79,36 +78,18 @@ watch(()=>numberValue.value, (newVal) => {
 
 
 const lint = (value)=>{
-
-	const valueType = props.field.valueType;
-	// both the type itself has a lint fn,
-	// as well as field itself.
-	// run both:
-	value = valueType.lint(value);
-	value = props.field.lintFn(value);
-
-	// if the value type has a min/max apply them
-	if(valueType.min!==undefined && valueType.min!==null)
-		value = Math.max(value, valueType.min);
-	if(valueType.max!==undefined && valueType.max!==null)
-		value = Math.min(value, valueType.max);
-
-	return value;
+	return value.charAt(0);
 };
 
 
 const validate = (value)=>{
-
-	// both the type itself has a validate fn,
-	// as well as field itself.
-	// run both:
-	return props.field.valueType.validate(value) && props.field.validateFn(value);
+	return value.length === 1;
 }
 
 </script>
 <style lang="scss" scoped>
 
-	.n-angle-widget {
+	.n-char-widget {
 			
 		.input-wrapper {
 			
@@ -126,15 +107,12 @@ const validate = (value)=>{
 				// icon on left
 				.icon {
 					position: absolute;
-					inset: 2em 2em auto 2em;
-					width: 16em;
-					height: 16em;
-
-					// for debug
-					/* border: 1px solid red; */
+					inset: 0em 2em auto 2em;
+					width: 20em;
+					height: 20em;
 
 					// bg image for icon
-					background: url('/img/icons/angle.png') no-repeat center center;
+					background: url('/img/icons/char.png') no-repeat center center;
 					background-size: 100% 100%;
 				}// icon
 
@@ -142,6 +120,6 @@ const validate = (value)=>{
 
 		}// .input-wrapper
 
-	} // .n-angle-widget
+	} // .n-char-widget
 
 </style>

@@ -5,6 +5,7 @@
 	Represents a single character.
 */
 import VType from '../VType.js';
+import NVCharacterWidget from '@/components/TypeWidgets/NVCharacterWidget.vue';
 
 export class VCharacter extends VType {
 	
@@ -20,6 +21,9 @@ export class VCharacter extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#aa88ee';
+
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVCharacterWidget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'character';

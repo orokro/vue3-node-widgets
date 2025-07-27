@@ -5,6 +5,7 @@
 	Represents a string of one or more characters.
 */
 import VType from '../VType.js';
+import NVTextWidget from '@/components/TypeWidgets/NVTextWidget.vue';
 
 export class VText extends VType {
 	
@@ -20,6 +21,9 @@ export class VText extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#8888cc';
+
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVTextWidget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'text';
@@ -39,5 +43,25 @@ export class VText extends VType {
 	/** Custom string representation */
 	toString() {
 		return `${this.constructor.typeName}(\"${this.value}\")`;
+	}
+
+	static minLength = null;
+	static maxLength = null;
+
+	/** Default constructor */
+	constructor(value) {
+
+		super(value);
+
+		this.static.minLength = this.static.params?.min ? this.static.params.min : null;
+		this.static.maxLength = this.static.params?.max ? this.static.params.max : null;
+	}
+
+	static Min(min){
+		return this.addConstructorParam({min});
+	}
+
+	static Max(max){
+		return this.addConstructorParam({max});
 	}
 }

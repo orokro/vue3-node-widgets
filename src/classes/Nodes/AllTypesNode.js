@@ -108,6 +108,20 @@ export default class AllTypesNode extends NWNode {
 			description: "Tests angles widget",
 			type: VAngles,
 		});
+
+		// text inputs
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'textInput',
+			title: 'Text Input',
+			description: "Tests text widget",
+			type: VText.Min(3).Max(10),
+		});
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'characterInput',
+			title: 'Character Input',
+			description: "Tests character widget",
+			type: VCharacter,
+		});
 	}
 
 

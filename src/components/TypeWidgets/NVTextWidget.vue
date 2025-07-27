@@ -1,14 +1,12 @@
 <!--
-	NVIntegerWidget.vue
-	-------------------
+	NVTextWidget.vue
+	----------------
 
-	This will be the component used to display the NVInteger type in the node UI.
-
-	This will appear editing for input & props & readonly for outputs / wired inputs.
+	This will be the component used to display the NVText type in the node UI.
 -->
 <template>
 
-	<div class="n-integer-widget" :style="{
+	<div class="n-text-widget" :style="{
 		'text-align': align,
 	}">
 
@@ -17,14 +15,16 @@
 
 			<!-- by default show value & click to enable the input -->
 			<div class="number-value-row">
-				<NumberInput 
-					v-model="numberValue"
-					@update:modelValue="numberValue = $event"
+
+				<div class="icon"></div>
+
+				<TextInput 
+					v-model="textValue"
+					@update:modelValue="textValue = $event"
 					:lint="lint"
 					:validate="validate"
-					:step="1"
-					:min="field.valueType.min"
-					:max="field.valueType.max"
+					:minLength="field.valueType.minLength"
+					:maxLength="field.valueType.maxLength"
 				/>
 			</div>
 
@@ -39,6 +39,7 @@ import { ref, onMounted, computed, shallowRef, watch } from 'vue';
 
 // components
 import NumberInput from './NumberInput.vue';
+import TextInput from './TextInput.vue';
 
 // props
 const props = defineProps({
@@ -66,9 +67,9 @@ const props = defineProps({
 
 
 // we'll store the editable value here & run our state logic on it
-const numberValue = shallowRef(props.node.fieldState[props.field.name].val);
+const textValue = shallowRef(props.node.fieldState[props.field.name].val);
 
-watch(()=>numberValue.value, (newVal) => {
+watch(()=>textValue.value, (newVal) => {
 
 	// update the node's field state when the value changes
 	props.node.fieldState[props.field.name].val = newVal;
@@ -78,52 +79,56 @@ watch(()=>numberValue.value, (newVal) => {
 
 const lint = (value)=>{
 
-	const valueType = props.field.valueType;
-	// both the type itself has a lint fn,
-	// as well as field itself.
-	// run both:
-	value = valueType.lint(value);
-	value = props.field.lintFn(value);
-
-	// if the value type has a min/max apply them
-	if(valueType.min!==undefined && valueType.min!==null)
-		value = Math.max(value, valueType.min);
-	if(valueType.max!==undefined && valueType.max!==null)
-		value = Math.min(value, valueType.max);
-
 	return value;
 };
 
 
 const validate = (value)=>{
 
+	return true;
 	// both the type itself has a validate fn,
 	// as well as field itself.
 	// run both:
-	return props.field.valueType.validate(value) && props.field.validateFn(value);
+	// return props.field.valueType.validate(value) && props.field.validateFn(value);
 }
 
 </script>
 <style lang="scss" scoped>
 
-	.n-integer-widget {
-		
+	.n-text-widget {
+			
 		.input-wrapper {
 			
+			// so we can position children abso-lutely
+			position: relative;
+
 			.number-value-row {
 
-				// for debug
-				// border: 1px solid blue;
-				padding: 0em 0em 3em 0em;
+				padding: 0em 0em 3em 24em;
 				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);
 
+				// icon on left
+				.icon {
+					position: absolute;
+					inset: 0em 2em auto 2em;
+					width: 20em;
+					height: 20em;
+
+					// for debug
+					/* border: 1px solid red; */
+
+					// bg image for icon
+					background: url('/img/icons/text.png') no-repeat center center;
+					background-size: 100% 100%;
+				}// icon
+
 			}// .number-value-row
 
 		}// .input-wrapper
 
-	}// .n-integer-widget
+	} // .n-text-widget
 
 </style>
