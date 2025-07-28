@@ -131,6 +131,20 @@ export default class AllTypesNode extends NWNode {
 			type: VBoolean.OffLabel('No').OnLabel('Yes'),
 		});
 
+		// colors
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'color3Input',
+			title: 'Color 3 Input',
+			description: "Tests color 3 widget",
+			type: VColor3,
+		});
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'color4Input',
+			title: 'Color 4 Input',
+			description: "Tests color 4 widget",
+			type: VColor4,
+		});
+
 	}
 
 

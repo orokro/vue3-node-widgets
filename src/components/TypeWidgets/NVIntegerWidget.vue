@@ -23,6 +23,7 @@
 					:lint="lint"
 					:validate="validate"
 					:step="1"
+					:dragSpeed="1/5"
 					:min="field.valueType.min"
 					:max="field.valueType.max"
 				/>

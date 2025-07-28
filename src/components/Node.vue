@@ -268,8 +268,9 @@ function startDrag(e) {
 
 					span {
 						padding: 0em;
-						font-size: 12em;
+						font-size: 11em;
 						font-style: italic;
+						opacity: 0.85;
 					}
 
 				}// .field-name

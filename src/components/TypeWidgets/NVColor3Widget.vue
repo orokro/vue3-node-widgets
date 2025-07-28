@@ -1,12 +1,13 @@
 <!--
-	NVBooleanWidget.vue
+	NVColor3Widget.vue
 	-------------------
 
-	This will be the component used to display the NVVector3 type in the node UI.
+	This will be the component used to display the NVColor3 type in the node UI.
+	(i.e. no alpha channel)
 -->
 <template>
 
-	<div class="n-boolean-widget" :style="{
+	<div class="n-color3-widget" :style="{
 		'text-align': align,
 	}">
 
@@ -23,8 +24,8 @@
 					<div class="box off"><span>{{ field.valueType.offText }}</span></div>
 					<div class="box switch">
 						<Toggle 
-							v-model="stateVal"
-							@update:modelValue="stateVal = $event"
+							v-model="color"
+							@update:modelValue="color = $event"
 							:readOnly="props.node.readOnly"
 							:field="field"
 						/>
@@ -70,19 +71,27 @@ const props = defineProps({
 });
 
 
+// const localValue = 
 // we'll store the editable value here & run our state logic on it
-const stateVal = shallowRef(props.node.fieldState[props.field.name].val);
-watch([stateVal], ([newVal], [odlVal]) => {
+const colorR = shallowRef(props.node.fieldState[props.field.name].val.r);
+const colorG = shallowRef(props.node.fieldState[props.field.name].val.g);
+const colorB = shallowRef(props.node.fieldState[props.field.name].val.b);
+
+watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
 
 	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = newVal;
+	props.node.fieldState[props.field.name].val = {
+		r: nr,
+		g: ng,
+		b: nb
+	};
 	
 });
 
 </script>
 <style lang="scss" scoped>
 
-	.n-boolean-widget {
+	.n-color3-widget {
 		
 		.input-wrapper {
 			
@@ -142,6 +151,6 @@ watch([stateVal], ([newVal], [odlVal]) => {
 
 		}// .input-wrapper
 
-	}// .n-boolean-widget
+	}// .n-color3-widget
 
 </style>
