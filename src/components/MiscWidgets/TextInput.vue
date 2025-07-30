@@ -142,9 +142,17 @@ const inputEnabled = ref(false);
 // helper to see which side should have rounding CSS
 const roundCss = computed(()=>{
 
+	// originally I only supported left/right/both, but later needed all corners/
+	// this is kinda goofy now, so I should probably refactor this at some point
 	let classNames = {
 		'rounded-left': (props.round === 'left' || props.round === 'both'),
 		'rounded-right': (props.round === 'right' || props.round === 'both'),
+		'rounded-top': (props.round === 'top'),
+		'rounded-bottom': (props.round === 'bottom'),
+		'rounded-tl': (props.round === 'top-left'),
+		'rounded-tr': (props.round === 'top-right'),
+		'rounded-bl': (props.round === 'bottom-left'),
+		'rounded-br': (props.round === 'bottom-right'),
 	};
 	return classNames;
 });
@@ -181,6 +189,11 @@ watch(()=>localValue.value, (newVal) => {
 
 	// check if the value is valid
 	invalidValue.value = !isValidValue(newVal);
+
+	// if we're valid, broad cast the value
+	if (!invalidValue.value) {
+		updateModel(newVal);
+	}
 });
 
 
@@ -299,15 +312,30 @@ function showInput(){
 		// so we can position children abso-lutely
 		position: relative;
 
-		// border rounding	
-		&.rounded-left, &.rounded-left input {
-			border-radius: 20em 0em 0em 20em;
-		}
-		&.rounded-right, &.rounded-right input {
-			border-radius: 0em 20em 20em 0em;
-		}
-		&.rounded-left.rounded-right, &.rounded-left.rounded-right input {
-			border-radius: 20em;
+		// border rounding
+		// NOTE: as I described in the computed function above, this got out of hand
+		// so I should probably refactor this at some point
+		// (originally I only supported left/right/both, but later needed all corners,)
+		&.rounded-left {
+			border-radius: 20em 0em 0em 20em; }
+		&.rounded-right {
+			border-radius: 0em 20em 20em 0em; }
+		&.rounded-left.rounded-right {
+			border-radius: 20em; }
+		&.rounded-top {
+			border-radius: 10em 10em 0em 0em; }
+		&.rounded-bottom {
+			border-radius: 0em 0em 10em 10em; }
+		&.rounded-tl {
+			border-radius: 10em 0em 0em 0em; }
+		&.rounded-tr {
+			border-radius: 0em 10em 0em 0em; }
+		&.rounded-bl {
+			border-radius: 0em 0em 0em 10em; }
+		&.rounded-br {
+			border-radius: 0em 0em 10em 0em; }
+		input {
+			border-radius: 0px;
 		}
 
 		// allow nothing to escape

@@ -5,6 +5,7 @@
 	Represents a color using red, green, and blue floating-point components.
 */
 import VType from '../VType.js';
+import NVColor3Widget from '@/components/TypeWidgets/NVColor3Widget.vue';
 
 export class VColor3 extends VType {
 	
@@ -20,6 +21,9 @@ export class VColor3 extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#cc3388';
+
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVColor3Widget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'color3';
