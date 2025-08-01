@@ -303,6 +303,13 @@ function showInput(){
 	});
 }
 
+// provide some things outside the component
+defineExpose({
+
+	// expose the inputRef so we can focus it from outside
+	inputEnabled,
+});
+
 </script>
 <style lang="scss" scoped>
 

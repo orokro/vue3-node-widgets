@@ -26,9 +26,8 @@
 		<div 
 			class="number-value"			
 			@mousedown="startDrag"
-			@click="showInput"
+			@mouseup="showInput"
 		>
-
 			<template v-if="min !== null && max !== null">
 				<!-- background bar for the slider -->
 				<div 
@@ -45,7 +44,7 @@
 				v-if="showButtons && !isDragging"
 				class="btn decrement"
 				:title="`Decrease by ${step}`"
-				@mousedown.stop
+				@mousedown.stop.prevent
 				@mouseup.stop.prevent="changeValue(localValue - step)"
 			>
 				<span>◀</span>
@@ -54,7 +53,7 @@
 				v-if="showButtons && !isDragging"
 				class="btn increment"
 				:title="`Increase by ${step}`"
-				@mousedown.stop
+				@mousedown.stop.prevent
 				@mouseup.stop.prevent="changeValue(localValue + step)"
 			>
 				<span>▶</span>
@@ -158,7 +157,7 @@ const props = defineProps({
 
 
 // so we can update the model value
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue']);
 
 // reference to our input element so we can focus it when clicked
 const inputRef = ref(null);
@@ -168,7 +167,7 @@ const localValue = ref(props.modelValue)
 
 watch(() => props.modelValue, (newVal) => {
 	localValue.value = newVal
-})
+});
 
 // true when we're in an error state
 const invalidValue = ref(false);
@@ -206,6 +205,7 @@ const roundCss = computed(()=>{
 	};
 	return classNames;
 });
+
 
 /**
  * Makes sure we never show more than 2 decimal places, but isn't always fixed, 
@@ -433,6 +433,14 @@ function showInput(){
 		inputRef.value.select();
 	});
 }
+
+
+// provide some things outside the component
+defineExpose({
+
+	// expose the inputRef so we can focus it from outside
+	inputEnabled,
+});
 
 </script>
 <style lang="scss" scoped>

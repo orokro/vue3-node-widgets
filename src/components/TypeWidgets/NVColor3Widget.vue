@@ -32,7 +32,7 @@
 							:max="1"
 							:step="0.01"
 							round="top-left"
-							:formatFn="f => `r ${f}`"
+							:formatFn="f => `r:${f}`"
 						/>
 					</div>
 
@@ -46,7 +46,7 @@
 							:step="0.01"
 							border="0px 0px 0px 2px"
 							round="neither"
-							:formatFn="f => `g ${f}`"
+							:formatFn="f => `g:${f}`"
 						/>
 					</div>
 
@@ -60,19 +60,30 @@
 							:step="0.01"
 							border="0px 0px 0px 2px"
 							round="top-right"
-							:formatFn="f => `b ${f}`"
+							:formatFn="f => `b:${f}`"
 						/>
 					</div>
 
 				</div>
-				<TextInput 
-					class="hex-input"
-					v-model="hexValue"
-					@update:modelValue="hexValue = $event"
-					round="bottom"
-					:lint="lintHex"
-					:validate="validateHex"
-				/>
+
+				<!-- text and color-picker row -->
+				<div class="color-picker-row">
+
+					<TextInput 
+						ref="hexEditEl"
+						class="hex-input"
+						v-model="hexValue"
+						@update:modelValue="hexValue = $event"
+						round="bottom-left"
+						:lint="lintHex"
+						:validate="validateHex"
+					/>
+
+					<div class="color-input-wrapper">
+						<input type="color" v-model="hexValue" />
+					</div>
+				</div>
+
 			</div>
 
 		</div>
@@ -117,6 +128,8 @@ const props = defineProps({
 	
 });
 
+const hexEditEl = ref(null);
+
 
 // const localValue = 
 // we'll store the editable value here & run our state logic on it
@@ -135,6 +148,11 @@ watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
 		g: ng,
 		b: nb
 	};
+
+	if(hexEditEl.value.inputEnabled==true){
+		console.log('not updating hex value because input is enabled');
+		return;
+	}
 
 	// update the hex value whenever the RGB values change
 	hexValue.value = rgbToHex(nr, ng, nb);
@@ -199,7 +217,7 @@ function hexToRgbFloat(hex) {
 
 // we'll use a local variable to store the hex equivalent of the color
 // and allow the user to type hex, but internally we'll
-// alawys convert and store to floating-point r-g-b-values
+// always convert and store to floating-point r-g-b-values
 const hexValue = ref(rgbToHex(colorR.value, colorG.value, colorB.value));
 
 
@@ -208,7 +226,7 @@ watch(() => hexValue.value, (newVal, oldVal) => {
 
 	// If it's not a valid hex color, revert to the old value & GTFO
 	if (!colord(newVal).isValid()) {
-		console.warn(`Invalid hex color: ${newVal}`);
+		// console.warn(`Invalid hex color: ${newVal}`);
 		hexValue.value = oldVal;
 		return;
 	}
@@ -223,7 +241,7 @@ watch(() => hexValue.value, (newVal, oldVal) => {
 		colorG.value = rgb.g;
 		colorB.value = rgb.b;
 	} else {
-		console.warn(`Failed to convert hex to RGB: ${newVal}`);
+		// console.warn(`Failed to convert hex to RGB: ${newVal}`);
 	}
 
 });
@@ -334,7 +352,37 @@ function validateHex(v) {
 					}
 				}// .color-rgb-wrapper
 
+				// below the R:G:B boxes, we'll have a #hex input & a regular ol color picker
+				.color-picker-row {
 
+					display: flex;
+
+					.hex-input {
+						width: 50%;						
+					}
+
+					.color-input-wrapper {
+
+						position: relative;
+
+						width: 50%;
+						background: black;
+						border-left: 2px solid black;
+						border-radius: 0em 0em 10em 0em;
+
+						overflow: clip;
+
+						input {
+							position: absolute;
+							inset: -10px -10px -10px -10px;
+							width: calc(100% + 20px);
+							height: calc(100% + 20px);
+
+						}
+
+					}// .color-input-wrapper
+
+				}// .color-picker-row
 				
 			}// .number-value-row
 
@@ -346,10 +394,10 @@ function validateHex(v) {
 <style lang="css">
 
 	.hex-input .text-value{
-		background: var(--hex-color) !important;
+		/* background: var(--hex-color) !important; */
 	}
 
 	.hex-input:not(.invalid-value) input {
-		background: var(--hex-color) !important;
+		/* background: var(--hex-color) !important; */
 	}
 </style>
