@@ -1,20 +1,17 @@
 
 - support "/" path for nodes menu
 
+- Add color widgets ✔️
+- Add select combo widget (property only) ✔️
 
-
-
-
-- Add color widgets
-- Add select combo widget (property only)
 - Spawn sockets separately from widgets, but have widgets provide the initial Y values
-- Build connection managaer with some pre-made connections
+- Build connection manager with some pre-made connections
 	- Connection manager stores
 		- from node
 		- from sockets
 		- to node
 		- to sockets
-	- Connection mananger 
+	- Connection manager 
 		- Renders one SVG per connection
 		- Nodes store socket x/y positions on their self, with refs
 		- Connections use ref to dynamically update the SVG wires with computed

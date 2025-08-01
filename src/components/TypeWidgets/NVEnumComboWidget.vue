@@ -105,7 +105,7 @@ watch(()=>props.node.fieldState[props.field.name].val, (newVal) => {
 				.gray-wrapper {
 					border-radius: 10em;
 					background: gray;
-					height: 20em;
+					height: 18em;
 
 					select {
 
