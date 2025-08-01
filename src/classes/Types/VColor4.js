@@ -5,6 +5,7 @@
 	Represents a color using red, green, blue, and alpha floating-point components.
 */
 import VType from '../VType.js';
+import NVColor4Widget from '@/components/TypeWidgets/NVColor4Widget.vue';
 
 export class VColor4 extends VType {
 	
@@ -21,11 +22,14 @@ export class VColor4 extends VType {
 	/** @type {string} Theme color */
 	static themeColor = '#cc66aa';
 
+	/** @type {Function} Vue component for the node widget */
+	static nodeWidgetComponent = NVColor4Widget;
+
 	/** @type {string} Socket style */
 	static socketStyle = 'color4';
 
 	/** @type {*} Default value */
-	static defaultValue = { r: 0, g: 0, b: 0, a: 1.0 };
+	static defaultValue = { r: 0, g: 0, b: 0, a: 1 };
 
 	/** @type {(value: any) => boolean} */
 	static validateFn = (v) => typeof v === 'object' && v !== null &&

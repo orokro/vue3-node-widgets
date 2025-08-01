@@ -1,14 +1,14 @@
 <!--
-	NVColor3Widget.vue
+	NVColor4Widget.vue
 	-------------------
 
-	This will be the component used to display the NVColor3 type in the node UI.
-	(i.e. no alpha channel)
+	This will be the component used to display the NVColor4 type in the node UI.
+	(i.e. has alpha channel)
 -->
 <template>
 
 	<div 
-		class="n-color3-widget" 
+		class="n-color4-widget" 
 		:style="{
 			'text-align': align,
 			'--hex-color': hexValue,
@@ -59,8 +59,22 @@
 							:max="1"
 							:step="0.01"
 							border="0px 0px 0px 2px"
-							round="top-right"
+							round="neither"
 							:formatFn="f => `b:${f}`"
+						/>
+					</div>
+
+					<div class="a">
+						<NumberInput 
+							v-model="colorA"
+							:lint="lintFloat"
+							:validate="validateFloat"
+							:min="0"
+							:max="1"
+							:step="0.01"
+							border="0px 0px 0px 2px"
+							round="top-right"
+							:formatFn="f => `a:${f}`"
 						/>
 					</div>
 
@@ -80,7 +94,13 @@
 					/>
 
 					<div class="color-input-wrapper">
-						<input type="color" v-model="hexValue" />
+						<input 
+							type="color"
+							:style="{
+								opacity: colorA,
+							}"
+							v-model="colorInputHexValue"
+						/>
 					</div>
 				</div>
 
@@ -136,17 +156,19 @@ const hexEditEl = ref(null);
 const colorR = shallowRef(props.node.fieldState[props.field.name].val.r);
 const colorG = shallowRef(props.node.fieldState[props.field.name].val.g);
 const colorB = shallowRef(props.node.fieldState[props.field.name].val.b);
+const colorA = shallowRef(props.node.fieldState[props.field.name].val.a); 
 
-watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
+watch([colorR, colorG, colorB, colorA], ([nr, ng, nb, na], [or, og, ob, oa]) => {
 
 	// prevent watcher loop if values are the same
-	if (nr === or && ng === og && nb === ob) return;
+	if (nr === or && ng === og && nb === ob && na == oa) return;
 
 	// update the node's field state when the value changes
 	props.node.fieldState[props.field.name].val = {
 		r: nr,
 		g: ng,
-		b: nb
+		b: nb,
+		a: na
 	};
 
 	if(hexEditEl.value.inputEnabled==true){
@@ -155,7 +177,8 @@ watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
 	}
 
 	// update the hex value whenever the RGB values change
-	hexValue.value = rgbToHex(nr, ng, nb);
+	hexValue.value = rgbaToHex(nr, ng, nb, na);
+	colorInputHexValue.value = hexValue.value.slice(0, -2); 
 	
 });
 
@@ -163,63 +186,109 @@ watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
 
 // using colord convert floating point r-g-b-values to hex
 /**
- * Converts RGB floats (0–1) to HEX color string.
+ * Converts RGBA floats (0–1) to HEX color string with alpha.
  * @param {number} r - Red channel (0 to 1)
  * @param {number} g - Green channel (0 to 1)
  * @param {number} b - Blue channel (0 to 1)
- * @returns {string} Hex color string (e.g. "#ff7e00")
+ * @param {number} a - Alpha channel (0 to 1)
+ * @returns {string} Hex color string with alpha (e.g. "#ff7e00cc")
  */
-function rgbToHex(r, g, b) {
-
+ function rgbaToHex(r, g, b, a = 1) {
 	// Convert 0–1 floats to 0–255 integers
 	const R = Math.round(r * 255);
 	const G = Math.round(g * 255);
 	const B = Math.round(b * 255);
+	const A = a;
 
-	// Use colord to convert to hex
-	return colord({ r: R, g: G, b: B }).toHex();
-}
+	// Use colord to convert to hex including alpha
+	let hexStr = colord({ r: R, g: G, b: B, a: A }).toHex(); 
+
+	// if alpha is 1, colorDoes not include it, so we add it manually
+	if(A>=1)
+		hexStr += "ff";
+	
+	return hexStr;
+ }
 
 
 /**
- * Converts a hex color string to an object with r, g, b properties (0–1 floats).
- * 
- * @param hex - Hex color string (e.g. "#ff7e00")
- * @returns {Object|null} Object with r, g, b properties (0–1 floats) or null if invalid
+ * Converts a hex color string to an object with r, g, b, a properties (0–1 floats).
+ *
+ * Supports:
+ * - #RGB
+ * - #RGBA
+ * - #RRGGBB
+ * - #RRGGBBAA
+ *
+ * @param {string} hex - Hex color string (e.g. "#ff7e00cc")
+ * @returns {Object|null} { r, g, b, a } or null if invalid
  */
-function hexToRgbFloat(hex) {
-	if (typeof hex !== 'string') return null
+ function hexToRgbaFloat(hex) {
+	if (typeof hex !== "string") return null;
 
 	// Normalize input
-	let cleaned = hex.trim().replace(/^#/, '')
+	let cleaned = hex.trim().replace(/^#/, "");
 
-	// Support shorthand (#RGB)
-	if (cleaned.length === 3) {
-		cleaned = cleaned
-			.split('')
-			.map((ch) => ch + ch)
-			.join('')
+	// Expand shorthand (#RGB or #RGBA)
+	if (cleaned.length === 3 || cleaned.length === 4) {
+	cleaned = cleaned
+		.split("")
+		.map((ch) => ch + ch)
+		.join("");
 	}
 
-	// Must be exactly 6 hex digits now
-	if (!/^[0-9A-Fa-f]{6}$/.test(cleaned)) {
-		return null
+	// Must be 6 (RGB) or 8 (RGBA) hex digits now
+	if (!/^[0-9A-Fa-f]{6}([0-9A-Fa-f]{2})?$/.test(cleaned)) {
+	return null;
 	}
 
-	// Extract channels
-	const r = parseInt(cleaned.slice(0, 2), 16) / 255
-	const g = parseInt(cleaned.slice(2, 4), 16) / 255
-	const b = parseInt(cleaned.slice(4, 6), 16) / 255
+	// Extract RGB
+	const r = parseInt(cleaned.slice(0, 2), 16) / 255;
+	const g = parseInt(cleaned.slice(2, 4), 16) / 255;
+	const b = parseInt(cleaned.slice(4, 6), 16) / 255;
 
-	return { r, g, b }
+	// Extract Alpha if present, otherwise default to 1
+	const a = cleaned.length === 8 ? parseInt(cleaned.slice(6, 8), 16) / 255 : 1;
+	
+	return { r, g, b, a };
 }
 
 
 // we'll use a local variable to store the hex equivalent of the color
 // and allow the user to type hex, but internally we'll
 // always convert and store to floating-point r-g-b-values
-const hexValue = ref(rgbToHex(colorR.value, colorG.value, colorB.value));
+const hexValue = ref(rgbaToHex(colorR.value, colorG.value, colorB.value, colorA.value));
 
+// for color 4, we need a separate variable to use with the color input because
+// the color input does not support alpha channel
+// chop off the last two characters (alpha) from the hex value
+const hexValueWithoutAlpha = computed(() => {
+	return hexValue.value.slice(0, -2);
+});
+const colorInputHexValue = ref(hexValueWithoutAlpha.value);
+
+watch(() => colorInputHexValue.value, (newVal, oldVal) => {
+
+	// If it's not a valid hex color, revert to the old value & GTFO
+	if (!colord(newVal).isValid()) {
+		// console.warn(`Invalid hex color: ${newVal}`);
+		hexValue.value = oldVal;
+		return;
+	}
+
+	// prevent watcher loop if values are the same
+	if (newVal === oldVal) return;
+
+	// Convert hex to RGB floats
+	const rgb = hexToRgbaFloat(newVal);
+	if (rgb) {
+		colorR.value = rgb.r;
+		colorG.value = rgb.g;
+		colorB.value = rgb.b;
+	} else {
+		// console.warn(`Failed to convert hex to RGB: ${newVal}`);
+	}
+});
 
 // Validate whenever hexValue changes
 watch(() => hexValue.value, (newVal, oldVal) => {
@@ -234,12 +303,15 @@ watch(() => hexValue.value, (newVal, oldVal) => {
 	// prevent watcher loop if values are the same
 	if (newVal === oldVal) return;
 
+	colorInputHexValue.value = newVal.slice(0, -2);
+
 	// Convert hex to RGB floats
-	const rgb = hexToRgbFloat(newVal);
+	const rgb = hexToRgbaFloat(newVal);
 	if (rgb) {
 		colorR.value = rgb.r;
 		colorG.value = rgb.g;
 		colorB.value = rgb.b;
+		colorA.value = rgb.a !== undefined ? rgb.a : 1; 
 	} else {
 		// console.warn(`Failed to convert hex to RGB: ${newVal}`);
 	}
@@ -311,9 +383,9 @@ function lintHex(v) {
  */
 function validateHex(v) {
 
-	// gtfo if its not a string and if its length is less than 7
+	// check if its a string and has at least 9 characters (including #)
 	if( typeof v !== "string" ) return false;
-	if( v.length < 7 ) return false;
+	if( v.length < 9 ) return false;
 
 	return colord(v).isValid();
 }
@@ -322,7 +394,7 @@ function validateHex(v) {
 </script>
 <style lang="scss" scoped>
 
-	.n-color3-widget {
+	.n-color4-widget {
 		
 		.input-wrapper {
 			
@@ -346,14 +418,8 @@ function validateHex(v) {
 					border-bottom: 5px solid black;
 
 					display: flex;
-					.r {
-						width: 33.33%;
-					}
-					.g {
-						width: 33.33%;
-					}
-					.b {
-						width: 33.33%;
+					.r, .g, .b, .a {
+						width: 25%;
 					}
 				}// .color-rgb-wrapper
 
@@ -371,7 +437,10 @@ function validateHex(v) {
 						position: relative;
 
 						width: 50%;
-						background: black;
+						background: 
+ 							repeating-conic-gradient(#808080 0 25%, #0000 0 50%) 
+      						50% / 20px 20px;
+
 						border-left: 2px solid black;
 						border-radius: 0em 0em 10em 0em;
 
@@ -393,6 +462,6 @@ function validateHex(v) {
 
 		}// .input-wrapper
 
-	}// .n-color3-widget
+	}// .n-color4-widget
 
 </style>
