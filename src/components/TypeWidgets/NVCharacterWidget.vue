@@ -6,10 +6,12 @@
 -->
 <template>
 
-	<div class="n-char-widget" :style="{
-		'text-align': align,
-	}">
-
+	<div 
+		class="n-char-widget" 
+		:style="{
+			'text-align': align,
+		}"
+	>
 		<!-- the outer most wrapper -->
 		<div class="input-wrapper">
 

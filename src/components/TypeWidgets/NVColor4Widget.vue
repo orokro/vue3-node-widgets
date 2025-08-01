@@ -14,7 +14,6 @@
 			'--hex-color': hexValue,
 		}"
 	>
-
 		<!-- the outer most wrapper -->
 		<div class="input-wrapper">
 

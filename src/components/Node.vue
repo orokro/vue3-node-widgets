@@ -51,6 +51,7 @@
 					
 					<div 
 						class="node-field-row"
+						:data-type="field.fieldType"
 						v-for="(field, index) in node.constructor.fields"
 					>
 						<NLabel 
@@ -59,7 +60,7 @@
 							:text="field.text"
 							:align="field.align"/>
 
-						<template v-else-if="field.fieldType == FIELD_TYPE.INPUT">
+						<template v-else-if="[FIELD_TYPE.INPUT, FIELD_TYPE.PROP].includes(field.fieldType)">
 							<div 
 								class="field-name"
 								:title="field.description"

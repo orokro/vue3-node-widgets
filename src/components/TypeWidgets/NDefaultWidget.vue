@@ -9,9 +9,12 @@
 -->
 <template>
 
-	<div class="n-default-widget" :style="{
-		'text-align': align,
-	}">
+	<div 
+		class="n-default-widget"
+		:style="{
+			'text-align': align,
+		}"
+	>
 		<span>{{field.name }}</span>
 	</div>
 

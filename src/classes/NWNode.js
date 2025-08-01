@@ -381,6 +381,26 @@ export default class NWNode {
 				});
 				break;
 
+			case FIELD_TYPE.PROP:
+				
+				const propDef = {
+					fieldType: FIELD_TYPE.PROP,
+					valueType: options.type,
+					name: options.name,
+					title: options.title,
+					description: options.description,
+					align: options.align,
+				};
+
+				// add to the fields array & inputs map
+				this.fields.push(propDef);
+
+				console.log(this.fields);
+				// props don't have inputs or outputs
+				// they're for widget use only
+
+				break;
+
 			default:
 				throw new Error(`Unknown field type: ${fieldType}`);
 		

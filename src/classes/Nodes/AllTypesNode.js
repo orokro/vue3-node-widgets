@@ -20,6 +20,7 @@ import {
 	VText,
 	VVector2,
 	VVector3,
+	VEnum,
  } from '../Types/index.js';
  
 // main export
@@ -143,6 +144,14 @@ export default class AllTypesNode extends NWNode {
 			title: 'Color 4 Input',
 			description: "Tests color 4 widget",
 			type: VColor4,
+		});
+		
+		// enumeration
+		this.addField(FIELD_TYPE.PROP, { 
+			name: 'enumInput',
+			title: 'Enum Input',
+			description: "Tests enumeration widget",
+			type: VEnum.With(['Option 1', 'Option 2', 'Option 3']),
 		});
 
 	}

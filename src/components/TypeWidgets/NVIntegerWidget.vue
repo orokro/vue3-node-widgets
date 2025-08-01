@@ -8,10 +8,12 @@
 -->
 <template>
 
-	<div class="n-integer-widget" :style="{
-		'text-align': align,
-	}">
-
+	<div 
+		class="n-integer-widget" 
+		:style="{
+			'text-align': align,
+		}"
+	>
 		<!-- the outer most wrapper -->
 		<div class="input-wrapper">
 
