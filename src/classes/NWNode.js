@@ -395,7 +395,6 @@ export default class NWNode {
 				// add to the fields array & inputs map
 				this.fields.push(propDef);
 
-				console.log(this.fields);
 				// props don't have inputs or outputs
 				// they're for widget use only
 

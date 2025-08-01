@@ -171,7 +171,7 @@ watch([colorR, colorG, colorB, colorA], ([nr, ng, nb, na], [or, og, ob, oa]) => 
 	};
 
 	if(hexEditEl.value.inputEnabled==true){
-		console.log('not updating hex value because input is enabled');
+		// console.log('not updating hex value because input is enabled');
 		return;
 	}
 
