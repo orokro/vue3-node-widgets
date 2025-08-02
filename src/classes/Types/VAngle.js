@@ -27,7 +27,7 @@ export class VAngle extends VType {
 	static nodeWidgetComponent = NVAngleWidget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'angle';
+	static socketStyle = 'R,R,R,R,0';
 
 	/** @type {*} Default value */
 	static defaultValue = 0.0;

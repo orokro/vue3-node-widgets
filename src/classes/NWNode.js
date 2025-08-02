@@ -320,12 +320,18 @@ export default class NWNode {
 			...options,
 		};
 
+		// base object to mix in things
+		const baseField = {
+			fieldType,
+			name: options.name, 
+		};
+
 		switch(fieldType){
 
 			case FIELD_TYPE.LABEL:
 				
 				this.fields.push({
-					fieldType: FIELD_TYPE.LABEL,
+					...baseField,
 					text: options.text,
 					align: options.align,
 					title: options.title,
@@ -338,9 +344,8 @@ export default class NWNode {
 
 				// pack up the input field definition
 				const inputDef = {
-					fieldType: FIELD_TYPE.INPUT,
+					...baseField,
 					valueType: options.type,
-					name: options.name,
 					title: options.title,
 					description: options.description,
 					align: options.align,
@@ -359,9 +364,8 @@ export default class NWNode {
 				
 				// pack up the output field definition
 				const outputDef = {
-					fieldType: FIELD_TYPE.OUTPUT,
+					...baseField,
 					valueType: options.type,
-					name: options.name,
 					title: options.title,
 					description: options.description,
 					align: options.align,
@@ -376,7 +380,7 @@ export default class NWNode {
 			case FIELD_TYPE.CUSTOM:
 				
 				this.fields.push({
-					fieldType: FIELD_TYPE.CUSTOM,
+					...baseField,
 					component: options.component,
 				});
 				break;
@@ -384,9 +388,8 @@ export default class NWNode {
 			case FIELD_TYPE.PROP:
 				
 				const propDef = {
-					fieldType: FIELD_TYPE.PROP,
+					...baseField,
 					valueType: options.type,
-					name: options.name,
 					title: options.title,
 					description: options.description,
 					align: options.align,
@@ -490,6 +493,14 @@ export default class NWNode {
 		const wrapped = { 
 			name,
 			_valueObj: value,
+			data: {
+				
+				inputYPos: ref(0),
+				outputYPos: ref(0),
+
+				// ref to the row element in the DOM
+				rowEl: ref(null),
+			}
 		};
 
 		const node = this;

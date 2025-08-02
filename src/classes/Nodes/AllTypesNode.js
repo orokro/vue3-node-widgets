@@ -41,7 +41,7 @@ export default class AllTypesNode extends NWNode {
 		// add our fields
 
 		// labels
-		this.addField(FIELD_TYPE.LABEL, { text: 'All Types Node', align:'center' });
+		this.addField(FIELD_TYPE.LABEL, { name: 'lbl', text: 'All Types Node', align:'center' });
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label B', align:'left' });
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label 3', align:'right' });
 		// this.addField(FIELD_TYPE.LABEL, { text: 'Label Next', align:'left' });
@@ -145,7 +145,7 @@ export default class AllTypesNode extends NWNode {
 			description: "Tests color 4 widget",
 			type: VColor4,
 		});
-		
+
 		// enumeration
 		this.addField(FIELD_TYPE.PROP, { 
 			name: 'enumInput',

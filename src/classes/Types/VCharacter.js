@@ -26,7 +26,7 @@ export class VCharacter extends VType {
 	static nodeWidgetComponent = NVCharacterWidget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'character';
+	static socketStyle = 'S,R,S,R,45';
 
 	/** @type {*} Default value */
 	static defaultValue = 'A';

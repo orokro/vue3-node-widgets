@@ -26,7 +26,7 @@ export class VVector3 extends VType {
 	static nodeWidgetComponent = NVVector3Widget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'vector3';
+	static socketStyle = 'R,S,R,S,45';
 
 	/** @type {*} Default value */
 	static defaultValue = { x: 0, y: 0, z: 0 };

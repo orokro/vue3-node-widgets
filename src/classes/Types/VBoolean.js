@@ -26,7 +26,7 @@ export class VBoolean extends VType {
 	static nodeWidgetComponent = NVBooleanWidget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'boolean';
+	static socketStyle = 'S,S,R,R,0';
 
 	/** @type {*} Default value */
 	static defaultValue = false;

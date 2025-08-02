@@ -26,7 +26,7 @@ export class VText extends VType {
 	static nodeWidgetComponent = NVTextWidget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'text';
+	static socketStyle = 'S,R,S,R,45';
 
 	/** @type {*} Default value */
 	static defaultValue = '';

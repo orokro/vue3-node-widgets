@@ -28,7 +28,7 @@ export class VNumber extends VType {
 	static nodeWidgetComponent = NVNumberWidget;
 	
 	/** @type {string} Socket style */
-	static socketStyle = 'circle';
+	static socketStyle = 'R,R,R,R,0';
 
 	/** @type {*} Default value */
 	static defaultValue = 0.0;
