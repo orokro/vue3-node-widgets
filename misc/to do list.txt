@@ -1,5 +1,6 @@
 
 - support "/" path for nodes menu
+- disable right-click for input events (i.e. dragging numbers)
 
 - Add color widgets ✔️
 - Add select combo widget (property only) ✔️
