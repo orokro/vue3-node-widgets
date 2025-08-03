@@ -20,7 +20,17 @@ export class VColor4 extends VType {
 	static description = 'RGBA color with floating-point red, green, blue, and alpha values';
 
 	/** @type {string} Theme color */
-	static themeColor = '#cc66aa';
+	static themeColor = `conic-gradient(
+		from 0deg at 50% 50%,
+		red,
+		orange,
+		yellow,
+		green,
+		cyan,
+		violet,
+		red
+		)
+	`;
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVColor4Widget;

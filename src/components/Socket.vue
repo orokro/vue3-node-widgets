@@ -22,6 +22,11 @@
 			class="corner-socket"
 			:style="cornerStyle"
 		/>		
+		<div
+			v-else="socketFormat === 'svg'"
+		>
+			<!-- hello chatGPT -->
+		</div>
 	</div>
 
 </template>
@@ -218,7 +223,7 @@ function generateCornerStyle(input, themeColor = '#000') {
 	const borderRadius = `${cornerMap(tl)} ${cornerMap(tr)} ${cornerMap(br)} ${cornerMap(bl)}`;
 
 	return {
-		backgroundColor: themeColor,
+		background: themeColor,
 		borderRadius: borderRadius,
 		transform: `rotate(${degrees}deg)`,
 	};

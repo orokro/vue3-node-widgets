@@ -21,6 +21,7 @@ export class VVector3 extends VType {
 
 	/** @type {string} Theme color */
 	static themeColor = '#2288cc';
+	static themeColor = '#7777ff';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVVector3Widget;

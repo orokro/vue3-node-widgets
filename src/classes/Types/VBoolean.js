@@ -20,7 +20,7 @@ export class VBoolean extends VType {
 	static description = 'A binary value representing true or false';
 
 	/** @type {string} Theme color */
-	static themeColor = '#559966';
+	static themeColor = 'lightgray';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVBooleanWidget;

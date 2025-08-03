@@ -20,7 +20,17 @@ export class VColor3 extends VType {
 	static description = 'RGB color with floating-point red, green, and blue values';
 
 	/** @type {string} Theme color */
-	static themeColor = '#cc3388';
+	static themeColor = `conic-gradient(
+		from 0deg at 50% 50%,
+		red,
+		orange,
+		yellow,
+		green,
+		cyan,
+		violet,
+		red
+		)
+	`;
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVColor3Widget;

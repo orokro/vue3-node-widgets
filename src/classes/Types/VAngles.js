@@ -21,7 +21,7 @@ export class VAngles extends VType {
 	static description = 'Euler angles: pitch (x), yaw (y), and roll (z)';
 
 	/** @type {string} Theme color */
-	static themeColor = '#ddaa33';
+	static themeColor = 'orange';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVAnglesWidget;

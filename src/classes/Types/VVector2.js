@@ -20,7 +20,8 @@ export class VVector2 extends VType {
 	static description = 'A 2D vector with x and y floating-point components';
 
 	/** @type {string} Theme color */
-	static themeColor = '#44aa88';
+	// static themeColor = '#44aa88';
+	static themeColor = '#9999ff';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVVector2Widget;

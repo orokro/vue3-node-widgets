@@ -20,7 +20,8 @@ export class VInteger extends VType {
 	static description = 'A whole number (no decimal part)';
 
 	/** @type {string} Theme color */
-	static themeColor = '#cc3333';
+	// static themeColor = '#2266cc';
+	static themeColor = '#11bb44';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVIntegerWidget;

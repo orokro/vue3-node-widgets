@@ -21,7 +21,7 @@ export class VEnum extends VType {
 	static description = 'A list of indexed strings to switch between';
 
 	/** @type {string} Theme color */
-	static themeColor = '#3366cc';
+	static themeColor = 'darkgray';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVEnumComboWidget;

@@ -20,7 +20,8 @@ export class VText extends VType {
 	static description = 'A string of characters';
 
 	/** @type {string} Theme color */
-	static themeColor = '#8888cc';
+	// static themeColor = '#8888cc';
+	static themeColor = '#2288cc';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVTextWidget;

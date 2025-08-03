@@ -20,14 +20,15 @@ export class VCharacter extends VType {
 	static description = 'A single character (text length = 1)';
 
 	/** @type {string} Theme color */
-	static themeColor = '#aa88ee';
+	// static themeColor = '#aa88ee';
+	static themeColor = '#2266cc';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVCharacterWidget;
 
 	/** @type {string} Socket style */
 	static socketStyle = 'S,R,S,R,45';
-
+	
 	/** @type {*} Default value */
 	static defaultValue = 'A';
 

@@ -21,7 +21,7 @@ export class VAngle extends VType {
 	static description = 'A floating-point number interpreted as an angle';
 
 	/** @type {string} Theme color */
-	static themeColor = '#ffaa00';
+	static themeColor = '#ff8800';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVAngleWidget;

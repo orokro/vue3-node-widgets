@@ -22,7 +22,8 @@ export class VNumber extends VType {
 	static description = 'A positive or negative floating-point number';
 
 	/** @type {string} Theme color */
-	static themeColor = '#3366cc';
+	// static themeColor = '#2288cc';
+	static themeColor = '#11ee66';
 
 	/** @type {Function} Vue component for the node widget */
 	static nodeWidgetComponent = NVNumberWidget;
