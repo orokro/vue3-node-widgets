@@ -52,8 +52,8 @@ const props = defineProps({
 	},
 });
 
-// store the heirarchy of the menu
-const menuHeirarchy = shallowRef([]);
+// store the hierarchy of the menu
+const menuHierarchy = shallowRef([]);
 
 // search query
 const searchQuery = ref('');
@@ -61,15 +61,15 @@ const searchQuery = ref('');
 // reference to our search box
 const searchBoxEl = ref(null);
 
-// compute either the results of a search query, or the full menu heirarchy
+// compute either the results of a search query, or the full menu hierarchy
 const rootMenuItems = computed(() => {
 
-	// if the search query is empty, return the full menu heirarchy
+	// if the search query is empty, return the full menu hierarchy
 	if (searchQuery.value.trim() === '') {
-		return menuHeirarchy.value;
+		return menuHierarchy.value;
 	}
 
-	// otherwise, filter the menu heirarchy based on the search query
+	// otherwise, filter the menu hierarchy based on the search query
 	return filterMenuItems(props.nwSystem.availableNodes.value, searchQuery.value);
 });
 
@@ -100,8 +100,9 @@ function filterMenuItems(items, query) {
 	});
 
 	// convert the flat array into a nested object
-	return buildMenuHierarchy(filteredItems);
+	return _buildMenuHierarchy(filteredItems);
 }
+
 
 // watch when the menu becomes visible & focus the search box
 watch(() => props.nwSystem.showMenu.value, (newVal) => {
@@ -117,8 +118,9 @@ watch(() => props.nwSystem.showMenu.value, (newVal) => {
 	}
 });
 
+
 // loop over a flat array of items and build a nested object
-function buildMenuHierarchy(flatArray) {
+function _buildMenuHierarchy(flatArray) {
 	const root = [];
 
 	// Utility to sanitize path segments to Title Case
@@ -163,26 +165,25 @@ function buildMenuHierarchy(flatArray) {
 }
 
 
-
 /**
- * Builds out the ref we'll consume in the template to render the menu heirarchy
+ * Builds out the ref we'll consume in the template to render the menu hierarchy
  * 
  * @param availableNodes - The list of available nodes to build the menu from
  */
-function buildMenuHeirarchy(availableNodes) {
+function buildMenuHierarchy(availableNodes) {
 
-	menuHeirarchy.value = buildMenuHierarchy(availableNodes);
+	menuHierarchy.value = _buildMenuHierarchy(availableNodes);
 };
 
 
 // watch the available nodes on the NWSystem instance
-// while they probabaly wont change live at runtime, we still want to
-// build the menu heirarchy when the component is mounted
+// while they probably wont change live at runtime, we still want to
+// build the menu hierarchy when the component is mounted
 // and when the available nodes change
 watch(() => props.nwSystem.availableNodes.value, (newVal) => {
 
-	// build the menu heirarchy
-	buildMenuHeirarchy(newVal);
+	// build the menu hierarchy
+	buildMenuHierarchy(newVal);
 
 }, { immediate: true });
 
@@ -217,7 +218,7 @@ function closeMenu() {
 			background: rgba(0, 0, 0, 0.5);
 			padding: 8em;
 			border-radius: 8em;
-			height: 40em;
+			height: 30em;
 
 			margin-bottom: 8em;
 

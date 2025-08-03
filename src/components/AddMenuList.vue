@@ -120,7 +120,7 @@ function addNode(item){
 			}
 
 			.item-name {
-				font-size: 20em;
+				font-size: 14em;
 			}
 
 			backdrop-filter: blur(5px);
@@ -164,7 +164,7 @@ function addNode(item){
 				display: none;
 
 				position: absolute;
-				right: 5em;
+				right: 0em;
 				top: 0em;
 				// width: 200px; // fixed width for sub-menus
 				width: max-content;
