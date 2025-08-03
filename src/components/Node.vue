@@ -56,7 +56,7 @@
 						v-for="(field, index) in node.constructor.fields"
 						:key="index"
 						:ref="node.fieldState[field.name]?.data.rowEl"
-					>
+					><!-- :setYPos="setYPos(node.fieldState[field.name]?.data.rowEl, field)" -->
 						<NLabel 
 							v-if="field.fieldType == FIELD_TYPE.LABEL"
 							:key="index"
@@ -143,7 +143,7 @@ function a(a){
 }	
 
 // vue imports
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick, inject, watch } from 'vue';
 
 // our app
 import { FIELD_TYPE, NODE_TYPE } from '@/classes/NWNode';
@@ -172,6 +172,23 @@ const props = defineProps({
 // ref to the element where we spawn content
 const contentEl = ref(null);
 
+function setYPos(rowEl, field) {
+
+	nextTick(()=>{
+		console.log(rowEl);
+		rowEl = rowEl?.value?.[0];
+
+		// if the row element is not defined, return
+		if (!rowEl) return;
+
+		// get the offset of the row element in ems relative to its parent
+		const offsetInEm = getOffsetInEm(rowEl) + 26;
+
+		// set the input and output Y positions based on the offset
+		props.node.fieldState[field.name].data.inputYPos.value = offsetInEm;
+		props.node.fieldState[field.name].data.outputYPos.value = offsetInEm;
+	});
+}
 
 /**
  * Handles the start of dragging the node
@@ -229,6 +246,7 @@ function getOffsetInEm(rowEl) {
 	return pixelOffset / emSize
 }
 
+
 /**
  * Measures the positions of all fields in the node and sets their input and output Y positions.
  */
@@ -236,6 +254,11 @@ function measureFieldPositions(){
 
 	// loop through all the fields in the node
 	for (const field of props.node.constructor.fields) {
+
+		// skip non input/output fields
+		if (![FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT].includes(field.fieldType)) {
+			continue;
+		}
 
 		// get the row element for this field
 		const rowEl = props.node.fieldState[field.name]?.data.rowEl?.value[0];
@@ -246,13 +269,19 @@ function measureFieldPositions(){
 		}
 		
 		// get the offset of the row element in ems relative to its parent
-		const offsetInEm = getOffsetInEm(rowEl) + 21;
+		const offsetInEm = getOffsetInEm(rowEl) + 28;
 
 		// set the input and output Y positions based on the offset
 		props.node.fieldState[field.name].data.inputYPos.value = offsetInEm;
 		props.node.fieldState[field.name].data.outputYPos.value = offsetInEm;
 	}
 }
+
+
+const ctxRef = inject('ctx', null);
+watch(()=>ctxRef.value.zoomScale.value, (newZoom)=>{
+	measureFieldPositions();
+});
 
 onMounted(()=>{
 	measureFieldPositions();
@@ -409,8 +438,8 @@ onMounted(()=>{
 			width: 20em;
 
 			// mount inputs on left, outputs on right
-			&.sockets-inputs { left: -8em;	}
-			&.sockets-outputs { right: -8em; }
+			&.sockets-inputs { left: -1em;	}
+			&.sockets-outputs { right: -1em; }
 
 		}// .sockets
 

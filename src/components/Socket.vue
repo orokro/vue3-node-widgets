@@ -225,7 +225,7 @@ function generateCornerStyle(input, themeColor = '#000') {
 	return {
 		background: themeColor,
 		borderRadius: borderRadius,
-		transform: `rotate(${degrees}deg)`,
+		transform: `translate(-50%, -50%) rotate(${degrees}deg)`,
 	};
 }
 
@@ -235,11 +235,17 @@ function generateCornerStyle(input, themeColor = '#000') {
 
 	.socket {
 
+		width: 1px;
+		height: 1px;
+		/* border: 1px solid red; */
+
 		position: absolute;
 		cursor: pointer;
 
 		// the simple socket style that just specifies corners & rotation
 		.corner-socket {
+
+			transform: translate(-50%, -50%) rotate(0deg);
 
 			display: inline-block;
 			width: 14em;

@@ -118,6 +118,8 @@ const props = defineProps({
 let ctx = null;
 const ctxRef = shallowRef(null);
 
+provide('ctx', ctxRef);
+
 // true if the user right-moused-wn and moved the mouse
 const didPan = ref(false);
 const MAX_ZOOM = 5.0;

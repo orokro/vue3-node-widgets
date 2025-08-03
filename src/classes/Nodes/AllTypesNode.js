@@ -102,6 +102,7 @@ export default class AllTypesNode extends NWNode {
 			title: 'Angle Input',
 			description: "Tests angle widget",
 			type: VAngle,
+			valuePassThrough: false,
 		});
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'anglesInput',
