@@ -49,6 +49,7 @@ import {
 	V2AddNode,
 	V2SubNode,
 	V2DotNode,
+	V2LerpNode,
 	V2SeparateXYNode,
 	V2CombineXYNode,
 
@@ -56,6 +57,7 @@ import {
 	V3AddNode,
 	V3SubNode,
 	V3DotNode,
+	V3LerpNode,
 	V3SeparateXYZNode,
 	V3CombineXYZNode,
 
@@ -67,7 +69,7 @@ import {
 	CombineRGBNode,
 	CombineRGBANode,
 	CombineHSVNode,
-
+	
 	RandomColorNode,
 	RandomNumberNode,
 	RandomV2Node,
@@ -104,33 +106,35 @@ onMounted(() => {
 	ctx.addNode(V2AddNode, 400, 400);
 	ctx.addNode(V2SubNode, 580, 400);
 	ctx.addNode(V2DotNode, 760, 400);
-	ctx.addNode(V2SeparateXYNode, 940, 400);
-	ctx.addNode(V2CombineXYNode, 1120, 400);
+	ctx.addNode(V2LerpNode, 940, 400);
+	ctx.addNode(V2SeparateXYNode, 1120, 400);
+	ctx.addNode(V2CombineXYNode, 1300, 400);
 
 	// next row is vector 3
-	ctx.addNode(V3ScaleNode, 220, 600);
-	ctx.addNode(V3AddNode, 400, 600);
-	ctx.addNode(V3SubNode, 580, 600);
-	ctx.addNode(V3DotNode, 760, 600);
-	ctx.addNode(V3SeparateXYZNode, 940, 600);
-	ctx.addNode(V3CombineXYZNode, 1120, 600);
+	ctx.addNode(V3ScaleNode, 220, 620);
+	ctx.addNode(V3AddNode, 400, 620);
+	ctx.addNode(V3SubNode, 580, 620);
+	ctx.addNode(V3DotNode, 760, 620);
+	ctx.addNode(V3LerpNode, 940, 620);
+	ctx.addNode(V3SeparateXYZNode, 1120, 620);
+	ctx.addNode(V3CombineXYZNode, 1300 , 620);
 
 	// next row is random things
-	ctx.addNode(RandomColorNode, 220, 800);
-	ctx.addNode(RandomNumberNode, 400, 800);
-	ctx.addNode(RandomV2Node, 580, 800);
-	ctx.addNode(RandomV3Node, 760, 800);
-	ctx.addNode(RandomBoolNode, 940, 800);
+	ctx.addNode(RandomColorNode, 220, 840);
+	ctx.addNode(RandomNumberNode, 400, 840);
+	ctx.addNode(RandomV2Node, 580, 840);
+	ctx.addNode(RandomV3Node, 760, 840);
+	ctx.addNode(RandomBoolNode, 940, 840);
 
 	// next row is color nodes
-	ctx.addNode(ColorMixNode, 220, 1040);
-	ctx.addNode(ColorBlendNode, 400, 1040);
-	ctx.addNode(SeparateAlpha, 580, 1040);
-	ctx.addNode(SeparateHSVNode, 760, 1040);
-	ctx.addNode(SeparateRGBNode, 940, 1040);
-	ctx.addNode(CombineRGBNode, 1120, 1040);
-	ctx.addNode(CombineRGBANode, 1300, 1040);
-	ctx.addNode(CombineHSVNode, 1480, 1040);
+	ctx.addNode(ColorMixNode, 220, 1080);
+	ctx.addNode(ColorBlendNode, 400, 1080);
+	ctx.addNode(SeparateAlpha, 580, 1080);
+	ctx.addNode(SeparateHSVNode, 760, 1080);
+	ctx.addNode(SeparateRGBNode, 940, 1080);
+	ctx.addNode(CombineRGBNode, 1120, 1080);
+	ctx.addNode(CombineRGBANode, 1300, 1080);
+	ctx.addNode(CombineHSVNode, 1480, 1080);
 
 
 

@@ -30,6 +30,7 @@ import V2ScaleNode from './V2ScaleNode';
 import V2AddNode from './V2AddNode';	
 import V2SubNode from './V2SubNode';
 import V2DotNode from './V2DotNode';
+import V2LerpNode from './V2LerpNode';
 import V2SeparateXYNode from './V2SeparateXYNode';
 import V2CombineXYNode from './V2CombineXYNode';
 
@@ -37,6 +38,7 @@ import V3ScaleNode from './V3ScaleNode';
 import V3AddNode from './V3AddNode';	
 import V3SubNode from './V3SubNode';
 import V3DotNode from './V3DotNode';
+import V3LerpNode from './V3LerpNode';
 import V3SeparateXYZNode from './V3SeparateXYZNode';
 import V3CombineXYZNode from './V3CombineXYZNode';
 
@@ -67,6 +69,7 @@ const defaultNodeList = [
 	{ class: V2AddNode, menuPath: '/Math (Vector2)' },
 	{ class: V2SubNode, menuPath: '/Math (Vector2)' },
 	{ class: V2DotNode, menuPath: '/Math (Vector2)' },
+	{ class: V2LerpNode, menuPath: '/Math (Vector2)' },
 	{ class: V2SeparateXYNode, menuPath: '/Math (Vector2)' },
 	{ class: V2CombineXYNode, menuPath: '/Math (Vector2)' },
 
@@ -75,6 +78,7 @@ const defaultNodeList = [
 	{ class: V3AddNode, menuPath: '/Math (Vector3)' },
 	{ class: V3SubNode, menuPath: '/Math (Vector3)' },
 	{ class: V3DotNode, menuPath: '/Math (Vector3)' },
+	{ class: V3LerpNode, menuPath: '/Math (Vector3)' },
 	{ class: V3SeparateXYZNode, menuPath: '/Math (Vector3)' },
 	{ class: V3CombineXYZNode, menuPath: '/Math (Vector3)' },
 
@@ -116,6 +120,7 @@ export {
 	V2AddNode,
 	V2SubNode,
 	V2DotNode,
+	V2LerpNode,
 	V2SeparateXYNode,
 	V2CombineXYNode,
 
@@ -123,6 +128,7 @@ export {
 	V3AddNode,
 	V3SubNode,
 	V3DotNode,
+	V3LerpNode,
 	V3SeparateXYZNode,
 	V3CombineXYZNode,
 
