@@ -369,6 +369,8 @@ export default class NWNode {
 					title: options.title,
 					description: options.description,
 					align: options.align,
+					validateFn: options.validateFn,
+					lintFn: options.lintFn,
 				};
 
 				// add to the fields array & outputs map

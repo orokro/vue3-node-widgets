@@ -63,7 +63,7 @@
 							:text="field.text"
 							:align="field.align"/>
 
-						<template v-else-if="[FIELD_TYPE.INPUT, FIELD_TYPE.PROP].includes(field.fieldType)">
+						<template v-else-if="[FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)">
 							<div 
 								class="field-name"
 								:title="field.description"
@@ -429,13 +429,15 @@ onMounted(()=>{
 		// the vertical rectangles on either side of the node to house the sockets
 		.sockets {
 
+			background: rgba(0, 0,0, 0.1);
 			// for debug
 			/* border: 1px solid red; */
 
+			// disable pointed events
 			position: absolute;
 			top: 22em;
 			bottom: 0em;
-			width: 20em;
+			width: 5em;
 
 			// mount inputs on left, outputs on right
 			&.sockets-inputs { left: -1em;	}

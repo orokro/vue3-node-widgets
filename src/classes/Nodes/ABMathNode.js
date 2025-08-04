@@ -6,7 +6,22 @@
 */
 
 import NWNode from '../NWNode.js';
-
+import { NODE_TYPE, FIELD_TYPE } from '../NWNode.js';
+import { 
+	VAngle,
+	VAngles,
+	VBoolean,
+	VCharacter,
+	VColor3,
+	VColor4,
+	VInteger,
+	VNumber,
+	VText,
+	VVector2,
+	VVector3,
+	VEnum,
+ } from '../Types/index.js';
+ 
 // main export
 export default class ABMathNode extends NWNode {
 
@@ -14,6 +29,45 @@ export default class ABMathNode extends NWNode {
 	static nodeName = 'AB Math Node';
 	static icon = 'math';
 
+	static {
+
+		// reset things
+		this.init();
+		
+		// set this before adding fields
+		this.setNodeType(NODE_TYPE.PROCESSING);
+
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'aValue',
+			title: 'A Value', 
+			description: "A value for math operations",
+			type: VNumber,
+		});	
+	
+		// enumeration
+		this.addField(FIELD_TYPE.PROP, { 
+			name: 'operation',
+			title: 'Operation',
+			description: "Which A - B operation to perform",
+			type: VEnum.With(['+', '-', '*', '/', '%', 'pow', 'log']),
+		});
+
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'bValue',
+			title: 'B Value', 
+			description: "B value for math operations",
+			type: VNumber,
+		});	
+
+		this.addField(FIELD_TYPE.OUTPUT, { 
+			name: 'result',
+			title: 'Result', 
+			description: "Result of A - B",
+			type: VNumber,
+		});
+
+	}
+	
 	/**
 	 * Constructor
 	 */

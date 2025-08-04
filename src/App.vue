@@ -60,7 +60,9 @@ onMounted(() => {
 
 	// add some debug nodes so we can test UI
 	ctx.addNode(TrigNode, 100, 100);
-	window.atn = ctx.addNode(AllTypesNode, 320, 100);
+	ctx.addNode(ABMathNode, 320, 100);
+	
+	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
