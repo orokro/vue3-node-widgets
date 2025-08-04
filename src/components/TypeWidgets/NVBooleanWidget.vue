@@ -8,6 +8,9 @@
 
 	<div 
 		class="n-boolean-widget" 
+		:class="{
+			'read-only': readOnly,
+		}"
 		:style="{
 			'text-align': align,
 		}"
@@ -27,7 +30,7 @@
 						<Toggle 
 							v-model="stateVal"
 							@update:modelValue="stateVal = $event"
-							:readOnly="props.node.readOnly"
+							:read-only="readOnly"
 							:field="field"
 						/>
 					</div>
@@ -69,6 +72,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
 });
 
 
@@ -86,6 +94,18 @@ watch([stateVal], ([newVal], [odlVal]) => {
 
 	.n-boolean-widget {
 		
+		&.read-only {
+
+			.input-wrapper .number-value-row{
+				// when read only, we don't allow interaction
+				cursor: not-allowed !important;
+			}
+			.switch {
+				// when read only, we don't allow interaction
+				cursor: not-allowed !important;
+			}
+		}// &.read-only
+
 		.input-wrapper {
 			
 			.number-value-row {
@@ -96,7 +116,6 @@ watch([stateVal], ([newVal], [odlVal]) => {
 				// for debug
 				// border: 1px solid blue;
 				padding: 0em 0em 3em 0em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

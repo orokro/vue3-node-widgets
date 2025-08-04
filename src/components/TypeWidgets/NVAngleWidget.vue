@@ -29,6 +29,7 @@
 					:min="field.valueType.min"
 					:max="field.valueType.max"
 					:formatFn="f => `${f}°`"
+					:read-only="readOnly"
 				/>
 			</div>
 
@@ -65,6 +66,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},	
 });
 
 
@@ -120,7 +126,6 @@ const validate = (value)=>{
 			.number-value-row {
 
 				padding: 0em 0em 3em 24em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

@@ -43,6 +43,7 @@ import {
 	RoundNode,
 	TrigNode,
 	AllTypesNode,
+	AllTypesOutNode,
 } from '@Nodes/index.js';
 
 // for vue testing
@@ -64,6 +65,7 @@ onMounted(() => {
 	
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
+	window.atnOut = ctx.addNode(AllTypesOutNode, 320, 300);
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {

@@ -28,6 +28,7 @@
 					:dragSpeed="1/5"
 					:min="field.valueType.min"
 					:max="field.valueType.max"
+					:read-only="readOnly"
 				/>
 			</div>
 
@@ -62,6 +63,12 @@ const props = defineProps({
 	align: {
 		type: String,
 		default: 'left'
+	},
+
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
 	},
 	
 });
@@ -118,7 +125,6 @@ const validate = (value)=>{
 				// for debug
 				// border: 1px solid blue;
 				padding: 0em 0em 3em 0em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

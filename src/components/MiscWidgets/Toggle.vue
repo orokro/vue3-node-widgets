@@ -180,8 +180,12 @@ function updateModel(newVal) {
 
 		// override styles for read-only mode
 		&.read-only {
-			opacity: .5;
+			opacity: .5 !important;
+			pointer-events: none !important;
 			
+			.toggle-track {
+				cursor: not-allowed !important;
+			}
 		}// &.read-only
 
 	}// .toggle-input-wrapper

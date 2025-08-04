@@ -20,13 +20,14 @@
 
 				<!-- gray wrapper for the select box -->
 				<div class="gray-wrapper">
+
 					<select
 						v-model="itemIndex"
-						:disabled="props.node.fieldState[props.field.name].readOnly"
 						:class="{
 							'input-enabled': !props.node.fieldState[props.field.name].readOnly,
-							'read-only': props.node.fieldState[props.field.name].readOnly
+							'read-only': readOnly
 						}"
+						:disabled="readOnly"
 					>
 						<option 
 							v-for="(item, index) in items" 
@@ -68,6 +69,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
 });
 
 // the items for the select box
@@ -121,6 +127,10 @@ watch(()=>props.node.fieldState[props.field.name].val, (newVal) => {
 						color: white;
 						font-size: 12em;
 
+						&.read-only {
+							opacity: 0.5;
+							cursor: not-allowed;
+						}
 					}// select
 
 				}// .gray-wrapper

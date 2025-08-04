@@ -15,10 +15,12 @@ import RandomNumberNode from './RandomNumberNode';
 import ColorMixNode from './ColorMixNode';
 import ColorPickerNode from './ColorPickerNode';
 import AllTypesNode from './AllTypesNode';
+import AllTypesOutNode from './AllTypesOutNode';
 
 // make a reusable list of default nodes
 const defaultNodeList = [
 	{ class: AllTypesNode, menuPath: '/Debug' },
+	{ class: AllTypesOutNode, menuPath: '/Debug/Outputs' },
 	{ class: ABMathNode, menuPath: '/Math' },
 	{ class: MapRangeNode, menuPath: '/Math' },
 	{ class: RoundNode, menuPath: '/Math' },
@@ -41,4 +43,5 @@ export {
 	ColorMixNode,
 	ColorPickerNode,
 	AllTypesNode,
+	AllTypesOutNode
 };

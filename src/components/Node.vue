@@ -76,6 +76,7 @@
 								:nwSystem="nwSystem"
 								:node="node"
 								:field="field"
+								:read-only="field.fieldType == FIELD_TYPE.OUTPUT"
 							/>
 						</template>
 
@@ -143,7 +144,7 @@ function a(a){
 }	
 
 // vue imports
-import { ref, onMounted, nextTick, inject, watch } from 'vue';
+import { ref, onMounted, nextTick, inject, watch, readonly } from 'vue';
 
 // our app
 import { FIELD_TYPE, NODE_TYPE } from '@/classes/NWNode';
@@ -298,7 +299,7 @@ onMounted(()=>{
 		box-sizing: border-box;
 
 		// minimum box size
-		min-width: 200em;
+		min-width: 160em;
 		// min-height: 100em;
 
 		// nice rounded border
@@ -402,6 +403,10 @@ onMounted(()=>{
 					background: rgba(0, 0, 0, 0.15);
 				}
 
+				&:last-child {
+					padding-bottom: 6em;
+				}
+
 				.field-name {
 
 					padding: 6em 6em 0em;
@@ -429,9 +434,9 @@ onMounted(()=>{
 		// the vertical rectangles on either side of the node to house the sockets
 		.sockets {
 
-			background: rgba(0, 0,0, 0.1);
 			// for debug
 			/* border: 1px solid red; */
+			/* background: rgba(0, 0,0, 0.1); */
 
 			// disable pointed events
 			position: absolute;

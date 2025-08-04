@@ -28,6 +28,7 @@
 					:singleCharMode="true"
 					:minLength="field.valueType.minLength"
 					:maxLength="field.valueType.maxLength"
+					:read-only="readOnly"
 				/>
 			</div>
 
@@ -65,6 +66,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},	
 });
 
 
@@ -101,7 +107,6 @@ const validate = (value)=>{
 			.number-value-row {
 
 				padding: 0em 0em 3em 24em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

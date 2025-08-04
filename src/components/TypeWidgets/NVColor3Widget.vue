@@ -9,6 +9,9 @@
 
 	<div 
 		class="n-color3-widget" 
+		:class="{
+			'read-only': readOnly,
+		}"
 		:style="{
 			'text-align': align,
 			'--hex-color': hexValue,
@@ -32,6 +35,7 @@
 							:step="0.01"
 							round="top-left"
 							:formatFn="f => `r:${f}`"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -46,6 +50,7 @@
 							border="0px 0px 0px 2px"
 							round="neither"
 							:formatFn="f => `g:${f}`"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -60,6 +65,7 @@
 							border="0px 0px 0px 2px"
 							round="top-right"
 							:formatFn="f => `b:${f}`"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -76,10 +82,16 @@
 						round="bottom-left"
 						:lint="lintHex"
 						:validate="validateHex"
+						:placeholder="'#rrggbb'"
+						:read-only="readOnly"
 					/>
 
 					<div class="color-input-wrapper">
-						<input type="color" v-model="hexValue" />
+						<input 
+							type="color"
+							v-model="hexValue"  
+							:disabled="readOnly"
+						/>
 					</div>
 				</div>
 
@@ -125,6 +137,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
 });
 
 const hexEditEl = ref(null);
@@ -333,7 +350,6 @@ function validateHex(v) {
 				// for debug
 				// border: 1px solid blue;
 				padding: 0em 0em 3em 0em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);
@@ -341,8 +357,9 @@ function validateHex(v) {
 				// box around the three inputs
 				.color-rgb-wrapper {
 					width: 100%;
-					height: calc(18em + 2px);
-					border-bottom: 5px solid black;
+					height: calc(18em + 1px);
+					border-bottom: 2px solid black;
+					overflow: clip;
 
 					display: flex;
 					.r {
@@ -391,6 +408,14 @@ function validateHex(v) {
 			}// .number-value-row
 
 		}// .input-wrapper
+
+		&.read-only {
+
+			input {
+				cursor: not-allowed !important;
+			}
+
+		}// .read-only
 
 	}// .n-color3-widget
 

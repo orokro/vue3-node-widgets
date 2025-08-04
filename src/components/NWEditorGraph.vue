@@ -321,6 +321,7 @@ function checkAddMenu(e) {
 
 			// default styles
 			background: rgb(133, 126, 151);
+			background: rgb(60, 60, 60);
 			background-image: url(/img/grid_bg.png);
 			background-repeat: repeat;
 			

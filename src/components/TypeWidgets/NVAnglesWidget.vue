@@ -31,6 +31,7 @@
 							:step="1"
 							round="left"
 							:formatFn="f => `θ ${f}°`"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -44,6 +45,7 @@
 							border="0px 0px 0px 2px"
 							round="neither"
 							:formatFn="f => `ψ ${f}°`"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -57,6 +59,7 @@
 							border="0px 0px 0px 2px"
 							round="right"
 							:formatFn="f => `φ ${f}°`"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -99,6 +102,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
 });
 
 
@@ -144,7 +152,6 @@ const validateFloat = (value)=>{
 				// for debug
 				// border: 1px solid blue;
 				padding: 0em 0em 3em 24em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

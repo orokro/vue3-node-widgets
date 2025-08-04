@@ -10,6 +10,9 @@
 
 	<div 
 		class="n-number-widget" 
+		:class="{
+			'read-only': readOnly,
+		}"
 		:style="{
 			'text-align': align,
 		}"
@@ -27,6 +30,7 @@
 					:step="1"
 					:min="field.valueType.min"
 					:max="field.valueType.max"
+					:read-only="readOnly"
 				/>
 			</div>
 
@@ -63,6 +67,12 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
+
 });
 
 
@@ -71,6 +81,7 @@ onMounted(() => {
 	// console.log("node", props.node);
 	// console.log("field", props.field);
 	// console.log("align", props.align);
+	console.log("readOnly", props.readOnly);
 });
 
 
@@ -125,7 +136,6 @@ const validate = (value)=>{
 			.number-value-row {
 
 				padding: 0em 0em 3em 0em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

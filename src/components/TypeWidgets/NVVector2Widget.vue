@@ -30,6 +30,7 @@
 							:validate="validateFloat"
 							:step="1"
 							round="left"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -42,6 +43,7 @@
 							:step="1"
 							border="0px 0px 0px 2px"
 							round="right"
+							:read-only="readOnly"
 						/>
 					</div>
 
@@ -84,6 +86,11 @@ const props = defineProps({
 		default: 'left'
 	},
 	
+	// true when read only
+	readOnly: {
+		type: Boolean,
+		default: false
+	},
 });
 
 
@@ -128,7 +135,6 @@ const validateFloat = (value)=>{
 				// for debug
 				// border: 1px solid blue;
 				padding: 0em 0em 3em 24em;
-				cursor: pointer;
 
 				// text alignment
 				text-align: var(--align, left);

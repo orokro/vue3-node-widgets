@@ -447,7 +447,7 @@ defineExpose({
 
 	// main outer-wrapper for the number input
 	.number-input-wrapper {
-		
+
 		// so we can position children abso-lutely
 		position: relative;
 
@@ -508,7 +508,6 @@ defineExpose({
 
 		// the text value (if not input enabled)
 		.number-value {
-
 			background: gray;
 			text-align: center;
 			color: white;
@@ -593,7 +592,9 @@ defineExpose({
 			
 			.btn {
 				pointer-events: none;
+				display: none;
 			}
+			
 		}// &.read-only
 
 	}// .number-input-wrapper
