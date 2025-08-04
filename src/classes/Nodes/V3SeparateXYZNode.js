@@ -1,8 +1,8 @@
 /*
-	RandomNumberNode.js
+	V3SeparateXYNode.js
 	-------------------
 
-	This will be a node that provides a random number within a specified range.
+	Separates a Vector3 into its X, Y, and Z components.
 */
 
 import NWNode from '../NWNode.js';
@@ -21,13 +21,13 @@ import {
 	VVector3,
 	VEnum,
  } from '../Types/index.js';
-
+ 
 // main export
-export default class RandomNumberNode extends NWNode {
+export default class V3SeparateXYNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Random Number';
-	static icon = 'random-number';
+	static nodeName = 'Separate XYZ';
+	static icon = 'math';
 
 	static {
 
@@ -38,35 +38,40 @@ export default class RandomNumberNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'minVale',
-			title: 'Min Value', 
-			description: "Minimum value for the random number",
-			type: VNumber,
+			name: 'vecA',
+			title: 'Input Vector', 
+			description: "Vector to break into components",
+			type: VVector3,
 		});	
 
-		this.addField(FIELD_TYPE.INPUT, {
-			name: 'maxValue',
-			title: 'Max Value', 
-			description: "Maximum value for the random number",
+		this.addField(FIELD_TYPE.OUTPUT, { 
+			name: 'x',
+			title: 'X', 
+			description: "X component of the vector",
 			type: VNumber,
 		});
 
+		this.addField(FIELD_TYPE.OUTPUT, { 
+			name: 'y',
+			title: 'Y', 
+			description: "Y component of the vector",
+			type: VNumber,
+		});
 
 		this.addField(FIELD_TYPE.OUTPUT, { 
-			name: 'result',
-			title: 'Random Number', 
-			description: "Random number within the specified range",
+			name: 'z',
+			title: 'Z', 
+			description: "Z component of the vector",
 			type: VNumber,
 		});
 	}
-
+	
+	
 	/**
 	 * Constructor
 	 */
 	constructor() {
 		super();
-
-		this.fieldState.maxValue.val = 1;
 	}
 
 }

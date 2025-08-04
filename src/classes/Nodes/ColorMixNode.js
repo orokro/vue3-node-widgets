@@ -11,7 +11,7 @@ import NWNode from '../NWNode.js';
 export default class ColorMixNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Color Mix Node';
+	static nodeName = 'Color Mix';
 	static icon = 'color-mix';
 
 	/**

@@ -1,8 +1,8 @@
 /*
-	LerpValueNode.js
-	----------------
+	V2CombineXYNode.js
+	------------------
 
-	Node to lerp A and B values based on a factor.
+	Joins the X and Y components of a Vector2 into a single vector.
 */
 
 import NWNode from '../NWNode.js';
@@ -23,10 +23,10 @@ import {
  } from '../Types/index.js';
  
 // main export
-export default class LerpValueNode extends NWNode {
+export default class V2CombineXYNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Lerp Value';
+	static nodeName = 'Combines X and Y to Vector2';
 	static icon = 'math';
 
 	static {
@@ -38,42 +38,34 @@ export default class LerpValueNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'aValue',
-			title: 'A Value', 
-			description: "A value for math operations",
-			type: VNumber,
-		});	
-
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'bValue',
-			title: 'B Value', 
-			description: "B value for math operations",
-			type: VNumber,
-		});	
-
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'tValue',
-			title: 'T Value', 
-			description: "T value for lerping between A and B",
-			type: VNumber,
-		});	
-	
-		this.addField(FIELD_TYPE.OUTPUT, { 
-			name: 'result',
-			title: 'Result', 
-			description: "Result of Lerp operation",
+			name: 'x',
+			title: 'X', 
+			description: "X component of the vector",
 			type: VNumber,
 		});
 
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'y',
+			title: 'Y', 
+			description: "Y component of the vector",
+			type: VNumber,
+		});
+
+		this.addField(FIELD_TYPE.OUTPUT, { 
+			name: 'vecA',
+			title: 'Output Vector', 
+			description: "Vector created from X and Y components",
+			type: VVector2,
+		});	
+
 	}
+	
 	
 	/**
 	 * Constructor
 	 */
 	constructor() {
 		super();
-
-		this.fieldState.bValue.val = 1;
 	}
 
 }

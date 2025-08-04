@@ -26,7 +26,7 @@ import {
 export default class RoundNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Round Node';
+	static nodeName = 'Round';
 	static icon = 'round';
 
 	static {

@@ -81,7 +81,7 @@ onMounted(() => {
 	// console.log("node", props.node);
 	// console.log("field", props.field);
 	// console.log("align", props.align);
-	console.log("readOnly", props.readOnly);
+	// console.log("readOnly", props.readOnly);
 });
 
 

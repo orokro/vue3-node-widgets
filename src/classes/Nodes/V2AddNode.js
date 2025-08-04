@@ -1,8 +1,8 @@
 /*
-	LerpValueNode.js
-	----------------
+	V2AddNode.js
+	------------
 
-	Node to lerp A and B values based on a factor.
+	Adds 2 Vector2s
 */
 
 import NWNode from '../NWNode.js';
@@ -23,10 +23,10 @@ import {
  } from '../Types/index.js';
  
 // main export
-export default class LerpValueNode extends NWNode {
+export default class V2AddNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Lerp Value';
+	static nodeName = 'V2 Addition';
 	static icon = 'math';
 
 	static {
@@ -38,42 +38,33 @@ export default class LerpValueNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'aValue',
-			title: 'A Value', 
-			description: "A value for math operations",
-			type: VNumber,
+			name: 'vecA',
+			title: 'Vector A', 
+			description: "Vector to add to",
+			type: VVector2,
 		});	
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'bValue',
-			title: 'B Value', 
-			description: "B value for math operations",
-			type: VNumber,
+			name: 'vecB',
+			title: 'Vector B', 
+			description: "Vector to add",
+			type: VVector2,
 		});	
 
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'tValue',
-			title: 'T Value', 
-			description: "T value for lerping between A and B",
-			type: VNumber,
-		});	
-	
 		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'result',
-			title: 'Result', 
-			description: "Result of Lerp operation",
-			type: VNumber,
+			title: 'Added Vector', 
+			description: "Added Vector",
+			type: VVector2,
 		});
-
 	}
+	
 	
 	/**
 	 * Constructor
 	 */
 	constructor() {
 		super();
-
-		this.fieldState.bValue.val = 1;
 	}
 
 }

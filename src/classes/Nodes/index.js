@@ -13,18 +13,34 @@ import MapRangeNode from './MapRangeNode';
 import LerpValueNode from './LerpValueNode';
 import RoundNode from './RoundNode';
 import TrigNode from './TrigNode';
-import RandomColorNode from './RandomColorNode';
-import RandomNumberNode from './RandomNumberNode';
+
 import ColorMixNode from './ColorMixNode';
 import ColorPickerNode from './ColorPickerNode';
 import AllTypesNode from './AllTypesNode';
 import AllTypesOutNode from './AllTypesOutNode';
 
+import V2ScaleNode from './V2ScaleNode';
+import V2AddNode from './V2AddNode';	
+import V2SubNode from './V2SubNode';
+import V2DotNode from './V2DotNode';
+import V2SeparateXYNode from './V2SeparateXYNode';
+import V2CombineXYNode from './V2CombineXYNode';
+
+import V3ScaleNode from './V3ScaleNode';
+import V3AddNode from './V3AddNode';	
+import V3SubNode from './V3SubNode';
+import V3DotNode from './V3DotNode';
+import V3SeparateXYZNode from './V3SeparateXYZNode';
+import V3CombineXYZNode from './V3CombineXYZNode';
+
+import RandomColorNode from './RandomColorNode';
+import RandomNumberNode from './RandomNumberNode';
+
 // make a reusable list of default nodes
 const defaultNodeList = [
 	{ class: AllTypesNode, menuPath: '/Debug' },
 	{ class: AllTypesOutNode, menuPath: '/Debug/' },
-	
+
 	{ class: ABMathNode, menuPath: '/Math (Scalar)' },
 	{ class: ABCompareNode, menuPath: '/Math (Scalar)' },
 	{ class: RoundNode, menuPath: '/Math (Scalar)' },
@@ -33,8 +49,23 @@ const defaultNodeList = [
 	{ class: MapRangeNode, menuPath: '/Math (Scalar)' },	
 	{ class: TrigNode, menuPath: '/Math (Scalar)' },
 
-	{ class: RandomColorNode, menuPath: '/Math/Random/' },
-	{ class: RandomNumberNode, menuPath: 'math/Random' },
+	{ class: V2ScaleNode, menuPath: '/Math (Vector2)' },
+	{ class: V2AddNode, menuPath: '/Math (Vector2)' },
+	{ class: V2SubNode, menuPath: '/Math (Vector2)' },
+	{ class: V2DotNode, menuPath: '/Math (Vector2)' },
+	{ class: V2SeparateXYNode, menuPath: '/Math (Vector2)' },
+	{ class: V2CombineXYNode, menuPath: '/Math (Vector2)' },
+
+	{ class: V3ScaleNode, menuPath: '/Math (Vector3)' },
+	{ class: V3AddNode, menuPath: '/Math (Vector3)' },
+	{ class: V3SubNode, menuPath: '/Math (Vector3)' },
+	{ class: V3DotNode, menuPath: '/Math (Vector3)' },
+	{ class: V3SeparateXYZNode, menuPath: '/Math (Vector3)' },
+	{ class: V3CombineXYZNode, menuPath: '/Math (Vector3)' },
+
+	{ class: RandomColorNode, menuPath: '/Random/' },
+	{ class: RandomNumberNode, menuPath: 'Random/' },
+	
 	{ class: ColorMixNode, menuPath: '/Color' },
 	{ class: ColorPickerNode, menuPath: '/Color' }
 ];
@@ -54,5 +85,20 @@ export {
 	ColorMixNode,
 	ColorPickerNode,
 	AllTypesNode,
-	AllTypesOutNode
+	AllTypesOutNode,
+
+	V2ScaleNode,
+	V2AddNode,
+	V2SubNode,
+	V2DotNode,
+	V2SeparateXYNode,
+	V2CombineXYNode,
+
+	V3ScaleNode,
+	V3AddNode,
+	V3SubNode,
+	V3DotNode,
+	V3SeparateXYZNode,
+	V3CombineXYZNode,
+
 };

@@ -26,7 +26,7 @@ import {
 export default class ABMathNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'AB Math Node';
+	static nodeName = 'AB Math';
 	static icon = 'math';
 
 	static {

@@ -47,6 +47,21 @@ import {
 	TrigNode,
 	AllTypesNode,
 	AllTypesOutNode,
+
+	V2ScaleNode,
+	V2AddNode,
+	V2SubNode,
+	V2DotNode,
+	V2SeparateXYNode,
+	V2CombineXYNode,
+
+	V3ScaleNode,
+	V3AddNode,
+	V3SubNode,
+	V3DotNode,
+	V3SeparateXYZNode,
+	V3CombineXYZNode,
+
 } from '@Nodes/index.js';
 
 // for vue testing
@@ -71,6 +86,28 @@ onMounted(() => {
 	ctx.addNode(ClampValueNode, 940, 100);
 	ctx.addNode(MapRangeNode, 1120, 100);
 	ctx.addNode(LerpValueNode, 1300, 100);
+
+	// next row is vector 2
+	ctx.addNode(V2ScaleNode, 220, 400);
+	ctx.addNode(V2AddNode, 400, 400);
+	ctx.addNode(V2SubNode, 580, 400);
+	ctx.addNode(V2DotNode, 760, 400);
+	ctx.addNode(V2SeparateXYNode, 940, 400);
+	ctx.addNode(V2CombineXYNode, 1120, 400);
+
+
+	// next row is vector 3
+	ctx.addNode(V3ScaleNode, 220, 600);
+	ctx.addNode(V3AddNode, 400, 600);
+	ctx.addNode(V3SubNode, 580, 600);
+	ctx.addNode(V3DotNode, 760, 600);
+	ctx.addNode(V3SeparateXYZNode, 940, 600);
+	ctx.addNode(V3CombineXYZNode, 1120, 600);
+
+	// next row is random things
+	ctx.addNode(RandomColorNode, 220, 800);
+	ctx.addNode(RandomNumberNode, 400, 800);
+
 
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);

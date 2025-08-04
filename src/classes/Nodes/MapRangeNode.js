@@ -26,7 +26,7 @@ import {
 export default class MapRangeNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Map Range Node';
+	static nodeName = 'Map Range';
 	static icon = 'map-range';
 
 	static {

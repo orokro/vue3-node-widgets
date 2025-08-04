@@ -1,8 +1,8 @@
 /*
-	LerpValueNode.js
-	----------------
+	V3DotNode.js
+	------------
 
-	Node to lerp A and B values based on a factor.
+	Does the dot product of two vector 3s
 */
 
 import NWNode from '../NWNode.js';
@@ -23,10 +23,10 @@ import {
  } from '../Types/index.js';
  
 // main export
-export default class LerpValueNode extends NWNode {
+export default class V3DotNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Lerp Value';
+	static nodeName = 'V3 Dot Product';
 	static icon = 'math';
 
 	static {
@@ -38,42 +38,33 @@ export default class LerpValueNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'aValue',
-			title: 'A Value', 
-			description: "A value for math operations",
-			type: VNumber,
+			name: 'vecA',
+			title: 'Vector A', 
+			description: "Vector to dot with",
+			type: VVector3,
 		});	
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'bValue',
-			title: 'B Value', 
-			description: "B value for math operations",
-			type: VNumber,
+			name: 'vecB',
+			title: 'Vector B', 
+			description: "Vector to dot with",
+			type: VVector3,
 		});	
 
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'tValue',
-			title: 'T Value', 
-			description: "T value for lerping between A and B",
-			type: VNumber,
-		});	
-	
 		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'result',
-			title: 'Result', 
-			description: "Result of Lerp operation",
+			title: 'Dot Product', 
+			description: "Dot product of the two vectors",
 			type: VNumber,
 		});
-
 	}
+	
 	
 	/**
 	 * Constructor
 	 */
 	constructor() {
 		super();
-
-		this.fieldState.bValue.val = 1;
 	}
 
 }

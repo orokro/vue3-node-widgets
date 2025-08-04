@@ -26,7 +26,7 @@ import {
 export default class ClampValueNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Clamp Node';
+	static nodeName = 'Clamp';
 	static icon = 'math';
 
 	static {

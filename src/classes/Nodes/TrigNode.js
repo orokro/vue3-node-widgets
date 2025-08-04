@@ -26,7 +26,7 @@ import {
 export default class TrigNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Trig Node';
+	static nodeName = 'Trig';
 	static icon = 'trig';
 
 	static {

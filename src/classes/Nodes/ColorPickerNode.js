@@ -12,7 +12,7 @@ import NWNode from '../NWNode.js';
 export default class ColorPickerNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Color Picker Node';
+	static nodeName = 'Color Picker';
 	static icon = 'color-picker';
 
 	/**
