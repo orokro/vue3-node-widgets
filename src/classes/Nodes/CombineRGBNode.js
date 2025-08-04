@@ -1,8 +1,8 @@
 /*
-	ColorMixNode.js
-	---------------
+	CombineRGBNode.js
+	-----------------
 
-	This will be a node that provides a color mixing interface, allowing users to blend two or more colors.
+	Combines RGB components into a single color node.
 */
 
 import NWNode from '../NWNode.js';
@@ -22,14 +22,13 @@ import {
 	VEnum,
  } from '../Types/index.js';
  
-
 // main export
-export default class ColorMixNode extends NWNode {
+export default class CombineRGBNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Color Mix';
-	static icon = 'color-mix';
-	
+	static nodeName = 'Combine RGB';
+	static icon = 'math';
+
 	static {
 
 		// reset things
@@ -39,34 +38,36 @@ export default class ColorMixNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'aCol',
-			title: 'A Color', 
-			description: "A color for mix operations",
-			type: VColor3,
-		});	
-
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'bCol',
-			title: 'B Value', 
-			description: "B color for mix operations",
-			type: VColor3,
-		});	
-
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'tValue',
-			title: 'T Value', 
-			description: "T value for mixing between A and B",
+			name: 'r',
+			title: 'R', 
+			description: "Red component of the color",
 			type: VNumber,
-		});	
-	
-		this.addField(FIELD_TYPE.OUTPUT, { 
-			name: 'result',
-			title: 'Result', 
-			description: "Result of Color Mix operation",
-			type: VColor3,
 		});
 
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'g',
+			title: 'G', 
+			description: "Green component of the color",
+			type: VNumber,
+		});
+
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'b',
+			title: 'B', 
+			description: "Blue component of the color",
+			type: VNumber,
+		});
+
+		this.addField(FIELD_TYPE.OUTPUT, { 
+			name: 'col',
+			title: 'Output Color', 
+			description: "Combined RGB color",
+			type: VColor3,
+		});	
+
 	}
+	
+	
 	/**
 	 * Constructor
 	 */

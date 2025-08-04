@@ -6,6 +6,9 @@
 */
 
 // import all our node types
+import AllTypesNode from './AllTypesNode';
+import AllTypesOutNode from './AllTypesOutNode';
+
 import ABMathNode from './ABMathNode';
 import ABCompareNode from './ABCompareNode';
 import ClampValueNode from './ClampValueNode';
@@ -15,9 +18,13 @@ import RoundNode from './RoundNode';
 import TrigNode from './TrigNode';
 
 import ColorMixNode from './ColorMixNode';
-import ColorPickerNode from './ColorPickerNode';
-import AllTypesNode from './AllTypesNode';
-import AllTypesOutNode from './AllTypesOutNode';
+import ColorBlendNode from './ColorBlendNode';
+import SeparateAlpha from './SeparateAlphaNode';
+import SeparateHSVNode from './SeparateHSVNode';
+import SeparateRGBNode from './SeparateRGBNode';
+import CombineRGBNode from './CombineRGBNode';
+import CombineRGBANode from './CombineRGBANode';
+import CombineHSVNode from './CombineHSVNode';
 
 import V2ScaleNode from './V2ScaleNode';
 import V2AddNode from './V2AddNode';	
@@ -73,7 +80,13 @@ const defaultNodeList = [
 
 	// color nodes
 	{ class: ColorMixNode, menuPath: '/Color' },
-	{ class: ColorPickerNode, menuPath: '/Color' },
+	{ class: ColorBlendNode, menuPath: '/Color' },
+	{ class: SeparateRGBNode, menuPath: '/Color' },
+	{ class: SeparateAlpha, menuPath: '/Color' },
+	{ class: SeparateHSVNode, menuPath: '/Color' },
+	{ class: CombineRGBNode, menuPath: '/Color' },
+	{ class: CombineRGBANode, menuPath: '/Color' },
+	{ class: CombineHSVNode, menuPath: '/Color' },
 
 	// random nodes
 	{ class: RandomColorNode, menuPath: '/Random/' },
@@ -114,8 +127,14 @@ export {
 	V3CombineXYZNode,
 
 	ColorMixNode,
-	ColorPickerNode,
-
+	ColorBlendNode,
+	SeparateAlpha,
+	SeparateHSVNode,
+	SeparateRGBNode,
+	CombineRGBNode,
+	CombineRGBANode,
+	CombineHSVNode,
+	
 	RandomColorNode,
 	RandomNumberNode,
 	RandomV2Node,

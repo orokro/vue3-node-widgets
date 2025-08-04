@@ -59,6 +59,13 @@ export default class TrigNode extends NWNode {
 			type: VNumber,
 		});	
 
+		this.addField(FIELD_TYPE.PROP, { 
+			name: 'degrees',
+			title: 'Degrees', 
+			description: "Use Degrees? If false, radians will be used",
+			type: VBoolean,
+		});	
+
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'amplitude',
 			title: 'Amplitude', 
@@ -88,6 +95,7 @@ export default class TrigNode extends NWNode {
 	constructor() {
 		super();
 
+		this.fieldState.degrees.val = true;
 		this.fieldState.amplitude.val = 1;
 		this.fieldState.wavelength.val = 1;
 	}

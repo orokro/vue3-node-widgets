@@ -60,7 +60,13 @@ import {
 	V3CombineXYZNode,
 
 	ColorMixNode,
-	ColorPickerNode,
+	ColorBlendNode,
+	SeparateAlpha,
+	SeparateHSVNode,
+	SeparateRGBNode,
+	CombineRGBNode,
+	CombineRGBANode,
+	CombineHSVNode,
 
 	RandomColorNode,
 	RandomNumberNode,
@@ -101,7 +107,6 @@ onMounted(() => {
 	ctx.addNode(V2SeparateXYNode, 940, 400);
 	ctx.addNode(V2CombineXYNode, 1120, 400);
 
-
 	// next row is vector 3
 	ctx.addNode(V3ScaleNode, 220, 600);
 	ctx.addNode(V3AddNode, 400, 600);
@@ -117,10 +122,21 @@ onMounted(() => {
 	ctx.addNode(RandomV3Node, 760, 800);
 	ctx.addNode(RandomBoolNode, 940, 800);
 
+	// next row is color nodes
+	ctx.addNode(ColorMixNode, 220, 1040);
+	ctx.addNode(ColorBlendNode, 400, 1040);
+	ctx.addNode(SeparateAlpha, 580, 1040);
+	ctx.addNode(SeparateHSVNode, 760, 1040);
+	ctx.addNode(SeparateRGBNode, 940, 1040);
+	ctx.addNode(CombineRGBNode, 1120, 1040);
+	ctx.addNode(CombineRGBANode, 1300, 1040);
+	ctx.addNode(CombineHSVNode, 1480, 1040);
+
+
 
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
-	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 340);
+	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 400);
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {
