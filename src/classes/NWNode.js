@@ -290,12 +290,20 @@ export default class NWNode {
 		if (!this.nodeType || this.nodeType === NODE_TYPE.UNSET)
 			throw new Error('Node type must be set before adding fields');
 
-		// inputs can only have input fields, outputs can only have output fields,
-		if (this.nodeType === NODE_TYPE.INPUT && fieldType !== FIELD_TYPE.INPUT)
-			throw new Error('Input nodes can only have input fields');
+		/*
+			This next case might seem a bit counter-intuitive, at first.
 
-		if (this.nodeType === NODE_TYPE.OUTPUT && fieldType !== FIELD_TYPE.OUTPUT)
-			throw new Error('Output nodes can only have output fields');
+			INPUT nodes can only have OUTPUT fields, because they are inputs to the graph.
+			(Their values are set through coded on the graph component itself)
+
+			OUTPUT nodes can only have INPUT fields, because they are outputs of the graph.
+			So your nodes in the graph wire INTO the output node, therefore output nodes only have inputs.
+		*/
+		if (this.nodeType === NODE_TYPE.INPUT && fieldType !== FIELD_TYPE.OUTPUT)
+			throw new Error('Input nodes can only have output fields');
+
+		if (this.nodeType === NODE_TYPE.OUTPUT && fieldType !== FIELD_TYPE.INPUT)
+			throw new Error('Output nodes can only have input fields');
 		
 		// name is required for everything except labels and custom
 		if (fieldType !== FIELD_TYPE.LABEL && fieldType !== FIELD_TYPE.CUSTOM && !options.name) 
