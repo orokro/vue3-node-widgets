@@ -34,8 +34,9 @@
 				<div 
 					class="pan-container" 
 					:style="{
-						left: `${ctxRef.panX.value}px`,
-						top: `${ctxRef.panY.value}px`,
+						// left: `${ctxRef.panX.value}px`,
+						// top: `${ctxRef.panY.value}px`,
+						transform: `translate(${ctxRef.panX.value}px, ${ctxRef.panY.value}px)`,
 					}"
 				>
 					<!-- loop through all the nodes and render them -->
