@@ -35,12 +35,18 @@ import V3CombineXYZNode from './V3CombineXYZNode';
 
 import RandomColorNode from './RandomColorNode';
 import RandomNumberNode from './RandomNumberNode';
+import RandomV2Node from './RandomV2Node';
+import RandomV3Node from './RandomV3Node';
+import RandomBoolNode from './RandomBoolNode';
 
 // make a reusable list of default nodes
 const defaultNodeList = [
+
+	// debug nodes
 	{ class: AllTypesNode, menuPath: '/Debug' },
 	{ class: AllTypesOutNode, menuPath: '/Debug/' },
 
+	// mathematical nodes
 	{ class: ABMathNode, menuPath: '/Math (Scalar)' },
 	{ class: ABCompareNode, menuPath: '/Math (Scalar)' },
 	{ class: RoundNode, menuPath: '/Math (Scalar)' },
@@ -49,6 +55,7 @@ const defaultNodeList = [
 	{ class: MapRangeNode, menuPath: '/Math (Scalar)' },	
 	{ class: TrigNode, menuPath: '/Math (Scalar)' },
 
+	// vector2 nodes
 	{ class: V2ScaleNode, menuPath: '/Math (Vector2)' },
 	{ class: V2AddNode, menuPath: '/Math (Vector2)' },
 	{ class: V2SubNode, menuPath: '/Math (Vector2)' },
@@ -56,6 +63,7 @@ const defaultNodeList = [
 	{ class: V2SeparateXYNode, menuPath: '/Math (Vector2)' },
 	{ class: V2CombineXYNode, menuPath: '/Math (Vector2)' },
 
+	// vector3 nodes
 	{ class: V3ScaleNode, menuPath: '/Math (Vector3)' },
 	{ class: V3AddNode, menuPath: '/Math (Vector3)' },
 	{ class: V3SubNode, menuPath: '/Math (Vector3)' },
@@ -63,16 +71,23 @@ const defaultNodeList = [
 	{ class: V3SeparateXYZNode, menuPath: '/Math (Vector3)' },
 	{ class: V3CombineXYZNode, menuPath: '/Math (Vector3)' },
 
+	// color nodes
+	{ class: ColorMixNode, menuPath: '/Color' },
+	{ class: ColorPickerNode, menuPath: '/Color' },
+
+	// random nodes
 	{ class: RandomColorNode, menuPath: '/Random/' },
 	{ class: RandomNumberNode, menuPath: 'Random/' },
-	
-	{ class: ColorMixNode, menuPath: '/Color' },
-	{ class: ColorPickerNode, menuPath: '/Color' }
+	{ class: RandomV2Node, menuPath: '/Random/' },
+	{ class: RandomV3Node, menuPath: '/Random/' },
+	{ class: RandomBoolNode, menuPath: '/Random/' },
+
 ];
 
 // export all the things
 export { 
 	defaultNodeList,
+	
 	ABMathNode,
 	ABCompareNode,
 	ClampValueNode,
@@ -80,10 +95,7 @@ export {
 	LerpValueNode,
 	RoundNode,
 	TrigNode,
-	RandomColorNode,
-	RandomNumberNode,
-	ColorMixNode,
-	ColorPickerNode,
+	
 	AllTypesNode,
 	AllTypesOutNode,
 
@@ -101,4 +113,12 @@ export {
 	V3SeparateXYZNode,
 	V3CombineXYZNode,
 
+	ColorMixNode,
+	ColorPickerNode,
+
+	RandomColorNode,
+	RandomNumberNode,
+	RandomV2Node,
+	RandomV3Node,
+	RandomBoolNode,
 };

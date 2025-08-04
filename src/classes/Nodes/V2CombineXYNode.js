@@ -26,7 +26,7 @@ import {
 export default class V2CombineXYNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'Combines X and Y to Vector2';
+	static nodeName = 'Combine XY';
 	static icon = 'math';
 
 	static {

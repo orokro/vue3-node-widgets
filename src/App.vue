@@ -37,14 +37,11 @@ import {
 	ABMathNode,
 	ABCompareNode,
 	ClampValueNode,
-	LerpValueNode,
-	ColorMixNode,
-	ColorPickerNode,
 	MapRangeNode,
-	RandomColorNode,
-	RandomNumberNode,
+	LerpValueNode,
 	RoundNode,
 	TrigNode,
+	
 	AllTypesNode,
 	AllTypesOutNode,
 
@@ -61,6 +58,15 @@ import {
 	V3DotNode,
 	V3SeparateXYZNode,
 	V3CombineXYZNode,
+
+	ColorMixNode,
+	ColorPickerNode,
+
+	RandomColorNode,
+	RandomNumberNode,
+	RandomV2Node,
+	RandomV3Node,
+	RandomBoolNode,
 
 } from '@Nodes/index.js';
 
@@ -107,6 +113,9 @@ onMounted(() => {
 	// next row is random things
 	ctx.addNode(RandomColorNode, 220, 800);
 	ctx.addNode(RandomNumberNode, 400, 800);
+	ctx.addNode(RandomV2Node, 580, 800);
+	ctx.addNode(RandomV3Node, 760, 800);
+	ctx.addNode(RandomBoolNode, 940, 800);
 
 
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
