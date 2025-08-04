@@ -1,8 +1,8 @@
 /*
-	ABMathNode.js
-	-------------
+	LerpValueNode.js
+	----------------
 
-	This will be a node that provides some basic math operations, in the form of A - B, A + B, A * B, A / B, etc.
+	Node to lerp A and B values based on a factor.
 */
 
 import NWNode from '../NWNode.js';
@@ -23,10 +23,10 @@ import {
  } from '../Types/index.js';
  
 // main export
-export default class ABMathNode extends NWNode {
+export default class LerpValueNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'AB Math Node';
+	static nodeName = 'Lerp Value Node';
 	static icon = 'math';
 
 	static {
@@ -43,14 +43,6 @@ export default class ABMathNode extends NWNode {
 			description: "A value for math operations",
 			type: VNumber,
 		});	
-	
-		// enumeration
-		this.addField(FIELD_TYPE.PROP, { 
-			name: 'operation',
-			title: 'Operation',
-			description: "Which A - B operation to perform",
-			type: VEnum.With(['+', '-', '*', '/', '%', 'pow', 'log']),
-		});
 
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'bValue',
@@ -59,10 +51,17 @@ export default class ABMathNode extends NWNode {
 			type: VNumber,
 		});	
 
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'tValue',
+			title: 'T Value', 
+			description: "T value for lerping between A and B",
+			type: VNumber,
+		});	
+	
 		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'result',
 			title: 'Result', 
-			description: "Result of A operation B",
+			description: "Result of Lerp operation",
 			type: VNumber,
 		});
 
@@ -73,6 +72,8 @@ export default class ABMathNode extends NWNode {
 	 */
 	constructor() {
 		super();
+
+		this.fieldState.bValue.val = 1;
 	}
 
 }

@@ -7,7 +7,10 @@
 
 // import all our node types
 import ABMathNode from './ABMathNode';
+import ABCompareNode from './ABCompareNode';
+import ClampValueNode from './ClampValueNode';
 import MapRangeNode from './MapRangeNode';
+import LerpValueNode from './LerpValueNode';
 import RoundNode from './RoundNode';
 import TrigNode from './TrigNode';
 import RandomColorNode from './RandomColorNode';
@@ -20,11 +23,16 @@ import AllTypesOutNode from './AllTypesOutNode';
 // make a reusable list of default nodes
 const defaultNodeList = [
 	{ class: AllTypesNode, menuPath: '/Debug' },
-	{ class: AllTypesOutNode, menuPath: '/Debug/Outputs' },
-	{ class: ABMathNode, menuPath: '/Math' },
-	{ class: MapRangeNode, menuPath: '/Math' },
-	{ class: RoundNode, menuPath: '/Math' },
-	{ class: TrigNode, menuPath: '/Math' },
+	{ class: AllTypesOutNode, menuPath: '/Debug/' },
+	
+	{ class: ABMathNode, menuPath: '/Math (Scalar)' },
+	{ class: ABCompareNode, menuPath: '/Math (Scalar)' },
+	{ class: RoundNode, menuPath: '/Math (Scalar)' },
+	{ class: ClampValueNode, menuPath: '/Math (Scalar)' },
+	{ class: LerpValueNode, menuPath: '/Math (Scalar)' },
+	{ class: MapRangeNode, menuPath: '/Math (Scalar)' },	
+	{ class: TrigNode, menuPath: '/Math (Scalar)' },
+
 	{ class: RandomColorNode, menuPath: '/Math/Random/' },
 	{ class: RandomNumberNode, menuPath: 'math/Random' },
 	{ class: ColorMixNode, menuPath: '/Color' },
@@ -35,7 +43,10 @@ const defaultNodeList = [
 export { 
 	defaultNodeList,
 	ABMathNode,
+	ABCompareNode,
+	ClampValueNode,
 	MapRangeNode,
+	LerpValueNode,
 	RoundNode,
 	TrigNode,
 	RandomColorNode,

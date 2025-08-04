@@ -35,6 +35,9 @@ const myGraph = ref(null);
 // import all our nodes
 import { 
 	ABMathNode,
+	ABCompareNode,
+	ClampValueNode,
+	LerpValueNode,
 	ColorMixNode,
 	ColorPickerNode,
 	MapRangeNode,
@@ -60,12 +63,18 @@ onMounted(() => {
 	ctx = mg.getContext();
 
 	// add some debug nodes so we can test UI
-	ctx.addNode(TrigNode, 100, 100);
-	ctx.addNode(ABMathNode, 320, 100);
-	
+	ctx.addNode(TrigNode, 20, 100);
+	ctx.addNode(ABMathNode, 220, 100);
+	ctx.addNode(ABCompareNode, 400, 100);
+	ctx.addNode(RoundNode, 580, 100);
+	ctx.addNode(TrigNode, 760, 100);
+	ctx.addNode(ClampValueNode, 940, 100);
+	ctx.addNode(MapRangeNode, 1120, 100);
+	ctx.addNode(LerpValueNode, 1300, 100);
+
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
-	window.atnOut = ctx.addNode(AllTypesOutNode, 320, 300);
+	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 340);
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {

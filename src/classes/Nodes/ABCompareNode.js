@@ -1,8 +1,10 @@
 /*
-	ABMathNode.js
-	-------------
+	ABCompareNode.js
+	----------------
 
-	This will be a node that provides some basic math operations, in the form of A - B, A + B, A * B, A / B, etc.
+	Provides logic for comparing A to B, i.e =, !=, <, >, <=, >=
+
+	outputs a Boolean value
 */
 
 import NWNode from '../NWNode.js';
@@ -23,10 +25,10 @@ import {
  } from '../Types/index.js';
  
 // main export
-export default class ABMathNode extends NWNode {
+export default class ABCompareNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'AB Math Node';
+	static nodeName = 'AB Compare';
 	static icon = 'math';
 
 	static {
@@ -40,7 +42,7 @@ export default class ABMathNode extends NWNode {
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'aValue',
 			title: 'A Value', 
-			description: "A value for math operations",
+			description: "A value to compare to B",
 			type: VNumber,
 		});	
 	
@@ -48,22 +50,29 @@ export default class ABMathNode extends NWNode {
 		this.addField(FIELD_TYPE.PROP, { 
 			name: 'operation',
 			title: 'Operation',
-			description: "Which A - B operation to perform",
-			type: VEnum.With(['+', '-', '*', '/', '%', 'pow', 'log']),
+			description: "Which comparison operation to perform",
+			type: VEnum.With([
+					'= (Equals)', 
+					'!= (Not Equals)', 
+					'< (Less Than)',
+					'> (Greater Than)', 
+					'<= (Less Than or Equal)',
+					'>= (Greater Than or Equal)'
+			]),
 		});
 
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'bValue',
 			title: 'B Value', 
-			description: "B value for math operations",
+			description: "B value to compare to A",
 			type: VNumber,
 		});	
 
 		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'result',
 			title: 'Result', 
-			description: "Result of A operation B",
-			type: VNumber,
+			description: "Result of comparison",
+			type: VBoolean,
 		});
 
 	}

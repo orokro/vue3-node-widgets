@@ -29,7 +29,7 @@ import {
 export default class AllTypesOutNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'All Types';
+	static nodeName = 'All Types (Out)';
 	static icon = 'math';
 
 	static {

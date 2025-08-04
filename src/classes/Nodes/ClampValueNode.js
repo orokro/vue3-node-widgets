@@ -1,6 +1,6 @@
 /*
-	ABMathNode.js
-	-------------
+	ClampValueNode.js
+	-----------------
 
 	This will be a node that provides some basic math operations, in the form of A - B, A + B, A * B, A / B, etc.
 */
@@ -23,10 +23,10 @@ import {
  } from '../Types/index.js';
  
 // main export
-export default class ABMathNode extends NWNode {
+export default class ClampValueNode extends NWNode {
 
 	// static properties for the class
-	static nodeName = 'AB Math Node';
+	static nodeName = 'Clamp Node';
 	static icon = 'math';
 
 	static {
@@ -38,31 +38,30 @@ export default class ABMathNode extends NWNode {
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'aValue',
-			title: 'A Value', 
-			description: "A value for math operations",
+			name: 'value',
+			title: 'Value to Clamp', 
+			description: "The value to clamp",
 			type: VNumber,
-		});	
-	
-		// enumeration
-		this.addField(FIELD_TYPE.PROP, { 
-			name: 'operation',
-			title: 'Operation',
-			description: "Which A - B operation to perform",
-			type: VEnum.With(['+', '-', '*', '/', '%', 'pow', 'log']),
 		});
 
 		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'bValue',
-			title: 'B Value', 
-			description: "B value for math operations",
+			name: 'minValue',
+			title: 'Min Value', 
+			description: "Minimum to clamp to",
 			type: VNumber,
 		});	
 
+		this.addField(FIELD_TYPE.INPUT, { 
+			name: 'maxValue',
+			title: 'Max Value', 
+			description: "Maximum to clamp to",
+			type: VNumber,
+		});	
+	
 		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'result',
-			title: 'Result', 
-			description: "Result of A operation B",
+			title: 'Clamped Value', 
+			description: "Clamped value",
 			type: VNumber,
 		});
 
@@ -73,6 +72,8 @@ export default class ABMathNode extends NWNode {
 	 */
 	constructor() {
 		super();
+
+		this.fieldState.maxValue.val = 1;
 	}
 
 }

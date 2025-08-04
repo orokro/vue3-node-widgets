@@ -279,7 +279,7 @@ function checkAddMenu(e) {
 	.NWEditorGraph {
 
 		// some default styles
-		// border: 2px solid black;
+		/* border: 2px solid red; */
 		// border-radius: 4px;
 
 		font-family: sans-serif;
@@ -332,9 +332,9 @@ function checkAddMenu(e) {
 				position: absolute;
 
 				// for debug
-				min-width: 640em;
+				/* min-width: 640em;
 				min-height: 480em;
-				// border: 1px solid red;
+				border: 1px solid red; */
 
 				// test boxes
 				.a-test-box {
