@@ -53,6 +53,10 @@ const props = defineProps({
 		
 		span {
 			font-size: 12em;
+
+			word-wrap: none;
+			white-space: nowrap;
+			text-overflow: ellipsis;
 		}
 
 	}// .n-field-name

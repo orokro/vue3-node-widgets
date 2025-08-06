@@ -54,23 +54,35 @@
 						class="node-field-row"
 						:data-type="field.fieldType"
 						v-for="(field, index) in node.constructor.fields"
-						:key="index"
-						:ref="node.fieldState[field.name]?.data.rowEl"
+						:key="index"			
 					><!-- :setYPos="setYPos(node.fieldState[field.name]?.data.rowEl, field)" -->
+
+
+						<!-- all node kinds can have labels -->
 						<NLabel 
 							v-if="field.fieldType == FIELD_TYPE.LABEL"
 							:key="index"
 							:text="field.text"
 							:align="field.align"/>
 
-						<template v-else-if="[FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)">
+						<!-- if it wasn't a label then we're build a row for either an INPUT/OUTPUT/PROP -->
+						<template v-else>
+
+							<!-- if it's a processing node, or its prop on an input/output we show a field-name row -->
 							<div 
+								v-if="node.constructor.nodeType == NODE_TYPE.PROCESSING || field.fieldType == FIELD_TYPE.PROP"
 								class="field-name"
 								:title="field.description"
 							>
 								<span>{{ field.title }}</span>
-							</div>
+							</div>	
+
+							<!-- area to spawn sockets below -->
+							<div :ref="node.fieldState[field.name]?.data.rowEl"	 class="socket-ref-el"/>
+
+							<!-- otherwise, if we're processing node we'll mount it's component-->
 							<component
+								v-if="node.constructor.nodeType == NODE_TYPE.PROCESSING || field.fieldType == FIELD_TYPE.PROP"
 								:is="field.valueType.nodeWidgetComponent"
 								:key="index"
 								:nwSystem="nwSystem"
@@ -78,7 +90,19 @@
 								:field="field"
 								:read-only="field.fieldType == FIELD_TYPE.OUTPUT"
 							/>
+
+							<!-- otherwise, if it's an input node and an input field, or an output node and an output field
+								     then we just show the field name aligned to the socket -->
+							<NFieldNameWidget
+								v-else
+								
+								:text="field.title"
+								:align="field.fieldType == FIELD_TYPE.INPUT ? 'left' : 'right'"
+							/>
+
 						</template>
+
+
 
 					</div>
 
@@ -152,6 +176,7 @@ import { FIELD_TYPE, NODE_TYPE } from '@/classes/NWNode';
 // components
 import NLabel from './TypeWidgets/NLabel.vue';
 import Socket from './Socket.vue';
+import NFieldNameWidget from './TypeWidgets/NFieldNameWidget.vue';
 
 // props
 const props = defineProps({
@@ -270,7 +295,7 @@ function measureFieldPositions(){
 		}
 		
 		// get the offset of the row element in ems relative to its parent
-		const offsetInEm = getOffsetInEm(rowEl) + 28;
+		const offsetInEm = getOffsetInEm(rowEl) + 9;
 
 		// set the input and output Y positions based on the offset
 		props.node.fieldState[field.name].data.inputYPos.value = offsetInEm;

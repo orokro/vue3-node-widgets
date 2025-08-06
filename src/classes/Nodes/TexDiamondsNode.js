@@ -43,7 +43,7 @@ export default class TexDiamonds extends NWNode {
 
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'sizeV2',
-			title: 'Diamond Width x Height as Vector2', 
+			title: 'Width & Height', 
 			description: "X is width, Y is height",
 			type: VVector2,
 		});	

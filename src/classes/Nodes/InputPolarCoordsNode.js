@@ -79,6 +79,8 @@ export default class InputPolarCoords extends NWNode {
 	 */
 	constructor() {
 		super();
+
+		this.fieldState.degrees.val = true;
 	}
 
 }
