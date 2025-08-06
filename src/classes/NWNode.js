@@ -299,18 +299,20 @@ export default class NWNode {
 			OUTPUT nodes can only have INPUT fields, because they are outputs of the graph.
 			So your nodes in the graph wire INTO the output node, therefore output nodes only have inputs.
 		*/
-		if (this.nodeType === NODE_TYPE.INPUT && fieldType !== FIELD_TYPE.OUTPUT)
+		const { INPUT, OUTPUT, LABEL, PROP, CUSTOM } = FIELD_TYPE;
+		
+		if (this.nodeType === NODE_TYPE.INPUT && ![OUTPUT, LABEL, PROP, CUSTOM].includes(fieldType)) 
 			throw new Error('Input nodes can only have output fields');
 
-		if (this.nodeType === NODE_TYPE.OUTPUT && fieldType !== FIELD_TYPE.INPUT)
+		if (this.nodeType === NODE_TYPE.OUTPUT && ![INPUT, LABEL, PROP, CUSTOM].includes(fieldType))
 			throw new Error('Output nodes can only have input fields');
 		
 		// name is required for everything except labels and custom
-		if (fieldType !== FIELD_TYPE.LABEL && fieldType !== FIELD_TYPE.CUSTOM && !options.name) 
+		if (fieldType !== FIELD_TYPE.LABEL && fieldType !== CUSTOM && !options.name) 
 			throw new Error('Field must provide a name');
 		
 		// custom nodes must provide a component to render
-		if (fieldType === FIELD_TYPE.CUSTOM && !options.component)
+		if (fieldType === CUSTOM && !options.component)
 			throw new Error('Custom field must provide a component to render');
 
 		// not all options will be used for every type, but we'll provide all defaults here

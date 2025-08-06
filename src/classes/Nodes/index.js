@@ -48,6 +48,19 @@ import RandomV2Node from './RandomV2Node';
 import RandomV3Node from './RandomV3Node';
 import RandomBoolNode from './RandomBoolNode';
 
+
+import InputCanvasInfo from './InputCanvasInfoNode';
+import InputCartesianCoords from './InputCartesianCoordsNode';
+import InputPolarCoords from './InputPolarCoordsNode';
+
+import TexChecker from './TexCheckerNode';
+import TexDiamonds from './TexDiamondsNode';
+import TexNoise from './TexNoiseNode';
+import TexImage from './TexImageNode';
+import TexLayer from './TexLayerNode';
+
+// import Input
+
 // make a reusable list of default nodes
 const defaultNodeList = [
 
@@ -98,6 +111,9 @@ const defaultNodeList = [
 	{ class: RandomV2Node, menuPath: '/Random/' },
 	{ class: RandomV3Node, menuPath: '/Random/' },
 	{ class: RandomBoolNode, menuPath: '/Random/' },
+
+	// input nodes
+
 
 ];
 
