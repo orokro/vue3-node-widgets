@@ -43,7 +43,7 @@ export default class TexNoise extends NWNode {
 
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'scale',
-			title: 'Diamond Width x Height as Vector2', 
+			title: 'Scale', 
 			description: "X is width, Y is height",
 			type: VNumber.Min(1).Max(500)
 		});	
@@ -97,6 +97,14 @@ export default class TexNoise extends NWNode {
 	 */
 	constructor() {
 		super();
+
+		this.fieldState.scale.val = 50.0;
+		this.fieldState.octaves.val = 4;
+		this.fieldState.persistence.val = 0.5;
+		this.fieldState.lacunarity.val = 2.0;
+		this.fieldState.contrast.val = 1.0;
+		this.fieldState.brightness.val = 0.0;
+		this.fieldState.seed.val = 0;		
 	}
 
 

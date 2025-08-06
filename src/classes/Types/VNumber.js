@@ -63,8 +63,10 @@ export class VNumber extends VType {
 
 		super(value);
 
-		this.static.min = this.static.params?.min ? this.static.params.min : null;
-		this.static.max = this.static.params?.max ? this.static.params.max : null;
+		this.static.min = this.static.params?.min!==undefined ? this.static.params.min : null;
+		this.static.max = this.static.params?.max!==undefined ? this.static.params.max : null;
+
+		
 	}
 
 	static Min(min){

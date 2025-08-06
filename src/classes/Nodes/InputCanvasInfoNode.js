@@ -48,14 +48,14 @@ export default class InputCanvasInfo extends NWNode {
 			type: VVector2,
 		});	
 	
-		this.addField(FIELD_TYPE.PROP, { 
+		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'width',
 			title: 'Width',
 			description: "Width",
 			type: VInteger
 		});
 
-		this.addField(FIELD_TYPE.PROP, { 
+		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'height',
 			title: 'Height',
 			description: "Height",

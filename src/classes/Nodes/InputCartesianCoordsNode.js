@@ -58,21 +58,21 @@ export default class InputCartesianCoords extends NWNode {
 			type: VVector2,
 		});	
 	
-		this.addField(FIELD_TYPE.PROP, { 
+		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'xPos',
 			title: 'X',
 			description: "X Position",
 			type: VInteger
 		});
 
-		this.addField(FIELD_TYPE.PROP, { 
+		this.addField(FIELD_TYPE.OUTPUT, { 
 			name: 'yPos',
 			title: 'Y',
 			description: "Y Position",
 			type: VInteger
 		});
 	}
-	
+
 	
 	/**
 	 * Constructor

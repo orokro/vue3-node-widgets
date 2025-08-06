@@ -48,7 +48,7 @@ export default class InputPolarCoords extends NWNode {
 			name: 'degrees',
 			title: 'Angle Format', 
 			description: "Use Degrees? If false, radians will be used",
-			type: VBoolean.OnLabel('Degrees').OffLabel('Radians'),
+			type: VBoolean.OnLabel('Deg').OffLabel('Rad'),
 		});	
 
 		this.addField(FIELD_TYPE.PROP, { 

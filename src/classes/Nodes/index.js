@@ -48,6 +48,7 @@ import RandomV2Node from './RandomV2Node';
 import RandomV3Node from './RandomV3Node';
 import RandomBoolNode from './RandomBoolNode';
 
+import OutputColor from './OutputColorNode';
 
 import InputCanvasInfo from './InputCanvasInfoNode';
 import InputCartesianCoords from './InputCartesianCoordsNode';
@@ -113,7 +114,19 @@ const defaultNodeList = [
 	{ class: RandomBoolNode, menuPath: '/Random/' },
 
 	// input nodes
+	{ class: InputCanvasInfo, menuPath: '/Input' },
+	{ class: InputCartesianCoords, menuPath: '/Input' },
+	{ class: InputPolarCoords, menuPath: '/Input' },
 
+	// output node
+	{ class: OutputColor, menuPath: '/Output' },
+
+	// texture nodes
+	{ class: TexChecker, menuPath: '/Texture' },
+	{ class: TexDiamonds, menuPath: '/Texture' },
+	{ class: TexNoise, menuPath: '/Texture' },
+	{ class: TexImage, menuPath: '/Texture' },
+	{ class: TexLayer, menuPath: '/Texture' },
 
 ];
 
