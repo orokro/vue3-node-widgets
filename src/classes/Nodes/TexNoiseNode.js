@@ -89,6 +89,20 @@ export default class TexNoise extends NWNode {
 			description: "Integer seed for reproducible randomness",
 			type: VInteger
 		});
+
+		this.addField(FIELD_TYPE.OUTPUT, {
+			name: 'value',
+			title: 'Value', 
+			description: "Scalar value of noise at pixel coordinates",
+			type: VNumber
+		});
+
+		this.addField(FIELD_TYPE.OUTPUT, {
+			name: 'color',
+			title: 'Color', 
+			description: "Noise value as color (grayscale)",
+			type: VColor3
+		});
 	}
 	
 

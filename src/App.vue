@@ -76,6 +76,18 @@ import {
 	RandomV3Node,
 	RandomBoolNode,
 
+	InputCanvasInfo,
+	InputCartesianCoords,
+	InputPolarCoords,
+
+	OutputColor,
+
+	TexChecker,
+	TexDiamonds,
+	TexNoise,
+	TexImage,
+	TexLayer,
+
 } from '@Nodes/index.js';
 
 // for vue testing
@@ -91,6 +103,37 @@ onMounted(() => {
 
 	ctx = mg.getContext();
 
+	// add tons of nodes
+	// addBuildInNodesBatch01();
+
+	// add the new nodes specific for the demo
+	ctx.addNode(InputCanvasInfo, 20, 20);
+	ctx.addNode(InputCartesianCoords, 220, 20);
+	ctx.addNode(InputPolarCoords, 420, 20);
+
+	ctx.addNode(OutputColor, 620, 20);
+
+	ctx.addNode(TexChecker, 20, 240);
+	ctx.addNode(TexDiamonds, 220, 240);
+	ctx.addNode(TexNoise, 420, 240);
+	ctx.addNode(TexImage, 620, 240);
+	ctx.addNode(TexLayer, 820, 240);
+	// ctx.addNode(TexLayer, 1020, 200);
+
+
+
+	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
+	window.addEventListener('keydown', (e) => {
+		if (e.key === 'Home') {
+			ctx.zoomScale.value = 1;
+			ctx.panX.value = 0;
+			ctx.panY.value = 0;
+		}
+	});
+});
+
+
+function addBuildInNodesBatch01() {
 	// add some debug nodes so we can test UI
 	ctx.addNode(TrigNode, 20, 100);
 	ctx.addNode(ABMathNode, 220, 100);
@@ -136,21 +179,10 @@ onMounted(() => {
 	ctx.addNode(CombineRGBANode, 1300, 1080);
 	ctx.addNode(CombineHSVNode, 1480, 1080);
 
-
-
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
 	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 400);
-
-	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
-	window.addEventListener('keydown', (e) => {
-		if (e.key === 'Home') {
-			ctx.zoomScale.value = 1;
-			ctx.panX.value = 0;
-			ctx.panY.value = 0;
-		}
-	});
-});
+}
 
 
 /**

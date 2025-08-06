@@ -175,4 +175,16 @@ export {
 	RandomV2Node,
 	RandomV3Node,
 	RandomBoolNode,
+
+	InputCanvasInfo,
+	InputCartesianCoords,
+	InputPolarCoords,
+
+	OutputColor,
+
+	TexChecker,
+	TexDiamonds,
+	TexNoise,
+	TexImage,
+	TexLayer,
 };
