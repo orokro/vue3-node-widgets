@@ -162,11 +162,6 @@
 </template>
 <script setup>
 
-function a(a){
-	console.log('a', a);
-	return a;
-}	
-
 // vue imports
 import { ref, onMounted, nextTick, inject, watch, readonly } from 'vue';
 
