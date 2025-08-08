@@ -240,7 +240,7 @@ function generateCornerStyle(input, themeColor = '#000') {
 		/* border: 1px solid red; */
 
 		position: absolute;
-		cursor: pointer;
+		cursor: move;
 
 		// the simple socket style that just specifies corners & rotation
 		.corner-socket {
