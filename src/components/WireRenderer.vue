@@ -52,7 +52,7 @@ onMounted(()=>{
 		position: relative;
 
 		// for debugging purposes, we can see the container
-		border: 1px solid red;
+		/* border: 1px solid red; */
 
 	}// .wire-renderer-container
 
