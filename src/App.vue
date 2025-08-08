@@ -51,8 +51,10 @@ onMounted(() => {
 	window.mg = myGraph.value;
 
 	ctx = mg.getContext();
+	window.ctx = ctx;
 
 	buildNaturalLayout01(ctx);
+
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {

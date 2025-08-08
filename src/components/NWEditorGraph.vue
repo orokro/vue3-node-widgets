@@ -39,6 +39,9 @@
 						transform: `translate(${ctxRef.panX.value}px, ${ctxRef.panY.value}px)`,
 					}"
 				>
+					<!-- spawn all wires here -->
+					<WireRenderer :nwSystem="ctxRef" />
+					
 					<!-- loop through all the nodes and render them -->
 					<Node 
 						v-for="(node, index) in ctxRef.graph.nodes.value" 
@@ -85,6 +88,7 @@ import { ref, shallowRef, onMounted, provide } from 'vue';
 import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import Node from '@Components/Node.vue';
+import WireRenderer from '@Components/WireRenderer.vue';
 
 // our app
 import NWEditor from '../classes/NWEditor.js';

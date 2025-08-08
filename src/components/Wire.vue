@@ -1,0 +1,165 @@
+<!--
+	Wire.vue
+	--------
+
+	One of the wires in the graph. This is a simple component that renders a wire between two nodes.
+-->
+<template>
+
+	<div
+		class="wire-container"
+
+		:style="{
+			// position the wire container absolutely, based on the start position of the wire
+			left: `${SVGDetails.viewBoxX}em`,
+			top: `${SVGDetails.viewBoxY}em`,
+			width: `${(SVGDetails.width)}em`,
+			height: `${(SVGDetails.height)}em`,
+		}"
+	>
+		
+		<!-- SVG with the wire -->
+		<svg 
+			class="wire-svg" 
+			:viewBox="SVGDetails.viewBox"			
+			pointer-events="none"
+		>
+			<path 
+				:d="SVGDetails.pathData" 
+				stroke="white" 
+				stroke-width="" 
+				fill="none"
+			/>
+		</svg>
+	</div>
+
+</template>
+<script setup>
+
+// vue
+import { ref, onMounted, computed, watch } from 'vue';
+
+// props
+const props = defineProps({
+
+	// the NWSystem is the context of the graph, which contains the graph and other properties
+	nwSystem: {
+		type: Object,
+		required: true,
+	},
+
+	// the wire object to render
+	wire: {
+		type: Object,
+		required: true,
+	},
+
+});
+
+// generate the SVG details for the wire
+const SVGDetails = computed(()=>{
+
+	// for now we'll just reference the built in positions
+	let {
+		startX,
+		startY,
+		endX,
+		endY,
+	} = props.wire.positions;
+
+	// get te width and height of the start/end points
+	let width = Math.abs(endX - startX);
+	let height = Math.abs(endY - startY);
+
+	// get third width for generating the control points
+	const thirdWidth = width / 3;
+
+	// now, if the start is to the left of the end, we want the control points to be to the right of the start and to the left of the end
+	let controlPoint1X, controlPoint2X;
+	if (startX < endX) {
+		controlPoint1X = startX + thirdWidth;
+		controlPoint2X = endX - thirdWidth;
+	} else {
+		controlPoint1X = startX - thirdWidth;
+		controlPoint2X = endX + thirdWidth;
+	}
+
+	// control points Y will be the same as start and end Y
+	let controlPoint1Y = startY;
+	let controlPoint2Y = endY;
+
+	const padding = 10;
+
+	// now that we have the control points and the start/end positions
+	// let's calculate the viewbox for the SVG
+	// because the control points can be outside the start/end positions
+	// we need to calculate the min and max X and Y values
+	const minX = Math.min(startX, endX, controlPoint1X, controlPoint2X);
+	const maxX = Math.max(startX, endX, controlPoint1X, controlPoint2X);
+	const minY = Math.min(startY, endY, controlPoint1Y, controlPoint2Y);
+	const maxY = Math.max(startY, endY, controlPoint1Y, controlPoint2Y);
+	const viewBoxWidth = (maxX - minX) + (padding * 2);
+	const viewBoxHeight = (maxY - minY) + (padding * 2);
+
+	// now that we've computed the viewbox, adjust the start, end, and control points to be relative to the viewbox
+	startX = startX - minX + padding;
+	startY = startY - minY + padding;
+	endX = endX - minX + padding;
+	endY = endY - minY + padding;
+	controlPoint1X = controlPoint1X - minX + padding;
+	controlPoint1Y = controlPoint1Y - minY + padding;
+	controlPoint2X = controlPoint2X - minX + padding;
+	controlPoint2Y = controlPoint2Y - minY + padding;
+	width = maxX - minX + (padding * 2);
+	height = maxY - minY + (padding * 2);
+
+	// compute the top-left corner of the viewbox
+	const viewBoxX = minX - padding;
+	const viewBoxY = minY - padding;
+
+	// make the svg path and viewbox string
+	const pathData = `M ${startX} ${startY} C ${controlPoint1X} ${controlPoint1Y}, ${controlPoint2X} ${controlPoint2Y}, ${endX} ${endY}`;
+	const viewBox = `${0} ${0} ${viewBoxWidth} ${viewBoxHeight}`;
+
+	// exit early for now, until we have a better way to handle deleted nodes/ports
+	return {
+		pathData,
+		viewBox,
+		viewBoxX,
+		viewBoxY,
+		width,
+		height,
+		startX,
+		startY,
+		endX,
+		endY,
+		controlPoint1X,
+		controlPoint1Y,
+		controlPoint2X,
+		controlPoint2Y,
+	};
+
+});
+	
+</script>
+<style lang="scss" scoped>
+
+	// the div in em size that positioned and scales with zoom
+	.wire-container {
+
+		// for debug
+		/* border: 1px solid cyan; */
+
+		// fixed positioning
+		position: absolute;
+
+		// the actual SVG
+		.wire-svg {
+			/* border: 1px solid red; */
+			line-height: initial;
+
+		}// .wire-svg
+
+	}// .wire-container
+
+</style>

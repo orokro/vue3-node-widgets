@@ -416,7 +416,7 @@ onMounted(()=>{
 			// the rows where we spawn the individual fields
 			.node-field-row {
 
-				padding: 0em 8em;
+				padding: 6em 8em 0em 6em;
 
 				background: rgba(0, 0, 0, 0.1);
 				&:nth-child(odd) {

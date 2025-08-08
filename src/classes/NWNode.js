@@ -476,6 +476,9 @@ export default class NWNode {
 		this.x = ref(0);
 		this.y = ref(0);
 
+		// optional slug used for finding the node
+		this.slug = '';
+
 		// when we constructor a new instance of this node,
 		// we need to init the state for all the fields
 		this.fieldState = {};

@@ -130,23 +130,32 @@ function addBuildInNodesBatch02(ctx) {
 	ctx.addNode(TexNoise, 420, 240);
 	ctx.addNode(TexImage, 620, 240);
 	ctx.addNode(TexLayer, 820, 240);
-	// ctx.addNode(TexLayer, 1020, 200);
-
 }
 
 
 function buildNaturalLayout01(ctx) {
 
 	// inputs along left
-	ctx.addNode(InputCartesianCoords, 20, 20);
-	ctx.addNode(InputPolarCoords, 20, 180);
-	ctx.addNode(InputCanvasInfo, 20, 360);
+	ctx.addNode(InputCartesianCoords, 20, 20, 'coords');
+	ctx.addNode(InputPolarCoords, 20, 200, 'pcoords');
+	ctx.addNode(InputCanvasInfo, 20, 400, 'canvas');
 
 	// output on right
-	ctx.addNode(OutputColor, 1020, 20);
+	ctx.addNode(OutputColor, 1020, 20, 'output');
 
 	// some random stuff in the middle
-	ctx.addNode(TexChecker, 320, 20);
+	ctx.addNode(TexChecker, 320, 20, 'checker');
+
+	// set up a wire
+	ctx.connMgr.tempWire.startX = 9 * 20;
+	ctx.connMgr.tempWire.startY = 5.5 * 20;
+	ctx.connMgr.tempWire.endX = 16 * 20;
+	ctx.connMgr.tempWire.endY = 4.7 * 20;
+
+	ctx.connMgr.addConnectionBasic(
+		9*20, 5.4*20,
+		16*20, 3.8*20
+	);
 }
 
 

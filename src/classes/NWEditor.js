@@ -17,6 +17,8 @@ import { ref, shallowRef, reactive } from 'vue';
 import NodeWidget from './NWNode';
 import DevErrors from './DevErrors';
 import { VTypeRegistry } from './VTypeRegistry';
+import { Connection } from './Connection';
+import { ConnectionManager } from './ConnectionManager';
 
 // lib/misc
 import DragHelper from 'gdraghelper';
@@ -105,6 +107,9 @@ export default class NWEditor {
 			nodes: shallowRef([]),
 			wires: shallowRef([]),
 		};
+
+		// make new manager for our connections
+		this.connMgr = new ConnectionManager(this);
 
 		// whenever the user changes the graph, we can build a single functional "compute" function
 		// that represents the entire graph, and can be called with inputs to get outputs
@@ -206,7 +211,7 @@ export default class NWEditor {
 	 * @param {Number} y - The y position to add the node at.
 	 * @returns {NWNode} - The newly created node.
 	 */
-	addNode(nodeClass, x = 0, y = 0){
+	addNode(nodeClass, x = 0, y = 0, slug = null){
 
 		// if x and y are 0, use the current menu position
 		if(x === 0 && y === 0){
@@ -237,10 +242,33 @@ export default class NWEditor {
 		// set the position of the node
 		newNode.setPosition(x, y);
 
+		// if we got a slug
+		if(t.isDefined(slug) && t.isString(slug)){
+			newNode.slug = slug;
+		}
+
 		// add the node to our graph
 		this.graph.nodes.value = [...this.graph.nodes.value, newNode];
 
 		return newNode
+	}
+
+
+	/**
+	 * Finds a node by its slug.
+	 * 
+	 * @param {String} slug - The slug of the node to find.
+	 * @returns {NWNode|null} - The node with the specified slug, or null if not found.
+	 */
+	findNodeBySlug(slug){
+
+		// if we were passed in a slug, find the node by slug
+		if(t.isDefined(slug) && t.isString(slug)){
+			return this.graph.nodes.value.find(n => n.slug === slug);
+		}
+
+		// if we weren't passed in a slug, return null
+		return null;
 	}
 
 
