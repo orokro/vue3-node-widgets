@@ -53,8 +53,8 @@ onMounted(() => {
 	ctx = mg.getContext();
 	window.ctx = ctx;
 
-	buildNaturalLayout01(ctx);
-
+	// buildNaturalLayout01(ctx);
+	addBuildInNodesBatch01(ctx);
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {
@@ -62,7 +62,7 @@ onMounted(() => {
 			ctx.zoomScale.value = 1;
 			ctx.panX.value = 0;
 			ctx.panY.value = 0;
-		}
+		}0
 	});
 });
 
