@@ -111,8 +111,8 @@ function addBuildInNodesBatch01(ctx) {
 	ctx.addNode(CombineHSVNode, 1480, 1260);
 
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
-	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
-	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 460);
+	window.atn = ctx.addNode(AllTypesNode, 20, 460);
+	// window.atnOut = ctx.addNode(AllTypesOutNode, 20, 460);
 }
 
 
