@@ -76,43 +76,43 @@ function addBuildInNodesBatch01(ctx) {
 	ctx.addNode(LerpValueNode, 1300, 100);
 
 	// next row is vector 2
-	ctx.addNode(V2ScaleNode, 220, 400);
-	ctx.addNode(V2AddNode, 400, 400);
-	ctx.addNode(V2SubNode, 580, 400);
-	ctx.addNode(V2DotNode, 760, 400);
-	ctx.addNode(V2LerpNode, 940, 400);
-	ctx.addNode(V2SeparateXYNode, 1120, 400);
-	ctx.addNode(V2CombineXYNode, 1300, 400);
+	ctx.addNode(V2ScaleNode, 220, 460);
+	ctx.addNode(V2AddNode, 400, 460);
+	ctx.addNode(V2SubNode, 580, 460);
+	ctx.addNode(V2DotNode, 760, 460);
+	ctx.addNode(V2LerpNode, 940, 460);
+	ctx.addNode(V2SeparateXYNode, 1120, 460);
+	ctx.addNode(V2CombineXYNode, 1300, 460);
 
 	// next row is vector 3
-	ctx.addNode(V3ScaleNode, 220, 620);
-	ctx.addNode(V3AddNode, 400, 620);
-	ctx.addNode(V3SubNode, 580, 620);
-	ctx.addNode(V3DotNode, 760, 620);
-	ctx.addNode(V3LerpNode, 940, 620);
-	ctx.addNode(V3SeparateXYZNode, 1120, 620);
-	ctx.addNode(V3CombineXYZNode, 1300 , 620);
+	ctx.addNode(V3ScaleNode, 220, 720);
+	ctx.addNode(V3AddNode, 400, 720);
+	ctx.addNode(V3SubNode, 580, 720);
+	ctx.addNode(V3DotNode, 760, 720);
+	ctx.addNode(V3LerpNode, 940, 720);
+	ctx.addNode(V3SeparateXYZNode, 1120, 720);
+	ctx.addNode(V3CombineXYZNode, 1300 , 720);
 
 	// next row is random things
-	ctx.addNode(RandomColorNode, 220, 840);
-	ctx.addNode(RandomNumberNode, 400, 840);
-	ctx.addNode(RandomV2Node, 580, 840);
-	ctx.addNode(RandomV3Node, 760, 840);
-	ctx.addNode(RandomBoolNode, 940, 840);
+	ctx.addNode(RandomColorNode, 220, 980);
+	ctx.addNode(RandomNumberNode, 400, 980);
+	ctx.addNode(RandomV2Node, 580, 980);
+	ctx.addNode(RandomV3Node, 760, 980);
+	ctx.addNode(RandomBoolNode, 940, 980);
 
 	// next row is color nodes
-	ctx.addNode(ColorMixNode, 220, 1080);
-	ctx.addNode(ColorBlendNode, 400, 1080);
-	ctx.addNode(SeparateAlpha, 580, 1080);
-	ctx.addNode(SeparateHSVNode, 760, 1080);
-	ctx.addNode(SeparateRGBNode, 940, 1080);
-	ctx.addNode(CombineRGBNode, 1120, 1080);
-	ctx.addNode(CombineRGBANode, 1300, 1080);
-	ctx.addNode(CombineHSVNode, 1480, 1080);
+	ctx.addNode(ColorMixNode, 220, 1260);
+	ctx.addNode(ColorBlendNode, 400, 1260);
+	ctx.addNode(SeparateAlpha, 580, 1260);
+	ctx.addNode(SeparateHSVNode, 760, 1260);
+	ctx.addNode(SeparateRGBNode, 940, 1260);
+	ctx.addNode(CombineRGBNode, 1120, 1260);
+	ctx.addNode(CombineRGBANode, 1300, 1260);
+	ctx.addNode(CombineHSVNode, 1480, 1260);
 
 	// window.atn = ctx.addNode(AllTypesNode, 320, 100);
 	// window.atn = ctx.addNode(AllTypesNode, 320, 300);
-	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 400);
+	window.atnOut = ctx.addNode(AllTypesOutNode, 20, 460);
 }
 
 
