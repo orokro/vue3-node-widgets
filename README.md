@@ -1,5 +1,8 @@
 # vue3-node-widgets
 
+A system for customizable Node-graphs that can either run logic or provide a model of the graph.
+Nodes can use built-in widgets, or be completley customizable by adding your own components for the feilds or nodes themselves.
+
 Note:
 
 If you're reading this, you're in the 'master' branch before this project was converted to a vue3 plugin.
