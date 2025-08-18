@@ -133,7 +133,7 @@
 							:y="node.fieldState[field.name]?.data.inputYPos.value"
 							:node="node"
 							:field="field"
-							:socketType="FIELD_TYPE.INPUT"
+							:socketType="SOCKET_TYPE.INPUT"
 							:socketStyle="field.valueType.socketStyle"
 						/>
 					</template>
@@ -150,7 +150,7 @@
 							:y="node.fieldState[field.name]?.data.outputYPos.value"
 							:node="node"
 							:field="field"
-							:socketType="FIELD_TYPE.OUTPUT"
+							:socketType="SOCKET_TYPE.OUTPUT"
 							:socketStyle="field.valueType.socketStyle"
 						/>
 					</template>
@@ -166,7 +166,7 @@
 import { ref, onMounted, nextTick, inject, watch, readonly } from 'vue';
 
 // our app
-import { FIELD_TYPE, NODE_TYPE } from '@/classes/NWNode';
+import { FIELD_TYPE, NODE_TYPE, SOCKET_TYPE } from '@/classes/NWNode';
 
 // components
 import NLabel from './TypeWidgets/NLabel.vue';
@@ -210,6 +210,7 @@ function setYPos(rowEl, field) {
 		props.node.fieldState[field.name].data.outputYPos.value = offsetInEm;
 	});
 }
+
 
 /**
  * Handles the start of dragging the node

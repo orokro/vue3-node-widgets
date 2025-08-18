@@ -214,6 +214,13 @@ export const FIELD_TYPE = {
 	CUSTOM: 'custom', // uses a custom component for rendering
 };
 
+// socket types
+export const SOCKET_TYPE = {
+	INPUT: 'input',
+	OUTPUT: 'output',
+};
+
+
 // main export class
 export default class NWNode {
 
@@ -509,9 +516,14 @@ export default class NWNode {
 			name,
 			_valueObj: value,
 			data: {
-				
+
+				// positions of sockets
 				inputYPos: ref(0),
 				outputYPos: ref(0),
+				
+				// elements to mounted sockets (if exist)
+				inputSocketEl: null,
+				outputSocketEl: null,
 
 				// ref to the row element in the DOM
 				rowEl: ref(null),

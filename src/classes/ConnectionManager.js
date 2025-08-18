@@ -15,6 +15,7 @@
 import { shallowRef } from "vue";
 import NWEditor from "./NWEditor";
 import { Connection } from "./Connection";
+import { SOCKET_TYPE } from "./NWNode";
 
 export class ConnectionManager {
 
@@ -31,13 +32,24 @@ export class ConnectionManager {
 		// the wires array
 		this.wires = this.editor.graph.wires;
 
-		// this wire will be used for for the wire being drawn
-		// or debugging
-		this.tempWire = new Connection(this);
-
+		// while the user is dragging out a wire, we'll store some state here
+		this.draggingWire = shallowRef(false);
+		this.dragEnd = shallowRef(SOCKET_TYPE.OUTPUT);
+		this.dragOriginNode = shallowRef(null);
+		this.dragOriginField = shallowRef(null);
+		this.dragCurrentPos = shallowRef({ x: 0, y: 0 });
 	}
 
 
+	/**
+	 * Adds a new connection with basic start and end positions.
+	 * 
+	 * @param {Number} startX - the start X position of the connection.
+	 * @param {Number} startY - the start Y position of the connection.
+	 * @param {Number} endX - the end X position of the connection.
+	 * @param {Number} endY - the end Y position of the connection.
+	 * @returns {Connection} - the newly created connection instance.
+	 */
 	addConnectionBasic(startX, startY, endX, endY) {
 
 		// create a new connection
@@ -53,6 +65,40 @@ export class ConnectionManager {
 		this.wires.value = [...this.wires.value, conn];
 
 		return conn;
+	}
+
+	
+	/**
+	 * Destroy a connection.
+	 * 
+	 * @param {Connection|String} conn - the connection to destroy, or the ID of the connection to destroy.
+	 */
+	destroyConnection(conn) {
+
+		// if conn is a string, then it's an ID
+		if (typeof conn === 'string') {
+			conn = this.wires.value.find(c => c.id === conn);
+		}
+
+		// remove the connection from the wires array
+		this.wires.value = this.wires.value.filter(c => c.id !== conn.id);
+	}
+
+
+	startWire(node, field, isInput=false) {
+
+		// save our stats about our drag origin
+		// note on this: users can drag from an output socket or an input socket
+		// so we need to note which end of the wire is attached to the mouse
+		this.dragEnd.value = isInput ? SOCKET_TYPE.INPUT : SOCKET_TYPE.OUTPUT;
+		this.dragOriginNode.value = node;
+		this.dragOriginField.value = field;
+
+		// true while dragging
+		this.draggingWire.value = true;
+
+		
+
 	}
 
 

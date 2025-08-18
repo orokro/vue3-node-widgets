@@ -147,11 +147,6 @@ function buildNaturalLayout01(ctx) {
 	ctx.addNode(TexChecker, 320, 20, 'checker');
 
 	// set up a wire
-	ctx.connMgr.tempWire.startX = 9 * 20;
-	ctx.connMgr.tempWire.startY = 5.5 * 20;
-	ctx.connMgr.tempWire.endX = 16 * 20;
-	ctx.connMgr.tempWire.endY = 4.7 * 20;
-
 	ctx.connMgr.addConnectionBasic(
 		9*20, 5.4*20,
 		16*20, 3.8*20

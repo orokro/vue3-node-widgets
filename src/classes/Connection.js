@@ -38,4 +38,17 @@ export class Connection {
 		});
 	}
 
+
+	/**
+	 * Destroys this connection.
+	 * 
+	 * This will remove the connection from the connection manager
+	 * and clean up any resources associated with it.
+	 */
+	destroy(){
+
+		// am kil
+		this.mgr.destroyConnection(this.id);
+	}
+
 }

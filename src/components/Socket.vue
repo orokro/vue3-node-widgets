@@ -8,6 +8,7 @@
 <template>
 
 	<div
+		ref="elRef"
 		class="socket"
 		:class="{
 			'socket-input': socketType === FIELD_TYPE.INPUT,
@@ -16,6 +17,7 @@
 		:style="{
 			top: `${y}em`,
 		}"
+		@mousedown="onMouseDown"
 	>	
 		<div
 			v-if="socketFormat === 'corner'"
@@ -25,7 +27,6 @@
 		<div
 			v-else="socketFormat === 'svg'"
 		>
-			<!-- hello chatGPT -->
 		</div>
 	</div>
 
@@ -71,6 +72,9 @@ const props = defineProps({
 	},
 });
 
+// ref to the socket element
+const elRef = ref(null);
+
 // either 'corner' or 'svg' or 'unknown'
 const socketFormat = ref('unknown');
 
@@ -80,9 +84,39 @@ const cornerStyle = shallowRef({});
 // when we mount we should figure out how to render this socket
 onMounted(() => {
 
+	// set the element reference in the node's field state
+	setElRef();
+
+	// configure our socket style
+	buildSocketStyle();
+});
+
+
+
+/**
+ * Sets the element reference in the node's field state for this socket
+ */
+function setElRef(){
+
+	const fieldName = props.field.name;
+	const fieldState = props.node.fieldState[fieldName];
+
+	if(props.socketType === FIELD_TYPE.INPUT){
+		fieldState.data.inputSocketEl = elRef.value;
+	}else if(props.socketType === FIELD_TYPE.OUTPUT){
+		fieldState.data.outputSocketEl = elRef.value;
+	}
+}
+
+
+/**
+ * Builds the socket style based on the socketStyle prop
+ */
+function buildSocketStyle(){
+
 	// detect the format of the style string
 	socketFormat.value = detectStyleFormat(props.socketStyle);
-
+	
 	// validate the style string based on its format
 	if (socketFormat.value === 'corner') {
 		if (!validateCornerFormat(props.socketStyle)) {
@@ -101,8 +135,7 @@ onMounted(() => {
 	} else {
 		console.warn(`Unknown style format for socket ${props.field.name}: ${props.socketStyle}`);
 	}
-
-});
+}
 
 
 /**
@@ -229,6 +262,13 @@ function generateCornerStyle(input, themeColor = '#000') {
 	};
 }
 
+
+function onMouseDown(event) {
+	// Placeholder for future drag-and-drop functionality
+	// props.nwSystem.startWire(props.node, props.field, socketType, $event)
+
+	console.log(props.node, props.field, props.socketType);
+}
 
 </script>
 <style lang="scss" scoped>
