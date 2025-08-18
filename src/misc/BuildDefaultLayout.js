@@ -62,6 +62,7 @@ import {
 	TexLayer,
 
 } from '@Nodes/index.js';
+import { nextTick } from 'vue';
 
 
 function addBuildInNodesBatch01(ctx) {
@@ -151,6 +152,25 @@ function buildNaturalLayout01(ctx) {
 		9*20, 5.4*20,
 		16*20, 3.8*20
 	);
+
+	nextTick(() => {
+	
+		// get both nodes
+		const polarNode = ctx.graph.nodes.value[1];
+		const checkerNode = ctx.graph.nodes.value[4];
+
+		// get both fields:
+		const thetaField = polarNode.static.fields[2];
+		const colorAField = checkerNode.static.fields[1];
+
+		// make new connection
+		const newConn = ctx.connMgr.addConnectionBasic();
+
+		// wire it up
+		newConn.setInput(polarNode, thetaField);
+		newConn.setOutput(checkerNode, colorAField);
+	});
+
 }
 
 

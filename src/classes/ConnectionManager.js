@@ -91,20 +91,31 @@ export class ConnectionManager {
 	}
 
 
-	startWire(node, field, isInput=false) {
+	startWire(node, field, startFromOutput = true) {
 
 		// save our stats about our drag origin
 		// note on this: users can drag from an output socket or an input socket
 		// so we need to note which end of the wire is attached to the mouse
-		this.dragEnd.value = isInput ? SOCKET_TYPE.INPUT : SOCKET_TYPE.OUTPUT;
+		this.dragEnd.value = startFromOutput ? SOCKET_TYPE.OUTPUT : SOCKET_TYPE.INPUT;
 		this.dragOriginNode.value = node;
 		this.dragOriginField.value = field;
 
 		// true while dragging
 		this.draggingWire.value = true;
 
-		
+		// add a new connection, we'll fill in the positions later
+		const conn = this.addConnectionBasic();
 
+		if( startFromOutput ) {
+			
+			// the INPUT for the wire is an output socket
+			conn.setInput(node, field);
+		}else {
+			// the OUTPUT for the wire is an input socket
+			conn.setOutput(node, field);
+		}
+
+		return conn;
 	}
 
 

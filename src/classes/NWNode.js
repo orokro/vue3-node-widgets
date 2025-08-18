@@ -195,7 +195,7 @@
 
 // vue
 import { Value } from 'sass';
-import { ref } from 'vue';
+import { ref, shallowRef } from 'vue';
 
 // the kind of nodes
 export const NODE_TYPE = {
@@ -480,7 +480,7 @@ export default class NWNode {
 		this.id = `node_${++NWNode.idCounter}`;
 
 		// when the vue component is mounted for this node it will store it's el ref here:
-		this.nodeEl = ref(null);
+		this.nodeEl = shallowRef(null);
 
 		// position of the node in the graph
 		this.x = ref(0);
@@ -525,8 +525,8 @@ export default class NWNode {
 				outputYPos: ref(0),
 				
 				// elements to mounted sockets (if exist)
-				inputSocketEl: ref(null),
-				outputSocketEl: ref(null),
+				inputSocketEl: shallowRef(null),
+				outputSocketEl: shallowRef(null),
 
 				// ref to the row element in the DOM
 				rowEl: ref(null),
@@ -585,19 +585,58 @@ export default class NWNode {
 	}
 
 
-	getSocketPosition(fieldName, socketType) {
 
-		// get the field state with this name
-		const fieldState = this.fieldState[fieldName];
-		if (!fieldState) {
-			throw new Error(`Field "${fieldName}" not found in node "${this.id}"`);
-		}
+	/**
+	 * Gets the position of a socket for a given field.
+	 * 
+	 * @param {Object|String} field - the field to get the socket position for, or the name of the field
+	 * @param {String} socketType - one of the SOCKET_TYPE constants, either INPUT or OUTPUT
+	 * @returns {Object|null} - an object with x and y properties in EM units, or null if the socket is not found
+	 */
+	getSocketPosition(field, socketType) {
 
-		// get the html element for the socket
-		const socketEl = (socketType === SOCKET_TYPE.INPUT) ? 
-			fieldState.data.inputSocketEl : fieldState.data.outputSocketEl;
-
-		
+		// 1) resolve node element
+		const nodeEl = this.nodeEl && this.nodeEl.value;
+		if (!nodeEl) return null;
+	  
+		// 2) normalize field name
+		const fieldName = (field && typeof field === 'object' && 'name' in field)
+		  ? field.name
+		  : String(field);
+	  
+		const fieldEntry = this.fieldState && this.fieldState[fieldName];
+		if (!fieldEntry || !fieldEntry.data) return null;
+	  
+		// 3) pick socket element by type
+		const socketRef = (socketType === SOCKET_TYPE.INPUT)
+		  ? fieldEntry.data.inputSocketEl
+		  : fieldEntry.data.outputSocketEl;
+	  
+		const socketEl = socketRef && socketRef.value;
+		if (!socketEl) return null;
+	  
+		// 4) measure in viewport px
+		const nodeRect = nodeEl.getBoundingClientRect();
+		const sockRect = socketEl.getBoundingClientRect();
+	  
+		// center of the socket relative to node's top-left (px)
+		const relPxX = (sockRect.left + sockRect.width / 2) - nodeRect.left;
+		const relPxY = (sockRect.top  + sockRect.height / 2) - nodeRect.top;
+	  
+		// 5) convert px -> em using the node's computed font-size
+		const emPx = parseFloat(getComputedStyle(nodeEl).fontSize) || 1;
+		const relEmX = relPxX / emPx;
+		const relEmY = relPxY / emPx;
+	  
+		// 6) add node's global position (already in em) -> global EM space
+		const baseX = (this.x && this.x.value) || 0;
+		const baseY = (this.y && this.y.value) || 0;
+	  
+		return { 
+			x: baseX + relEmX,
+			y: baseY + relEmY
+		};
 	}
+
 
 }
