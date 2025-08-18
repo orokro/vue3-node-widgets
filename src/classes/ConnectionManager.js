@@ -52,6 +52,12 @@ export class ConnectionManager {
 	 */
 	addConnectionBasic(startX, startY, endX, endY) {
 
+		// ensure we have valid positions
+		startX = startX || 0;
+		startY = startY || 0;
+		endX = endX || 0;
+		endY = endY || 0;
+
 		// create a new connection
 		const conn = new Connection(this);
 

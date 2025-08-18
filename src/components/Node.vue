@@ -16,7 +16,10 @@
 <template>
 
 	<!-- main outer wrapper -->
-	<div class="node-box" :style="{
+	<div 
+		:ref="node.nodeEl"
+		class="node-box"
+		:style="{
 			left: `${node.x?.value}em`,
 			top: `${node.y?.value}em`,
 		}">
@@ -334,7 +337,7 @@ onMounted(()=>{
 		//  & can drag the node around
 		.title-bar {
 
-			// fixed position along the topo
+			// fixed position along the top
 			position: absolute;
 			inset: 0em 0em auto 0em;
 			height: 22em;

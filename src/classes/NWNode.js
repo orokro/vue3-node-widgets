@@ -479,6 +479,9 @@ export default class NWNode {
 		// unique id for this node
 		this.id = `node_${++NWNode.idCounter}`;
 
+		// when the vue component is mounted for this node it will store it's el ref here:
+		this.nodeEl = ref(null);
+
 		// position of the node in the graph
 		this.x = ref(0);
 		this.y = ref(0);
@@ -522,8 +525,8 @@ export default class NWNode {
 				outputYPos: ref(0),
 				
 				// elements to mounted sockets (if exist)
-				inputSocketEl: null,
-				outputSocketEl: null,
+				inputSocketEl: ref(null),
+				outputSocketEl: ref(null),
 
 				// ref to the row element in the DOM
 				rowEl: ref(null),
@@ -579,6 +582,22 @@ export default class NWNode {
 		// set the position of the node
 		this.x.value = x;
 		this.y.value = y;
+	}
+
+
+	getSocketPosition(fieldName, socketType) {
+
+		// get the field state with this name
+		const fieldState = this.fieldState[fieldName];
+		if (!fieldState) {
+			throw new Error(`Field "${fieldName}" not found in node "${this.id}"`);
+		}
+
+		// get the html element for the socket
+		const socketEl = (socketType === SOCKET_TYPE.INPUT) ? 
+			fieldState.data.inputSocketEl : fieldState.data.outputSocketEl;
+
+		
 	}
 
 }

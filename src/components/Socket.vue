@@ -8,7 +8,7 @@
 <template>
 
 	<div
-		ref="elRef"
+		:ref="getElRef()"
 		class="socket"
 		:class="{
 			'socket-input': socketType === FIELD_TYPE.INPUT,
@@ -85,13 +85,22 @@ const cornerStyle = shallowRef({});
 onMounted(() => {
 
 	// set the element reference in the node's field state
-	setElRef();
+	// setElRef();
 
 	// configure our socket style
 	buildSocketStyle();
 });
 
 
+function getElRef(){
+
+	const fieldName = props.field.name;
+	const fieldState = props.node.fieldState[fieldName];
+
+	return props.socketType === FIELD_TYPE.INPUT
+		? fieldState.data.inputSocketEl
+		: fieldState.data.outputSocketEl;
+}
 
 /**
  * Sets the element reference in the node's field state for this socket
