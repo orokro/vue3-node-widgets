@@ -135,31 +135,81 @@ export class ConnectionManager {
 			startY = conn.positions.startY = conn.positions.endY;
 		}
 
-		// use our drag helper to move the other side of the wire
-		this.editor.dragHelper.dragStart(
+		this.attachWireDrag(conn, startFromOutput, startX, startY, event);
 
-			(dx, dy)=>{
-
-				const scale = this.editor.zoomScale.value;
-				const newX = startX - dx * (1/scale);
-				const newY = startY - dy * (1/scale);
-
-				if(startFromOutput) {
-					conn.positions.endX = newX;
-					conn.positions.endY = newY;
-				}else {
-					conn.positions.startX = newX;
-					conn.positions.startY = newY;
-				}
-			},
-
-			(dx, dy)=>{
-
-			}
-		);
 		
 		return conn;
 	}
 
+
+	/**
+	 * Helper to convert screen coordinates to world coordinates.
+	 * 
+	 * @param {Number} clientX - the X position of the mouse in screen coordinates.
+	 * @param {Number} clientY - the Y position of the mouse in screen coordinates.
+	 * @returns {Object} - an object with the world coordinates of the mouse position, adjusted for the current pan and zoom.
+	 */
+	screenToWorld(clientX, clientY) {
+
+		const scale = this.editor.zoomScale.value;
+		const panX = this.editor.panX.value;
+		const panY = this.editor.panY.value;
+		return {
+			x: (clientX - panX) / scale,
+			y: (clientY - panY) / scale
+		};
+	}
+
+
+	/**
+	 * Does the drag-logic for a new wire connection.
+	 * 
+	 * @param {Connection} conn - the connection to attach the drag handler to.
+	 * @param {Boolean} startFromOutput - whether the wire is being started from an output socket (true) or an input socket (false).
+	 * @param {Number} startX - the X position to start dragging from.
+	 * @param {Number} startY - the Y position to start dragging from.	
+	 * @param {MouseEvent} startEvent - the mouse event that triggered the wire start (if applicable).
+	 */
+	attachWireDrag(conn, startFromOutput, startX, startY, startEvent) {
+
+		//	mouse screen position at drag start
+		const startClientX = startEvent?.clientX ?? 0;
+		const startClientY = startEvent?.clientY ?? 0;
+	
+		//	mouse world position at drag start
+		const startMouseWorld = this.screenToWorld(startClientX, startClientY);
+	
+		//	world pos of the grabbed end at drag start
+		const startWorldX = startX;
+		const startWorldY = startY;
+	
+		//	fixed offset so the grabbed point stays under the cursor
+		const grabOffsetX = startWorldX - startMouseWorld.x;
+		const grabOffsetY = startWorldY - startMouseWorld.y;
+	
+		this.editor.dragHelper.dragStart(
+			(dx, dy) => {
+				//	reconstruct current mouse screen pos from cumulative deltas
+				const curClientX = startClientX - dx;
+				const curClientY = startClientY - dy;
+	
+				//	project through the *current* view (handles mid-drag zoom/pan)
+				const curMouseWorld = this.screenToWorld(curClientX, curClientY);
+	
+				const newX = curMouseWorld.x + grabOffsetX;
+				const newY = curMouseWorld.y + grabOffsetY;
+	
+				if (startFromOutput) {
+					conn.positions.endX = newX;
+					conn.positions.endY = newY;
+				} else {
+					conn.positions.startX = newX;
+					conn.positions.startY = newY;
+				}
+			},
+			() => {}
+		);
+	}
+	
 
 }
