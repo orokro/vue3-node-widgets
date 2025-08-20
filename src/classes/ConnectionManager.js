@@ -135,6 +135,12 @@ export class ConnectionManager {
 			startY = conn.positions.startY = conn.positions.endY;
 		}
 
+		//	shift start to the *click point* (center -> click delta in world units)
+		const offset = this.socketClickWorldOffset(event, startScale);
+		startX += offset.x;
+		startY += offset.y;
+
+		// do the drag
 		this.attachWireDrag(conn, startFromOutput, startX, startY, event);
 
 		
@@ -211,5 +217,30 @@ export class ConnectionManager {
 		);
 	}
 	
+	/**
+	 * Helper to adjust wire drag pos based where the cursor clicked the origin socket
+	 * 
+	 * @param {MouseEvent} evt - the mouse event that triggered the click.
+	 * @param {Number} scale - the zoom scale to use for the conversion. Defaults to the current editor zoom scale.
+	 * @returns {Object} - an object with the x and y offsets in world units from the center of the socket to the click position.
+	 */
+	socketClickWorldOffset(evt, scale = this.editor.zoomScale.value) {
+		const el = evt.currentTarget || evt.target;
+		if (!el || !el.getBoundingClientRect) return { x: 0, y: 0 };
+	
+		const rect = el.getBoundingClientRect();
+		const centerClientX = rect.left + rect.width * 0.5;
+		const centerClientY = rect.top + rect.height * 0.5;
+	
+		//	screen delta from center -> click
+		const dxScreen = evt.clientX - centerClientX;
+		const dyScreen = evt.clientY - centerClientY;
+	
+		//	convert to world units; pan cancels for deltas, only divide by scale
+		return {
+			x: dxScreen / scale,
+			y: dyScreen / scale
+		};
+	}
 
 }
