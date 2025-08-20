@@ -38,6 +38,8 @@ export class ConnectionManager {
 		this.dragOriginNode = shallowRef(null);
 		this.dragOriginField = shallowRef(null);
 		this.dragCurrentPos = shallowRef({ x: 0, y: 0 });
+		this.isSnappedToSocket = shallowRef(false);
+		this.connectionBeingDragged = null;
 	}
 
 
@@ -108,12 +110,14 @@ export class ConnectionManager {
 		this.dragEnd.value = startFromOutput ? SOCKET_TYPE.OUTPUT : SOCKET_TYPE.INPUT;
 		this.dragOriginNode.value = node;
 		this.dragOriginField.value = field;
+		this.isSnappedToSocket.value = false;
 
 		// true while dragging
 		this.draggingWire.value = true;
 
 		// add a new connection, we'll fill in the positions later
 		const conn = this.addConnectionBasic();
+		this.connectionBeingDragged = conn;
 
 		// we'll store the initial scale of zoom when drag was started incase someone zoom-scrolls while dragging
 		const startScale = this.editor.zoomScale.value;
@@ -143,8 +147,60 @@ export class ConnectionManager {
 		// do the drag
 		this.attachWireDrag(conn, startFromOutput, startX, startY, event);
 
-		
 		return conn;
+	}
+
+
+	/**
+	 * When the user hovers over a socket, we might wanna snap to it if we're in the middle of dragging a wire.
+	 * 
+	 * @param {NWNode} node - the node that the socket belongs to.
+	 * @param {Object} field - the field on the node that the socket belongs to.
+	 * @param {Boolean} isInputSocket - whether the socket is an input socket (true) or an output socket (false).
+	 * @returns {void}
+	 */
+	hoverSocket(node, field, isInputSocket = true) {
+
+		// if we're not dragging a wire, just GTFO
+		if( !this.draggingWire.value ) return;
+
+		// if we're dragging the wire from an output socket, then we need to snap to the input socket
+		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket ) return;
+
+		// if we're dragging the wire from an input socket, then we need to snap to the output socket
+		if( this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket ) return;
+
+		// if we're here, then we need to snap to the socket
+		if( isInputSocket ) {
+
+			// set the input for the connection
+			this.connectionBeingDragged.setOutput(node, field);
+			this.isSnappedToSocket.value = true;
+		}else{
+
+			// set the output for the connection
+			this.connectionBeingDragged.setInput(node, field);
+			this.isSnappedToSocket.value = true;
+		}
+	}
+
+
+	/**
+	 * When the user stops hovering over a socket, we need to detach the drag end.
+	 */
+	leaveSocket() {
+
+		// gtfo if we're not in the middle of dragging a wire
+		if( !this.draggingWire.value ) return;
+		
+		// detach the drag end
+		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT ) {
+			this.connectionBeingDragged.setOutput(null, null);
+		} else {
+			this.connectionBeingDragged.setInput(null, null);
+		}
+
+		this.isSnappedToSocket.value = false;
 	}
 
 
@@ -195,6 +251,10 @@ export class ConnectionManager {
 	
 		this.editor.dragHelper.dragStart(
 			(dx, dy) => {
+				
+				// gtfo if we're snapped
+				if (this.isSnappedToSocket.value) return;
+
 				//	reconstruct current mouse screen pos from cumulative deltas
 				const curClientX = startClientX - dx;
 				const curClientY = startClientY - dy;
@@ -213,10 +273,15 @@ export class ConnectionManager {
 					conn.positions.startY = newY;
 				}
 			},
-			() => {}
+			() => {
+				this.draggingWire.value = false;
+				this.connectionBeingDragged = null;
+				this.isSnappedToSocket.value = false;
+			}
 		);
 	}
 	
+
 	/**
 	 * Helper to adjust wire drag pos based where the cursor clicked the origin socket
 	 * 

@@ -65,10 +65,18 @@ export class Connection {
 	 */
 	setInput(node, field){
 
+		// null defaults
+		node = node || null;
+		field = field || null;
+
 		// save the input node & field
 		this.inputNode = node;
 		this.inputField = field;
 
+		// if it was nulled (cleared) then we can just GTFO now
+		if(node === null || field === null)
+			return;
+		
 		// update the start position
 		const socketPos = node.getSocketPosition(field, SOCKET_TYPE.OUTPUT);
 		this.positions.startX = socketPos.x;
@@ -84,10 +92,18 @@ export class Connection {
 	 */
 	setOutput(node, field){
 
+		// null defaults
+		node = node || null;
+		field = field || null;
+
 		// save the output node & field
 		this.outputNode = node;
 		this.outputField = field;
 
+		// if it was nulled (cleared) then we can just GTFO now
+		if(node === null || field === null)
+			return;
+		
 		// update the end position
 		const socketPos = node.getSocketPosition(field, SOCKET_TYPE.INPUT);
 		this.positions.endX = socketPos.x;

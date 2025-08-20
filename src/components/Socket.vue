@@ -18,6 +18,8 @@
 			top: `${y}em`,
 		}"
 		@mousedown="onMouseDown"
+		@mouseover="onMouseOver"
+		@mouseleave="onMouseLeave"
 	>	
 		<div
 			v-if="socketFormat === 'corner'"
@@ -292,6 +294,34 @@ function onMouseDown(event) {
 		props.socketType == SOCKET_TYPE.OUTPUT,
 		event
 	);
+}
+
+
+/**
+ * Handles mouse over event on the socket
+ * 
+ * @param event - the mouse over event
+ */
+function onMouseOver(event) {
+	// Placeholder for future hover functionality
+	// console.log('Mouse over socket:', props.node, props.field, props.socketType);
+	
+	// notify the connection manager that we're hovering over this socket
+	ctx.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
+}
+
+
+/**
+ * Handles mouse leave event on the socket
+ * 
+ * @param event - the mouse leave event
+ */
+function onMouseLeave(event) {
+	// Placeholder for future hover out functionality
+	// console.log('Mouse leave socket:', props.node, props.field, props.socketType);
+	
+	// notify the connection manager that we're no longer hovering over this socket
+	ctx.connMgr.leaveSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
 }
 
 </script>
