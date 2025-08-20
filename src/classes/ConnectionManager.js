@@ -15,7 +15,7 @@
 import { shallowRef } from "vue";
 import NWEditor from "./NWEditor";
 import { Connection } from "./Connection";
-import { SOCKET_TYPE } from "./NWNode";
+import NWNode, { SOCKET_TYPE } from "./NWNode";
 
 export class ConnectionManager {
 
@@ -91,7 +91,16 @@ export class ConnectionManager {
 	}
 
 
-	startWire(node, field, startFromOutput = true) {
+	/**
+	 * Starts dragging a wire from a node's socket.
+	 * 
+	 * @param {NWNode} node - the node that the wire is being started from.
+	 * @param {Object} field - the field on the node that the wire is being started from.
+	 * @param {Boolean} startFromOutput - whether the wire is being started from an output socket (true) or an input socket (false).
+	 * @param {MouseEvent} event - the mouse event that triggered the wire start (if applicable).
+	 * @returns {void}
+	 */
+	startWire(node, field, startFromOutput = true, event) {
 
 		// save our stats about our drag origin
 		// note on this: users can drag from an output socket or an input socket
@@ -106,15 +115,49 @@ export class ConnectionManager {
 		// add a new connection, we'll fill in the positions later
 		const conn = this.addConnectionBasic();
 
+		// we'll store the initial scale of zoom when drag was started incase someone zoom-scrolls while dragging
+		const startScale = this.editor.zoomScale.value;
+
+		// set the start & node the positions
+		let startX = 0;
+		let startY = 0;
 		if( startFromOutput ) {
 			
 			// the INPUT for the wire is an output socket
 			conn.setInput(node, field);
+			startX = conn.positions.endX = conn.positions.startX;
+			startY = conn.positions.endY = conn.positions.startY;
+
 		}else {
 			// the OUTPUT for the wire is an input socket
 			conn.setOutput(node, field);
+			startX = conn.positions.startX = conn.positions.endX;
+			startY = conn.positions.startY = conn.positions.endY;
 		}
 
+		// use our drag helper to move the other side of the wire
+		this.editor.dragHelper.dragStart(
+
+			(dx, dy)=>{
+
+				const scale = this.editor.zoomScale.value;
+				const newX = startX - dx * (1/scale);
+				const newY = startY - dy * (1/scale);
+
+				if(startFromOutput) {
+					conn.positions.endX = newX;
+					conn.positions.endY = newY;
+				}else {
+					conn.positions.startX = newX;
+					conn.positions.startY = newY;
+				}
+			},
+
+			(dx, dy)=>{
+
+			}
+		);
+		
 		return conn;
 	}
 

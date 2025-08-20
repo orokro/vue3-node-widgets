@@ -34,9 +34,9 @@
 <script setup>
 
 // vue imports
-import { ref, onMounted, computed, shallowRef, watch } from 'vue';
+import { ref, onMounted, computed, shallowRef, watch, inject } from 'vue';
 
-import { FIELD_TYPE, NODE_TYPE } from '@/classes/NWNode';
+import { FIELD_TYPE, NODE_TYPE, SOCKET_TYPE } from '@/classes/NWNode';
 
 // props
 const props = defineProps({
@@ -71,6 +71,9 @@ const props = defineProps({
 		default: 'R,R,R,R,0'
 	},
 });
+
+// get our graph context
+const ctx = inject('ctx').value;
 
 // ref to the socket element
 const elRef = ref(null);
@@ -272,11 +275,23 @@ function generateCornerStyle(input, themeColor = '#000') {
 }
 
 
+/**
+ * Starts wire drag process when mouse is pressed down on the socket
+ * 
+ * @param event - the mouse down event
+ */
 function onMouseDown(event) {
 	// Placeholder for future drag-and-drop functionality
 	// props.nwSystem.startWire(props.node, props.field, socketType, $event)
+	// console.log(props.node, props.field, props.socketType);
 
-	console.log(props.node, props.field, props.socketType);
+	// start the wire dragging process
+	ctx.connMgr.startWire(
+		props.node,
+		props.field,
+		props.socketType == SOCKET_TYPE.OUTPUT,
+		event
+	);
 }
 
 </script>

@@ -8,7 +8,7 @@
 
 import { reactive } from "vue";
 import { ConnectionManager } from "./ConnectionManager";
-import { SOCKET_TYPE } from "./NWNode";
+import NWNode, { SOCKET_TYPE } from "./NWNode";
 
 export class Connection {
 
@@ -57,6 +57,12 @@ export class Connection {
 	}
 
 
+	/**
+	 * Sets the input for this connection.
+	 * 
+	 * @param {NWNode} node - the node that is the input for this connection.
+	 * @param {Object} field - the field on the node that is the input for this connection.
+	 */
 	setInput(node, field){
 
 		// save the input node & field
@@ -70,6 +76,12 @@ export class Connection {
 	}
 
 
+	/**
+	 * Sets the output for this connection.
+	 * 
+	 * @param {NWNode} node - the node that is the output for this connection.
+	 * @param {Object} field - the field on the node that is the output for this connection.
+	 */
 	setOutput(node, field){
 
 		// save the output node & field
