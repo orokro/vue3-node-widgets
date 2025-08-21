@@ -152,7 +152,7 @@ const SVGDetails = computed(()=>{
 	.wire-container {
 
 		// for debug
-		border: 1px solid cyan;
+		/* border: 1px solid cyan; */
 
 		// fixed positioning
 		position: absolute;
@@ -164,14 +164,19 @@ const SVGDetails = computed(()=>{
 			line-height: initial;
 
 			// fade out when destroyed
-			transition: opacity 0.2s linear;
 			opacity: 1;
+			transform: scaleX(1);
+			transition: 
+				opacity 0.17s linear,
+				transform 0.17s linear;
+			
 
 		}// .wire-svg
 
 		&.destroyed-fade-out {
 			.wire-svg {
 				opacity: 0;
+				transform: scaleX(0.9);
 			}
 		}
 

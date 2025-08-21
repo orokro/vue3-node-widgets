@@ -94,6 +94,30 @@ export class ConnectionManager {
 
 
 	/**
+	 * Breaks all connections that involve a specific node or array of nodes.
+	 * 
+	 * @param {NWNode|Array<NWNode>} node - the node or array of nodes to break connections for.
+	 * @returns {void}
+	 */
+	breakConnectionsByNode(node) {
+
+		// convert node to array if it's not
+		if (!Array.isArray(node))
+			node = [node];
+		
+		// loop through all the wires and break any connections that involve the node
+		for (const conn of this.wires.value) {
+
+			console.log('c', conn);
+
+			// if the connection has the node as an input or output, break it
+			if (node.includes(conn.inputNode) || node.includes(conn.outputNode))
+				conn.destroy();
+		}
+	}
+
+
+	/**
 	 * Starts dragging a wire from a node's socket.
 	 * 
 	 * @param {NWNode} node - the node that the wire is being started from.

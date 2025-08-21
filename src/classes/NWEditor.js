@@ -284,7 +284,12 @@ export default class NWEditor {
 
 		// if we found the node, remove it
 		if(node){
+
+			// delete the node
 			this.graph.nodes.value = this.graph.nodes.value.filter(n => n !== node);
+
+			// break any connections this node may have
+			this.connMgr.breakConnectionsByNode(node);
 			return true;
 		}
 
