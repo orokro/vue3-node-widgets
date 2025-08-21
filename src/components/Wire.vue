@@ -35,6 +35,12 @@
 				fill="none"
 			/>
 		</svg>
+		<div 
+			v-if="showWireIDs"
+			class="wire-id"
+		>
+			{{ props.wire.id }}
+		</div>
 	</div>
 
 </template>
@@ -59,6 +65,10 @@ const props = defineProps({
 	},
 
 });
+
+// debug toggle
+// TODO: move to a global debug settings flags object
+const showWireIDs = ref(false);
 
 // generate the SVG details for the wire
 const SVGDetails = computed(()=>{
@@ -156,6 +166,28 @@ const SVGDetails = computed(()=>{
 
 		// fixed positioning
 		position: absolute;
+
+		// debug wire-id label
+		.wire-id {
+
+			// center in container
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translateY(-50%) translateX(-50%);
+
+			// text styles
+			font-size: 8em;
+			color: rgba(255,255,255,0.8);
+			pointer-events: none;
+			user-select: none;
+
+			// gray pill shaped
+			background: rgba(0,0,0,0.5);
+			border-radius: 50em;
+			padding: 1em;
+
+		}// .wire-id
 
 		// the actual SVG
 		.wire-svg {
