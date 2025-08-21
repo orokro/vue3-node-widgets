@@ -192,7 +192,7 @@ export class ConnectionManager {
 
 		// gtfo if we're not in the middle of dragging a wire
 		if( !this.draggingWire.value ) return;
-		
+
 		// detach the drag end
 		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT ) {
 			this.connectionBeingDragged.setOutput(null, null);
@@ -274,9 +274,17 @@ export class ConnectionManager {
 				}
 			},
 			() => {
+
+				// clear our drag state
 				this.draggingWire.value = false;
 				this.connectionBeingDragged = null;
 				this.isSnappedToSocket.value = false;
+
+				// if the wire doesn't have both an input and output, we need to destroy it
+				if (!conn.inputNode || !conn.outputNode) {
+					conn.destroy();
+					return;
+				}
 			}
 		);
 	}

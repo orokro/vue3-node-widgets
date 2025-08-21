@@ -8,6 +8,10 @@
 
 	<div
 		class="wire-container"
+		:class="{
+			// if the wire is being deleted, add a class to fade it out
+			'destroyed-fade-out': props.wire.isBeingDestroyed.value,
+		}"
 
 		:style="{
 			// position the wire container absolutely, based on the start position of the wire
@@ -148,17 +152,28 @@ const SVGDetails = computed(()=>{
 	.wire-container {
 
 		// for debug
-		/* border: 1px solid cyan; */
+		border: 1px solid cyan;
 
 		// fixed positioning
 		position: absolute;
 
 		// the actual SVG
 		.wire-svg {
+
 			/* border: 1px solid red; */
 			line-height: initial;
 
+			// fade out when destroyed
+			transition: opacity 0.2s linear;
+			opacity: 1;
+
 		}// .wire-svg
+
+		&.destroyed-fade-out {
+			.wire-svg {
+				opacity: 0;
+			}
+		}
 
 	}// .wire-container
 

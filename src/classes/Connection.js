@@ -6,7 +6,7 @@
 	in our connection manager.
 */
 
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { ConnectionManager } from "./ConnectionManager";
 import NWNode, { SOCKET_TYPE } from "./NWNode";
 
@@ -54,6 +54,9 @@ export class Connection {
 		// save the output node & field
 		this.outputNode = null;
 		this.outputField = null;
+
+		// true if being destroyed
+		this.isBeingDestroyed = ref(false);
 	}
 
 
@@ -103,7 +106,7 @@ export class Connection {
 		// if it was nulled (cleared) then we can just GTFO now
 		if(node === null || field === null)
 			return;
-		
+
 		// update the end position
 		const socketPos = node.getSocketPosition(field, SOCKET_TYPE.INPUT);
 		this.positions.endX = socketPos.x;
@@ -119,8 +122,19 @@ export class Connection {
 	 */
 	destroy(){
 
-		// am kil
-		this.mgr.destroyConnection(this.id);
+		// set destroying to true to fade it out & then kill self
+		this.isBeingDestroyed.value = true;
+
+		// clear input and output refs
+		this.setInput(null, null);
+		this.setOutput(null, null);
+
+		// wait ab it & kill self
+		setTimeout(() => {
+
+			// am kil
+			this.mgr.destroyConnection(this.id);
+		}, 210);
 	}
 
 }
