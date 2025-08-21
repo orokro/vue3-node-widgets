@@ -248,6 +248,9 @@ export default class NWNode {
 	// just a helpful shorthand
 	static = this.constructor;
 
+	// when the editor adds a node it will add itself here
+	editor = null;
+
 	// resets the static properties of the class for subclasses
 	static init(){
 
@@ -582,6 +585,10 @@ export default class NWNode {
 		// set the position of the node
 		this.x.value = x;
 		this.y.value = y;
+
+		// tell connections manager to update connections
+		if (this.editor && this.editor.connMgr)
+			this.editor.connMgr.moveWires(this);
 	}
 
 

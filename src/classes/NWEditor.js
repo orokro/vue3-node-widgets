@@ -239,6 +239,9 @@ export default class NWEditor {
 			newNode = new nodeClass.class();
 		}
 
+		// set ourself
+		newNode.editor = this;
+		
 		// set the position of the node
 		newNode.setPosition(x, y);
 

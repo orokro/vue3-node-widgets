@@ -115,6 +115,28 @@ export class Connection {
 
 
 	/**
+	 * Updates the positions of the connection's start and end points.
+	 */
+	updatePositions(which = 'both'){
+
+		if(which === SOCKET_TYPE.INPUT || which === 'both'){
+			if(this.inputNode && this.inputField){
+				const socketPos = this.inputNode.getSocketPosition(this.inputField, SOCKET_TYPE.OUTPUT);
+				this.positions.startX = socketPos.x;
+				this.positions.startY = socketPos.y;
+			}
+		}
+		if(which === SOCKET_TYPE.OUTPUT || which === 'both'){
+			if(this.outputNode && this.outputField){
+				const socketPos = this.outputNode.getSocketPosition(this.outputField, SOCKET_TYPE.INPUT);
+				this.positions.endX = socketPos.x;
+				this.positions.endY = socketPos.y;
+			}
+		}
+	}
+
+
+	/**
 	 * Destroys this connection.
 	 * 
 	 * This will remove the connection from the connection manager

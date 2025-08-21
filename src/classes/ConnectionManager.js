@@ -96,7 +96,7 @@ export class ConnectionManager {
 	/**
 	 * Breaks all connections that involve a specific node or array of nodes.
 	 * 
-	 * @param {NWNode|Array<NWNode>} node - the node or array of nodes to break connections for.
+	 * @param {NWNode|NWNode[]} node - the node or array of nodes to break connections for.
 	 * @returns {void}
 	 */
 	breakConnectionsByNode(node) {
@@ -108,12 +108,32 @@ export class ConnectionManager {
 		// loop through all the wires and break any connections that involve the node
 		for (const conn of this.wires.value) {
 
-			console.log('c', conn);
-
 			// if the connection has the node as an input or output, break it
 			if (node.includes(conn.inputNode) || node.includes(conn.outputNode))
 				conn.destroy();
 		}
+	}
+
+
+	/**
+	 * When a node is moved, we should update the x/y positions of any wires connected to it.
+	 * 
+	 * @param {NWNode|NWNode[]} node 
+	 */
+	moveWires(node){
+
+		// convert to array if not already
+		if (!Array.isArray(node))
+			node = [node];
+
+		// filter out all the connections that wire into this node
+		this.wires.value.map(conn => {
+			if(node.includes(conn.inputNode))
+				conn.updatePositions(SOCKET_TYPE.INPUT);
+			if(node.includes(conn.outputNode))
+				conn.updatePositions(SOCKET_TYPE.OUTPUT);
+			return conn;
+		});
 	}
 
 
