@@ -156,11 +156,55 @@ export class ConnectionManager {
 		this.dragOriginField.value = field;
 		this.isSnappedToSocket.value = false;
 
-		// true while dragging
-		this.draggingWire.value = true;
+		// the connection that we're dragging
+		let conn = null;
+		let oldConn = false;
+		let oldOffset = {x: 0, y: 0};
 
-		// add a new connection, we'll fill in the positions later
-		const conn = this.addConnectionBasic();
+		// if we're starting from an input socket, we need to check if a connection is already plugged in there
+		// because only one connection can go into an input, we'll detach it instead
+		if( startFromOutput === false ) {
+
+			// check for any connections already plugged into this input socket
+			const existingConnections = this.getConnectionsBySocket(node, field, true);
+			
+			if( existingConnections.length > 0 ) {
+
+				const existingConn = existingConnections[0];
+				conn = existingConn;
+				node = existingConn.inputNode; 
+				field = existingConn.inputField;
+
+				// clear it's output b/c we're moving it
+				this.dragOriginNode.value = node;
+				this.dragOriginField.value = field;
+				this.dragEnd.value = SOCKET_TYPE.OUTPUT;
+				conn.setOutput(null, null);
+
+				startFromOutput = true;
+				oldConn = true;
+				oldOffset = {
+					x: existingConn.positions.endX - existingConn.positions.startX,
+					y: existingConn.positions.endY - existingConn.positions.startY
+				};
+				// this.destroyConnection(existingConn);
+				
+			}else {
+
+				// add a new connection, we'll fill in the positions later
+				conn = this.addConnectionBasic();
+			}
+
+		}else{
+
+			// add a new connection, we'll fill in the positions later
+			conn = this.addConnectionBasic();
+		}
+		
+		console.log('drag end', this.dragEnd.value);
+		console.log('drag origin', this.dragOriginNode.value, this.dragOriginField.value);
+
+		// save on our state
 		this.connectionBeingDragged = conn;
 
 		// we'll store the initial scale of zoom when drag was started incase someone zoom-scrolls while dragging
@@ -182,17 +226,50 @@ export class ConnectionManager {
 			startX = conn.positions.startX = conn.positions.endX;
 			startY = conn.positions.startY = conn.positions.endY;
 		}
+		
 
 		//	shift start to the *click point* (center -> click delta in world units)
 		const offset = this.socketClickWorldOffset(event, startScale);
-		startX += offset.x;
-		startY += offset.y;
+		startX += offset.x + oldOffset.x;
+		startY += offset.y + oldOffset.y;
+		
+		// true while dragging
+		this.draggingWire.value = true;
 
 		// do the drag
 		this.attachWireDrag(conn, startFromOutput, startX, startY, event);
 
 		return conn;
 	}
+
+
+	/**
+	 * Get's all connections for a specific socket on a node.
+	 * 
+	 * @param {NWNode} node - the node to get connections for.
+	 * @param {Object} field - the field on the node to get connections for.
+	 * @param {Boolean} isInputSocket - true if looking for input sockets
+	 * @returns 
+	 */
+	getConnectionsBySocket(node, field, isInputSocket = true) {
+
+		// if the node is not an instance of NWNode, we can't do anything
+		if( !(node instanceof NWNode) ) return [];
+
+		// if the field is not defined, we can't do anything
+		if( !field || !field.name ) return [];
+
+		// filter the wires for connections that match the node and field
+		return this.wires.value.filter(conn => {
+
+			if( isInputSocket ) {
+				return conn.outputNode === node && conn.outputField.name === field.name;
+			} else {
+				return conn.inputNode === node && conn.inputField.name === field.name;
+			}
+		});
+	}
+
 
 
 	/**
