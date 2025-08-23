@@ -187,7 +187,6 @@ export class ConnectionManager {
 					x: existingConn.positions.endX - existingConn.positions.startX,
 					y: existingConn.positions.endY - existingConn.positions.startY
 				};
-				// this.destroyConnection(existingConn);
 				
 			}else {
 
@@ -200,9 +199,6 @@ export class ConnectionManager {
 			// add a new connection, we'll fill in the positions later
 			conn = this.addConnectionBasic();
 		}
-		
-		console.log('drag end', this.dragEnd.value);
-		console.log('drag origin', this.dragOriginNode.value, this.dragOriginField.value);
 
 		// save on our state
 		this.connectionBeingDragged = conn;
@@ -217,8 +213,8 @@ export class ConnectionManager {
 			
 			// the INPUT for the wire is an output socket
 			conn.setInput(node, field);
-			startX = conn.positions.endX = conn.positions.startX;
-			startY = conn.positions.endY = conn.positions.startY;
+			startX = conn.positions.endX = conn.positions.startX + oldOffset.x;
+			startY = conn.positions.endY = conn.positions.startY + oldOffset.y;
 
 		}else {
 			// the OUTPUT for the wire is an input socket
@@ -230,8 +226,8 @@ export class ConnectionManager {
 
 		//	shift start to the *click point* (center -> click delta in world units)
 		const offset = this.socketClickWorldOffset(event, startScale);
-		startX += offset.x + oldOffset.x;
-		startY += offset.y + oldOffset.y;
+		startX += offset.x;
+		startY += offset.y;
 		
 		// true while dragging
 		this.draggingWire.value = true;
@@ -406,6 +402,9 @@ export class ConnectionManager {
 					conn.destroy();
 					return;
 				}
+
+				// if the wire was dragged into an input socket, it should replace whatever was there
+
 			}
 		);
 	}
