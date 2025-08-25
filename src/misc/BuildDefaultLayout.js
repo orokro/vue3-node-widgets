@@ -142,7 +142,7 @@ function buildNaturalLayout01(ctx) {
 	ctx.addNode(InputCanvasInfo, 20, 400, 'canvas');
 
 	// output on right
-	ctx.addNode(OutputColor, 1020, 20, 'output');
+	ctx.addNode(OutputColor, 600, 20, 'output');
 
 	// some random stuff in the middle
 	ctx.addNode(TexChecker, 320, 20, 'checker');
