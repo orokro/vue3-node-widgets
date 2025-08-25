@@ -86,16 +86,17 @@ const SVGDetails = computed(()=>{
 	let height = Math.abs(endY - startY);
 
 	// get third width for generating the control points
-	const thirdWidth = width / 3;
+	const controlPointWidth = (width / 3) * 1.5;
 
 	// now, if the start is to the left of the end, we want the control points to be to the right of the start and to the left of the end
 	let controlPoint1X, controlPoint2X;
 	if (startX < endX) {
-		controlPoint1X = startX + thirdWidth;
-		controlPoint2X = endX - thirdWidth;
+		controlPoint1X = startX + controlPointWidth;
+		controlPoint2X = endX - controlPointWidth;
 	} else {
-		controlPoint1X = startX - thirdWidth;
-		controlPoint2X = endX + thirdWidth;
+		console.log('aids');
+		controlPoint1X = startX + controlPointWidth;
+		controlPoint2X = endX - controlPointWidth;
 	}
 
 	// control points Y will be the same as start and end Y
