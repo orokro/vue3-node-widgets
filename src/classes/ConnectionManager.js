@@ -404,6 +404,18 @@ export class ConnectionManager {
 				}
 
 				// if the wire was dragged into an input socket, it should replace whatever was there
+				if(startFromOutput == true){
+					
+					// get all the connections for the input socket
+					const existingConnections = this.getConnectionsBySocket(conn.outputNode, conn.outputField, true);
+					
+					// filter out this new one online
+					const otherConnections = existingConnections.filter(c => c.id !== conn.id);
+
+					// destroy other connections
+					for(const otherConn of otherConnections)
+						otherConn.destroy();
+				}
 
 			}
 		);
