@@ -148,8 +148,15 @@
 						:key="index"
 					>
 						<Socket
-							v-if="field.fieldType == FIELD_TYPE.OUTPUT || 
-								(field.fieldType == FIELD_TYPE.INPUT && field.valuePassThrough)"
+							v-if="
+								node.constructor.nodeType != NODE_TYPE.OUTPUT 
+								&& 
+								(
+									field.fieldType == FIELD_TYPE.OUTPUT
+									|| 
+									(field.fieldType == FIELD_TYPE.INPUT && field.valuePassThrough)
+								)
+							"
 							:y="node.fieldState[field.name]?.data.outputYPos.value"
 							:node="node"
 							:field="field"
