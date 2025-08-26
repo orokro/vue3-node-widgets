@@ -159,23 +159,30 @@ function buildNaturalLayout01(ctx) {
 		const cartesianNode = ctx.graph.nodes.value[0];
 		const polarNode = ctx.graph.nodes.value[1];
 		const checkerNode = ctx.graph.nodes.value[4];
+		const outputNode = ctx.graph.nodes.value[3];
 
 		// get relevant fields:
 		const thetaField = polarNode.static.fields[2];
 		const colorAField = checkerNode.static.fields[1];
 		const coordsField = cartesianNode.static.fields[1];
 		const widthField = checkerNode.static.fields[0];
+		const checkerColorField = checkerNode.static.fields[4];
+		const outColorField = outputNode.static.fields[0];
 
 		// make new connections
 		const newConnTheta = ctx.connMgr.addConnectionBasic();
 		const newConnCoords = ctx.connMgr.addConnectionBasic();
-		
+		const newConnOut = ctx.connMgr.addConnectionBasic();
+
 		// wire it up
 		newConnTheta.setInput(polarNode, thetaField);
 		newConnTheta.setOutput(checkerNode, colorAField);
 
 		newConnCoords.setInput(cartesianNode, coordsField);
 		newConnCoords.setOutput(checkerNode, widthField);
+
+		newConnOut.setInput(checkerNode, checkerColorField);
+		newConnOut.setOutput(outputNode, outColorField);
 	});
 
 }
