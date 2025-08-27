@@ -86,6 +86,8 @@ const socketFormat = ref('unknown');
 // if 'corner' format, this will hold the generated style object
 const cornerStyle = shallowRef({});
 
+const cursorPopupEl = inject('cursorPopupEl');
+
 // when we mount we should figure out how to render this socket
 onMounted(() => {
 
@@ -304,8 +306,10 @@ function onMouseDown(event) {
  */
 function onMouseOver(event) {
 	// Placeholder for future hover functionality
-	// console.log('Mouse over socket:', props.node, props.field, props.socketType);
-	
+	console.log('Mouse over socket:', props.node, props.field, props.socketType);
+
+	cursorPopupEl.value.show("hello");
+
 	// notify the connection manager that we're hovering over this socket
 	ctx.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
 }
@@ -319,6 +323,8 @@ function onMouseOver(event) {
 function onMouseLeave(event) {
 	// Placeholder for future hover out functionality
 	// console.log('Mouse leave socket:', props.node, props.field, props.socketType);
+	
+	cursorPopupEl.value.hide();
 	
 	// notify the connection manager that we're no longer hovering over this socket
 	ctx.connMgr.leaveSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);

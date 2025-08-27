@@ -72,6 +72,10 @@
 			</div>
 		</div>
 
+		<!-- tool tip for errors when wiring up sockets -->
+		<CursorPopup 
+			ref="cursorPopupEl"
+		/>
 	</div>
 </template>
 <script setup>
@@ -89,6 +93,7 @@ import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import Node from '@Components/Node.vue';
 import WireRenderer from '@Components/WireRenderer.vue';
+import CursorPopup from './CursorPopup.vue';
 
 // our app
 import NWEditor from '../classes/NWEditor.js';
@@ -119,6 +124,11 @@ const props = defineProps({
 
 });
 
+
+// els
+const cursorPopupEl = ref(null);
+provide('cursorPopupEl', cursorPopupEl);
+
 // our context will either be passed in via the props, or one we made locally
 let ctx = null;
 const ctxRef = shallowRef(null);
@@ -145,7 +155,6 @@ onMounted(() => {
 		ctx = new NWEditor();
 	}
 	ctxRef.value = ctx;
-
 });
 
 
