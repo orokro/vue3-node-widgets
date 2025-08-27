@@ -63,15 +63,20 @@ defineExpose({
 </script>
 <style lang="scss" scoped>
 
+	// the main box
 	.tool-tip-box {
+
+		// don't interfere with mouse events
+		pointer-events: none;
 
 		// fixed b/c cursor is screen space
 		position: fixed;
+		transform: translate(-50%, 10px);
 
 		border-radius: 5px;
-		box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
 		padding: 0.3em 1em;
-		background: rgba(0,0,0,0.8);
+		background: rgba(0,0,0,0.75);
 		color: white;
 		font-size: 1em;
 		

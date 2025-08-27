@@ -306,12 +306,10 @@ function onMouseDown(event) {
  */
 function onMouseOver(event) {
 	// Placeholder for future hover functionality
-	console.log('Mouse over socket:', props.node, props.field, props.socketType);
-
-	cursorPopupEl.value.show("hello");
+	// console.log('Mouse over socket:', props.node, props.field, props.socketType);
 
 	// notify the connection manager that we're hovering over this socket
-	ctx.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
+	ctx.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT, cursorPopupEl.value);
 }
 
 
@@ -325,7 +323,7 @@ function onMouseLeave(event) {
 	// console.log('Mouse leave socket:', props.node, props.field, props.socketType);
 	
 	cursorPopupEl.value.hide();
-	
+
 	// notify the connection manager that we're no longer hovering over this socket
 	ctx.connMgr.leaveSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
 }
