@@ -209,6 +209,7 @@ export default class NWEditor {
 	 * @param {Function} nodeClass - The class of the node to add.
 	 * @param {Number} x - The x position to add the node at.
 	 * @param {Number} y - The y position to add the node at.
+	 * @param {String|null} slug - An optional slug to assign to the node.
 	 * @returns {NWNode} - The newly created node.
 	 */
 	addNode(nodeClass, x = 0, y = 0, slug = null){
@@ -241,7 +242,7 @@ export default class NWEditor {
 
 		// set ourself
 		newNode.editor = this;
-		
+
 		// set the position of the node
 		newNode.setPosition(x, y);
 
