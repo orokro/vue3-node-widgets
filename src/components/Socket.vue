@@ -322,6 +322,7 @@ function onMouseLeave(event) {
 	// Placeholder for future hover out functionality
 	// console.log('Mouse leave socket:', props.node, props.field, props.socketType);
 	
+	// hide the cursor popup if it's showing
 	cursorPopupEl.value.hide();
 
 	// notify the connection manager that we're no longer hovering over this socket

@@ -26,9 +26,14 @@ import { ref, onMounted, inject } from 'vue';
 // get our drag helper
 const dragHelper = inject('dh');
 
+// the text to show
 const text = ref('tool tip');
+
+// spawn position
 const xPos = ref(0);
 const yPos = ref(0);
+
+// we'll stay mounted but only visible when needed
 const visible = ref(false);
 
 
@@ -50,15 +55,18 @@ const show = (newText) => {
 
 }
 
+/**
+ * Hides our tool tip
+ */
 const hide = () => {
 	visible.value = false;
 }
 
+// expose show/hide methods
 defineExpose({
 	show,
 	hide
 });
-
 
 </script>
 <style lang="scss" scoped>
