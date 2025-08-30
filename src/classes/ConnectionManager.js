@@ -12,7 +12,10 @@
 	added.
 */
 
+// vue
 import { shallowRef } from "vue";
+
+// app
 import NWEditor from "./NWEditor";
 import { Connection } from "./Connection";
 import NWNode, { SOCKET_TYPE } from "./NWNode";

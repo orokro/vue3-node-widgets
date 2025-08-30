@@ -52,8 +52,8 @@ const show = (newText) => {
 	// set text & show
 	text.value = newText;
 	visible.value = true;
-
 }
+
 
 /**
  * Hides our tool tip
@@ -61,6 +61,7 @@ const show = (newText) => {
 const hide = () => {
 	visible.value = false;
 }
+
 
 // expose show/hide methods
 defineExpose({
