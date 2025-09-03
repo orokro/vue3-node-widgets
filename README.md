@@ -12,3 +12,5 @@ I'm developing this system in a working vue3 project.
 Later, I will move this branch to some other name, and extract just the logic for the plugin.
 
 Once the plugin works and is on NPM, this readme will be updated and relevant.
+
+Also note: this is for graphs, not for programming like visual scripting langauges. More like shaders.
