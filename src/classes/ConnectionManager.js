@@ -78,7 +78,7 @@ export class ConnectionManager {
 		return conn;
 	}
 
-	
+
 	/**
 	 * Destroy a connection.
 	 * 
@@ -107,7 +107,7 @@ export class ConnectionManager {
 		// convert node to array if it's not
 		if (!Array.isArray(node))
 			node = [node];
-		
+
 		// loop through all the wires and break any connections that involve the node
 		for (const conn of this.wires.value) {
 
@@ -123,7 +123,7 @@ export class ConnectionManager {
 	 * 
 	 * @param {NWNode|NWNode[]} node 
 	 */
-	moveWires(node){
+	moveWires(node) {
 
 		// convert to array if not already
 		if (!Array.isArray(node))
@@ -131,9 +131,9 @@ export class ConnectionManager {
 
 		// filter out all the connections that wire into this node
 		this.wires.value.map(conn => {
-			if(node.includes(conn.inputNode))
+			if (node.includes(conn.inputNode))
 				conn.updatePositions(SOCKET_TYPE.INPUT);
-			if(node.includes(conn.outputNode))
+			if (node.includes(conn.outputNode))
 				conn.updatePositions(SOCKET_TYPE.OUTPUT);
 			return conn;
 		});
@@ -162,20 +162,20 @@ export class ConnectionManager {
 		// the connection that we're dragging
 		let conn = null;
 		let oldConn = false;
-		let oldOffset = {x: 0, y: 0};
+		let oldOffset = { x: 0, y: 0 };
 
 		// if we're starting from an input socket, we need to check if a connection is already plugged in there
 		// because only one connection can go into an input, we'll detach it instead
-		if( startFromOutput === false ) {
+		if (startFromOutput === false) {
 
 			// check for any connections already plugged into this input socket
 			const existingConnections = this.getConnectionsBySocket(node, field, true);
-			
-			if( existingConnections.length > 0 ) {
+
+			if (existingConnections.length > 0) {
 
 				const existingConn = existingConnections[0];
 				conn = existingConn;
-				node = existingConn.inputNode; 
+				node = existingConn.inputNode;
 				field = existingConn.inputField;
 
 				// clear it's output b/c we're moving it
@@ -190,14 +190,14 @@ export class ConnectionManager {
 					x: existingConn.positions.endX - existingConn.positions.startX,
 					y: existingConn.positions.endY - existingConn.positions.startY
 				};
-				
-			}else {
+
+			} else {
 
 				// add a new connection, we'll fill in the positions later
 				conn = this.addConnectionBasic();
 			}
 
-		}else{
+		} else {
 
 			// add a new connection, we'll fill in the positions later
 			conn = this.addConnectionBasic();
@@ -212,26 +212,26 @@ export class ConnectionManager {
 		// set the start & node the positions
 		let startX = 0;
 		let startY = 0;
-		if( startFromOutput ) {
-			
+		if (startFromOutput) {
+
 			// the INPUT for the wire is an output socket
 			conn.setInput(node, field);
 			startX = conn.positions.endX = conn.positions.startX + oldOffset.x;
 			startY = conn.positions.endY = conn.positions.startY + oldOffset.y;
 
-		}else {
+		} else {
 			// the OUTPUT for the wire is an input socket
 			conn.setOutput(node, field);
 			startX = conn.positions.startX = conn.positions.endX;
 			startY = conn.positions.startY = conn.positions.endY;
 		}
-		
+
 
 		//	shift start to the *click point* (center -> click delta in world units)
 		const offset = this.socketClickWorldOffset(event, startScale);
 		startX += offset.x;
 		startY += offset.y;
-		
+
 		// true while dragging
 		this.draggingWire.value = true;
 
@@ -253,15 +253,15 @@ export class ConnectionManager {
 	getConnectionsBySocket(node, field, isInputSocket = true) {
 
 		// if the node is not an instance of NWNode, we can't do anything
-		if( !(node instanceof NWNode) ) return [];
+		if (!(node instanceof NWNode)) return [];
 
 		// if the field is not defined, we can't do anything
-		if( !field || !field.name ) return [];
+		if (!field || !field.name) return [];
 
 		// filter the wires for connections that match the node and field
 		return this.wires.value.filter(conn => {
 
-			if( isInputSocket ) {
+			if (isInputSocket) {
 				return conn.outputNode === node && conn.outputField.name === field.name;
 			} else {
 				return conn.inputNode === node && conn.inputField.name === field.name;
@@ -283,25 +283,82 @@ export class ConnectionManager {
 	hoverSocket(node, field, isInputSocket = true, cursorPopup = null) {
 
 		// if we're not dragging a wire, just GTFO
-		if( !this.draggingWire.value ) return;
+		if (!this.draggingWire.value) return;
 
 		// if we're dragging the wire from an output socket, then we need to snap to the input socket
-		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket ) return;
+		if (this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket) return;
 
 		// if we're dragging the wire from an input socket, then we need to snap to the output socket
-		if( this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket ) return;
+		if (this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket) return;
 
 		// for now we'll just show the socket name,
 		// later we'll show conversion or other info
 		cursorPopup.show(`${node.slug}_${field.name}`);
 
 		// if we're here, then we need to snap to the socket
-		if( isInputSocket ) {
+		if (isInputSocket) {
 
 			// set the input for the connection
 			this.connectionBeingDragged.setOutput(node, field);
 			this.isSnappedToSocket.value = true;
-		}else{
+		} else {
+
+			// set the output for the connection
+			this.connectionBeingDragged.setInput(node, field);
+			this.isSnappedToSocket.value = true;
+		}
+	}
+
+	hoverSocket_new(node, field, isInputSocket = true, cursorPopup = null) {
+
+		console.log(this.editor.typeRegistry);
+
+		// if we're not dragging a wire, just GTFO
+		if (!this.draggingWire.value) return;
+
+		// if we're dragging the wire from an output socket, then we need to snap to the input socket
+		if (this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket) return;
+
+		// if we're dragging the wire from an input socket, then we need to snap to the output socket
+		if (this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket) return;
+
+		// get source + target types from the socket fields
+		const sourceField = this.connectionBeingDragged?.startField;
+		const sourceType = sourceField?.type;
+		const targetType = field?.type;
+
+		// safety check
+		if (!sourceType || !targetType) return;
+
+		console.log(sourceType, targetType);
+
+		// check type compatibility
+		if (sourceType === targetType) {
+
+			// same type, no conversion needed
+			cursorPopup.show(`${node.slug}_${field.name} (${targetType})`);
+
+		} else if (this.editor.typeRegistry.canCoalesce(sourceType, targetType)) {
+
+			// different type, but can be auto-coalesced
+			cursorPopup.show(`Convert ${sourceType} → ${targetType}`);
+
+		} else {
+
+			// incompatible types
+			cursorPopup.show(`Incompatible: ${sourceType} → ${targetType}`);
+
+			// exit early, don't snap to this socket
+			return;
+		}
+
+		// if we're here, then we need to snap to the socket
+		if (isInputSocket) {
+
+			// set the input for the connection
+			this.connectionBeingDragged.setOutput(node, field);
+			this.isSnappedToSocket.value = true;
+		} else {
 
 			// set the output for the connection
 			this.connectionBeingDragged.setInput(node, field);
@@ -310,16 +367,18 @@ export class ConnectionManager {
 	}
 
 
+
+
 	/**
 	 * When the user stops hovering over a socket, we need to detach the drag end.
 	 */
 	leaveSocket() {
 
 		// gtfo if we're not in the middle of dragging a wire
-		if( !this.draggingWire.value ) return;
+		if (!this.draggingWire.value) return;
 
 		// detach the drag end
-		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT ) {
+		if (this.dragEnd.value === SOCKET_TYPE.OUTPUT) {
 			this.connectionBeingDragged.setOutput(null, null);
 		} else {
 			this.connectionBeingDragged.setInput(null, null);
@@ -362,34 +421,34 @@ export class ConnectionManager {
 		//	mouse screen position at drag start
 		const startClientX = startEvent?.clientX ?? 0;
 		const startClientY = startEvent?.clientY ?? 0;
-	
+
 		//	mouse world position at drag start
 		const startMouseWorld = this.screenToWorld(startClientX, startClientY);
-	
+
 		//	world pos of the grabbed end at drag start
 		const startWorldX = startX;
 		const startWorldY = startY;
-	
+
 		//	fixed offset so the grabbed point stays under the cursor
 		const grabOffsetX = startWorldX - startMouseWorld.x;
 		const grabOffsetY = startWorldY - startMouseWorld.y;
-	
+
 		this.editor.dragHelper.dragStart(
 			(dx, dy) => {
-				
+
 				// gtfo if we're snapped
 				if (this.isSnappedToSocket.value) return;
 
 				//	reconstruct current mouse screen pos from cumulative deltas
 				const curClientX = startClientX - dx;
 				const curClientY = startClientY - dy;
-	
+
 				//	project through the *current* view (handles mid-drag zoom/pan)
 				const curMouseWorld = this.screenToWorld(curClientX, curClientY);
-	
+
 				const newX = curMouseWorld.x + grabOffsetX;
 				const newY = curMouseWorld.y + grabOffsetY;
-	
+
 				if (startFromOutput) {
 					conn.positions.endX = newX;
 					conn.positions.endY = newY;
@@ -412,23 +471,23 @@ export class ConnectionManager {
 				}
 
 				// if the wire was dragged into an input socket, it should replace whatever was there
-				if(startFromOutput == true){
-					
+				if (startFromOutput == true) {
+
 					// get all the connections for the input socket
 					const existingConnections = this.getConnectionsBySocket(conn.outputNode, conn.outputField, true);
-					
+
 					// filter out this new one online
 					const otherConnections = existingConnections.filter(c => c.id !== conn.id);
 
 					// destroy other connections
-					for(const otherConn of otherConnections)
+					for (const otherConn of otherConnections)
 						otherConn.destroy();
 				}
 
 			}
 		);
 	}
-	
+
 
 	/**
 	 * Helper to adjust wire drag pos based where the cursor clicked the origin socket
@@ -440,15 +499,15 @@ export class ConnectionManager {
 	socketClickWorldOffset(evt, scale = this.editor.zoomScale.value) {
 		const el = evt.currentTarget || evt.target;
 		if (!el || !el.getBoundingClientRect) return { x: 0, y: 0 };
-	
+
 		const rect = el.getBoundingClientRect();
 		const centerClientX = rect.left + rect.width * 0.5;
 		const centerClientY = rect.top + rect.height * 0.5;
-	
+
 		//	screen delta from center -> click
 		const dxScreen = evt.clientX - centerClientX;
 		const dyScreen = evt.clientY - centerClientY;
-	
+
 		//	convert to world units; pan cancels for deltas, only divide by scale
 		return {
 			x: dxScreen / scale,

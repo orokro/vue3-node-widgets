@@ -67,9 +67,6 @@ onMounted(() => {
 });
 
 
-
-
-
 /**
  * Disables the context menu from appearing
  * @param {MouseEvent} e - The mouse event that triggered this function
