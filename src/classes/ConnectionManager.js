@@ -355,7 +355,7 @@ export class ConnectionManager {
 			if( cursorPopup ) cursorPopup.show(`Same Type: ${fromType.typeName}`);
 		}
 		// different type → see if we can coalesce FROM → TO
-		else if( this.editor.typeRegistry.canCoalesce(fromType, toType) ){
+		else if( this.editor.typeRegistry.hasCoalescer(fromType, toType) ){
 			if( cursorPopup ) cursorPopup.show(`Convert ${fromType.typeName} → ${toType.typeName}`);
 		}
 		// incompatible → show error + exit early (do NOT snap)
