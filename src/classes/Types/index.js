@@ -36,6 +36,14 @@ VInteger.addFromCoalescer(VText, (val) => {
 VInteger.addToCoalescer(VNumber, (val) => parseFloat(val?.value));
 VInteger.addToCoalescer(VCharacter, (val) => typeof val?.value === 'number' ? String.fromCharCode(val.value) : undefined);
 
+VVector2.addFromCoalescer(VNumber, (val) => {
+	const n = val?.value;
+	return (typeof n === 'number') ? { x: n, y: n } : undefined;
+});
+VVector2.addFromCoalescer(VInteger, (val) => {
+	const n = val?.value;
+	return (typeof n === 'number') ? { x: n, y: n } : undefined;
+});
 VVector2.addFromCoalescer(VVector3, (val) => ({ x: val?.value?.x, y: val?.value?.y }));
 VVector2.addFromCoalescer(VText, (val) => {
 	try {
