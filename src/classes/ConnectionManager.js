@@ -345,23 +345,37 @@ export class ConnectionManager {
 
 		// if we don't have types for some reason, just show the name and bail
 		if( !fromType || !toType ){
-			if( cursorPopup ) cursorPopup.show(`${node.slug}_${field.name}`);
+
+			cursorPopup.show(`${node.slug}_${field.name}`);
 			return;
 		}
 
 		// same type → no conversion
 		if( fromType === toType ){
-			// if( cursorPopup ) cursorPopup.show(`${node.slug}_${field.name} (${toType})`);
-			if( cursorPopup ) cursorPopup.show(`Same Type: ${fromType.typeName}`);
-		}
-		// different type → see if we can coalesce FROM → TO
-		else if( this.editor.typeRegistry.hasCoalescer(fromType, toType) ){
-			if( cursorPopup ) cursorPopup.show(`Convert ${fromType.typeName} → ${toType.typeName}`);
-		}
-		// incompatible → show error + exit early (do NOT snap)
-		else{
-			if( cursorPopup ) cursorPopup.show(`Incompatible: ${fromType.typeName} → ${toType.typeName}`);
-			return;	// don't snap
+		
+			// cursorPopup.show(`${node.slug}_${field.name} (${toType})`);
+			cursorPopup.show(`Same Type: ${fromType.typeName}`);
+		
+		}else{
+			
+			const willCoalesce = this.editor.typeRegistry.willCoalesce(fromType, toType);
+
+			// different type → see if we can coalesce FROM → TO
+			if( willCoalesce!=false ){
+
+				// willCoalesce will be an array of types, generate the string
+				const coalescePath = willCoalesce.map(t=>t.typeName).join(' → ');
+
+				// show msg
+				cursorPopup.show(`Will Convert: \n${coalescePath}`);
+			}
+
+			// incompatible → show error + exit early (do NOT snap)
+			else{
+
+				cursorPopup.show(`Incompatible: ${fromType.typeName} → ${toType.typeName}`);
+				return;	// don't snap
+			}
 		}
 
 		// if we're here, then we need to snap to the socket

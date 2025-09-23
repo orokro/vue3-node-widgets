@@ -47,18 +47,18 @@ export class VTypeRegistry {
 	/**
 	 * For debugging: print info about the registry and its coalescers.
 	 */
-	printInfo(){
+	printInfo() {
 
 		console.log('VTypeRegistry Info:');
 		console.log('-------------------');
 
 		// print all the keys in our coalescers map & if their first order
-		for (const [key, coalescer] of this.coalescers.entries()){
-		
+		for (const [key, coalescer] of this.coalescers.entries()) {
+
 			const isFirstOrder = coalescer.firstOrder;
 			const kindString = `[${isFirstOrder ? 'First Order' : 'Composed'}]`;
 
-			const getPathFromHops = (coalescer)=>{
+			const getPathFromHops = (coalescer) => {
 				return coalescer.hops.map(h => h.typeName).join(' -> ');
 			}
 			const path = isFirstOrder ? key : getPathFromHops(coalescer);
@@ -82,13 +82,13 @@ export class VTypeRegistry {
 				const ToType = T;
 				this._setCoalescer(
 					FromType,
-					ToType, 
+					ToType,
 					new VCoalescer(fn, {
 						firstOrder: true,
 						origin: [T],
 						hops: [FromType, T]
 					}
-				));
+					));
 
 			}// next [FromType, fn]
 
@@ -148,18 +148,18 @@ export class VTypeRegistry {
 
 				// only add if we don't have it from first order already
 				const key = this._getFromToKey(From, To);
-				if(!this.coalescers.has(key))
-					allPairs.push({key, from: From, to: To});
+				if (!this.coalescers.has(key))
+					allPairs.push({ key, from: From, to: To });
 
 			}// next To
 
 		}// next From
 
 		// function to get all the current types we can current go from to
-		const getFroms = (FromType)=>{
+		const getFroms = (FromType) => {
 
 			let froms = [];
-			for (const To of this.types){
+			for (const To of this.types) {
 
 				const key = this._getFromToKey(FromType, To);
 				if (this.coalescers.has(key)) {
@@ -170,9 +170,9 @@ export class VTypeRegistry {
 		}
 
 		// function to get all Tos for this type
-		const getTos = (ToType)=>{
+		const getTos = (ToType) => {
 			let tos = [];
-			for (const From of this.types){
+			for (const From of this.types) {
 
 				const key = this._getFromToKey(From, ToType);
 				if (this.coalescers.has(key)) {
@@ -181,11 +181,11 @@ export class VTypeRegistry {
 			}
 			return tos;
 		}
-		
+
 		// loop until done
 		let done = false;
 		let passes = 0;
-		while(!done){
+		while (!done) {
 
 			// if we have passed the max passes, we're done
 			if (passes >= maxPasses)
@@ -198,7 +198,7 @@ export class VTypeRegistry {
 			const allPairsClone = [...allPairs];
 
 			// loop over allPairs & see if we can compose any of them
-			for( const {key, from: From, to: To} of allPairsClone) {
+			for (const { key, from: From, to: To } of allPairsClone) {
 
 				// get all the froms and tos
 				const froms = getFroms(From);
@@ -209,7 +209,7 @@ export class VTypeRegistry {
 
 				// no common types, skip
 				if (common.length === 0)
-					continue; 
+					continue;
 
 				// otherwise, we'll compose with the first one we found
 				const Mid = common[0]; // take the first common type
@@ -229,7 +229,7 @@ export class VTypeRegistry {
 				const composedCoalescer = new VCoalescer(composedFn, {
 					firstOrder: false,
 					origin: [From, Mid, To],
-					hops: [...c1.hops, ...c2.hops.filter(i=>c1.hops.indexOf(i) === -1)]
+					hops: [...c1.hops, ...c2.hops.filter(i => c1.hops.indexOf(i) === -1)]
 				});
 
 				// store the composed coalescer
@@ -279,9 +279,9 @@ export class VTypeRegistry {
 		// if we already have this path, GTFO, we'll only add it once
 		// because we loop over the first order coalescers from our types
 		// they'll set themselves first, so we don't need to overwrite them with composed ones
-		if(this.coalescers.has(key))
+		if (this.coalescers.has(key))
 			return;
-		
+
 		// otherwise, store it
 		this.coalescers.set(key, coalescer);
 	}
@@ -299,7 +299,7 @@ export class VTypeRegistry {
 		const key = this._getFromToKey(fromType, toType);
 		return this.coalescers.get(key) || null;
 	}
-	
+
 
 	/**
 	 * Check if a coalescer exists between two types.
@@ -328,6 +328,37 @@ export class VTypeRegistry {
 
 
 	/**
+	 * Returns `false` if no path exists, otherwise returns an array of the hop types in order.
+	 * The array contains the type constructors themselves (e.g., [VVector2, VVector3, VColor3]).
+	 * 
+	 * @param {Function} fromType
+	 * @param {Function} toType
+	 * @returns {false|Function[]}
+	 */
+	willCoalesce(fromType, toType) {
+
+		// if we don't have a path, just GTFO
+		if (!this.hasCoalescer(fromType, toType))
+			return false;
+
+		// prefer grabbing the already-built coalescer so we get its hops
+		const key = this._getFromToKey(fromType, toType);
+		const coalescer = this.coalescers.get(key) || this.getCoalescer(fromType, toType);
+
+		// safety: if something went sideways, bail
+		if (!coalescer)
+			return false;
+
+		// if the coalescer tracks its hop chain, return a copy of that chain
+		if (Array.isArray(coalescer.hops) && coalescer.hops.length > 0)
+			return [...coalescer.hops];
+
+		// fallback: at minimum, return direct edge
+		return [fromType, toType];
+	}
+
+
+	/**
 	 * Run a coalescer to convert a value.
 	 * 
 	 * @param {Function} fromType
@@ -338,7 +369,7 @@ export class VTypeRegistry {
 	coalesce(fromType, toType, value) {
 
 		const coalescer = this.getCoalescer(fromType, toType);
-		if (!coalescer) 
+		if (!coalescer)
 			throw new Error(`No coalescer from ${fromType.typeName} to ${toType.typeName}`);
 		return coalescer.apply(value);
 	}

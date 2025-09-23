@@ -15,7 +15,7 @@
 			display: visible ? 'block' : 'none',
 		}"
 	>
-		{{ text }}
+		<pre>{{ text }}</pre>
 	</div>
 </template>
 <script setup>
@@ -89,6 +89,10 @@ defineExpose({
 		color: white;
 		font-size: 1em;
 		
+		pre {
+			font-size: 1.5em;
+			letter-spacing: -0.05em;
+		}
 	}// .tool-tip-box
 
 </style>
