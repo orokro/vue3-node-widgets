@@ -280,7 +280,7 @@ export class ConnectionManager {
 	 * @param {CursorPopup} cursorPopup - optional cursor popup instance to show info about the socket.
 	 * @returns {void}
 	 */
-	hoverSocket(node, field, isInputSocket = true, cursorPopup = null) {
+	hoverSocket_old(node, field, isInputSocket = true, cursorPopup = null) {
 
 		// if we're not dragging a wire, just GTFO
 		if (!this.draggingWire.value) return;
@@ -309,64 +309,74 @@ export class ConnectionManager {
 		}
 	}
 
-	hoverSocket_new(node, field, isInputSocket = true, cursorPopup = null) {
-
-		console.log(this.editor.typeRegistry);
+	hoverSocket(node, field, isInputSocket = true, cursorPopup = null) {
 
 		// if we're not dragging a wire, just GTFO
-		if (!this.draggingWire.value) return;
+		if( !this.draggingWire.value ) return;
 
 		// if we're dragging the wire from an output socket, then we need to snap to the input socket
-		if (this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket) return;
+		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket ) return;
 
 		// if we're dragging the wire from an input socket, then we need to snap to the output socket
-		if (this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket) return;
+		if( this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket ) return;
 
-		// get source + target types from the socket fields
-		const sourceField = this.connectionBeingDragged?.startField;
-		const sourceType = sourceField?.type;
-		const targetType = field?.type;
+		// for now we'll just show the socket name,
+		// later we'll show conversion or other info
+		// cursorPopup.show(`${node.slug}_${field.name}`);
 
-		// safety check
-		if (!sourceType || !targetType) return;
+		// figure out the types for compatibility checks
+		// note: depending on which end we're dragging, the "from" side flips
+		let fromType = null;
+		let toType = null;
 
-		console.log(sourceType, targetType);
+		if( isInputSocket ){
 
-		// check type compatibility
-		if (sourceType === targetType) {
+			// dragging from an OUTPUT → hovering an INPUT
+			fromType = this.connectionBeingDragged?.inputField?.valueType || null;
+			toType = field?.valueType || null;
 
-			// same type, no conversion needed
-			cursorPopup.show(`${node.slug}_${field.name} (${targetType})`);
+		}else{
 
-		} else if (this.editor.typeRegistry.canCoalesce(sourceType, targetType)) {
+			// dragging from an INPUT → hovering an OUTPUT
+			fromType = field?.valueType || null;
+			toType = this.connectionBeingDragged?.outputField?.valueType || null;
 
-			// different type, but can be auto-coalesced
-			cursorPopup.show(`Convert ${sourceType} → ${targetType}`);
+		}
 
-		} else {
-
-			// incompatible types
-			cursorPopup.show(`Incompatible: ${sourceType} → ${targetType}`);
-
-			// exit early, don't snap to this socket
+		// if we don't have types for some reason, just show the name and bail
+		if( !fromType || !toType ){
+			if( cursorPopup ) cursorPopup.show(`${node.slug}_${field.name}`);
 			return;
 		}
 
+		// same type → no conversion
+		if( fromType === toType ){
+			// if( cursorPopup ) cursorPopup.show(`${node.slug}_${field.name} (${toType})`);
+			if( cursorPopup ) cursorPopup.show(`Same Type: ${fromType.typeName}`);
+		}
+		// different type → see if we can coalesce FROM → TO
+		else if( this.editor.typeRegistry.canCoalesce(fromType, toType) ){
+			if( cursorPopup ) cursorPopup.show(`Convert ${fromType.typeName} → ${toType.typeName}`);
+		}
+		// incompatible → show error + exit early (do NOT snap)
+		else{
+			if( cursorPopup ) cursorPopup.show(`Incompatible: ${fromType.typeName} → ${toType.typeName}`);
+			return;	// don't snap
+		}
+
 		// if we're here, then we need to snap to the socket
-		if (isInputSocket) {
+		if( isInputSocket ) {
 
 			// set the input for the connection
 			this.connectionBeingDragged.setOutput(node, field);
 			this.isSnappedToSocket.value = true;
-		} else {
+		}else{
 
 			// set the output for the connection
 			this.connectionBeingDragged.setInput(node, field);
 			this.isSnappedToSocket.value = true;
 		}
 	}
-
-
 
 
 	/**
