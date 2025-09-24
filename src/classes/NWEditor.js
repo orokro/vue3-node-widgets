@@ -82,7 +82,7 @@ export default class NWEditor {
 		// true once we have at least one available node
 		this.isReady = ref(false);
 
-		// make a new error tracking system, incase the developer using our library has errors turned on for debugging
+		// make a new error tracking system, in case the developer using our library has errors turned on for debugging
 		this.devErrors = new DevErrors(this);
 
 		// our list of available nodes, as a shallow array
@@ -114,6 +114,7 @@ export default class NWEditor {
 		// whenever the user changes the graph, we can build a single functional "compute" function
 		// that represents the entire graph, and can be called with inputs to get outputs
 		// this function will be stored here
+		// NOTE: this is a stub, and will be built later
 		this.compiledComputeFN = ()=>{};
 
 		// use or build a default VTypeRegistry
