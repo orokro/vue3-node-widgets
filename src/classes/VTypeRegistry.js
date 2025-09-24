@@ -271,7 +271,14 @@ export class VTypeRegistry {
 	 * @param {Function} toType
 	 * @param {VCoalescer} coalescer
 	 */
-	_setCoalescer(fromType, toType, coalescer) {
+	_setCoalescer_old(fromType, toType, coalescer) {
+
+		/*
+			NOTE: this version is deprecated in favor of the one below.
+
+			Because we want it to be a little smarter than the first path.
+			Instead, the shortest path possible at any time.
+		*/
 
 		// get a key
 		const key = this._getFromToKey(fromType, toType);
@@ -284,6 +291,34 @@ export class VTypeRegistry {
 
 		// otherwise, store it
 		this.coalescers.set(key, coalescer);
+	}
+
+
+	/**
+	 * Store a coalescer between two types.
+	 * 
+	 * @param {Function} fromType
+	 * @param {Function} toType
+	 * @param {VCoalescer} coalescer
+	 */
+	_setCoalescer(FromType, ToType, coalescer) {
+
+		const key = this._getFromToKey(FromType, ToType);
+		const existing = this.coalescers.get(key);
+
+		// no existing → store and bail
+		if( !existing ){
+			this.coalescers.set(key, coalescer);
+			return;
+		}
+
+		// prefer fewer hops; tie-break with firstOrder if same length
+		const curLen = Array.isArray(existing.hops) ? existing.hops.length : Infinity;
+		const newLen = Array.isArray(coalescer.hops) ? coalescer.hops.length : Infinity;
+
+		if( newLen < curLen || (newLen === curLen && coalescer.firstOrder && !existing.firstOrder) ){
+			this.coalescers.set(key, coalescer);
+		}
 	}
 
 
