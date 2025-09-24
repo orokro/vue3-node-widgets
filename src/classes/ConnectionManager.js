@@ -43,6 +43,10 @@ export class ConnectionManager {
 		this.dragCurrentPos = shallowRef({ x: 0, y: 0 });
 		this.isSnappedToSocket = shallowRef(false);
 		this.connectionBeingDragged = null;
+
+		// we'll keep a cache of the map for quick lookups
+		// cached adjacency: Map<NWNode, Set<NWNode>>; FROM (output node) -> TO (input node)
+		this._adjCache = null;
 	}
 
 
@@ -75,6 +79,9 @@ export class ConnectionManager {
 		// add to the wires array
 		this.wires.value = [...this.wires.value, conn];
 
+		// invalidate the graph cache
+		this._invalidateGraphCache();
+
 		return conn;
 	}
 
@@ -93,6 +100,9 @@ export class ConnectionManager {
 
 		// remove the connection from the wires array
 		this.wires.value = this.wires.value.filter(c => c.id !== conn.id);
+
+		// invalidate the graph cache
+		this._invalidateGraphCache();
 	}
 
 
@@ -283,30 +293,37 @@ export class ConnectionManager {
 	hoverSocket(node, field, isInputSocket = true, cursorPopup = null) {
 
 		// if we're not dragging a wire, just GTFO
-		if( !this.draggingWire.value ) return;
+		if (!this.draggingWire.value) return;
 
 		// if we're dragging the wire from an output socket, then we need to snap to the input socket
-		if( this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket ) return;
+		if (this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket) return;
 
 		// if we're dragging the wire from an input socket, then we need to snap to the output socket
-		if( this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket ) return;
+		if (this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket) return;
 
 		// for now we'll just show the socket name,
 		// later we'll show conversion or other info
 		// cursorPopup.show(`${node.slug}_${field.name}`);
+
+		// loop check: bail if this snap would create a cycle
+		if( this._wouldCreateLoopForHover(node, isInputSocket) ){
+			
+			cursorPopup.show('Loops not allowed');
+			return;
+		}
 
 		// figure out the types for compatibility checks
 		// note: depending on which end we're dragging, the "from" side flips
 		let fromType = null;
 		let toType = null;
 
-		if( isInputSocket ){
+		if (isInputSocket) {
 
 			// dragging from an OUTPUT → hovering an INPUT
 			fromType = this.connectionBeingDragged?.inputField?.valueType || null;
 			toType = field?.valueType || null;
 
-		}else{
+		} else {
 
 			// dragging from an INPUT → hovering an OUTPUT
 			fromType = field?.valueType || null;
@@ -315,34 +332,34 @@ export class ConnectionManager {
 		}
 
 		// if we don't have types for some reason, just show the name and bail
-		if( !fromType || !toType ){
+		if (!fromType || !toType) {
 
 			cursorPopup.show(`${node.slug}_${field.name}`);
 			return;
 		}
 
 		// same type → no conversion
-		if( fromType === toType ){
-		
+		if (fromType === toType) {
+
 			// cursorPopup.show(`${node.slug}_${field.name} (${toType})`);
 			cursorPopup.show(`Same Type: ${fromType.typeName}`);
-		
-		}else{
-			
+
+		} else {
+
 			const willCoalesce = this.editor.typeRegistry.willCoalesce(fromType, toType);
 
 			// different type → see if we can coalesce FROM → TO
-			if( willCoalesce!=false ){
+			if (willCoalesce != false) {
 
 				// willCoalesce will be an array of types, generate the string
-				const coalescePath = willCoalesce.map(t=>t.typeName).join(' → ');
+				const coalescePath = willCoalesce.map(t => t.typeName).join(' → ');
 
 				// show msg
 				cursorPopup.show(`Will Convert: \n${coalescePath}`);
 			}
 
 			// incompatible → show error + exit early (do NOT snap)
-			else{
+			else {
 
 				cursorPopup.show(`Incompatible: ${fromType.typeName} → ${toType.typeName}`);
 				return;	// don't snap
@@ -350,12 +367,12 @@ export class ConnectionManager {
 		}
 
 		// if we're here, then we need to snap to the socket
-		if( isInputSocket ) {
+		if (isInputSocket) {
 
 			// set the input for the connection
 			this.connectionBeingDragged.setOutput(node, field);
 			this.isSnappedToSocket.value = true;
-		}else{
+		} else {
 
 			// set the output for the connection
 			this.connectionBeingDragged.setInput(node, field);
@@ -508,6 +525,119 @@ export class ConnectionManager {
 			x: dxScreen / scale,
 			y: dyScreen / scale
 		};
+	}
+
+
+	/**
+	 * Blow away the cached graph. Call this anytime a connection structure changes.
+	 */
+	_invalidateGraphCache() {
+		this._adjCache = null;
+	}
+
+
+	/**
+	 * Build the adjacency map from the current wires list (only fully attached wires).
+	 */
+	_buildGraphCache(){
+		
+		if( this._adjCache )
+			return this._adjCache;
+
+		/** @type {Map<NWNode, Set<NWNode>>} */
+		const adj = new Map();
+
+		for(const conn of this.wires.value){
+
+			// skip partial wires while dragging
+			const producer = conn?.inputNode || null;	// upstream
+			const consumer = conn?.outputNode || null;	// downstream
+			if( !producer || !consumer ) continue;
+
+			let set = adj.get(producer);
+			if( !set ){
+				set = new Set();
+				adj.set(producer, set);
+			}
+			set.add(consumer);
+		}
+
+		this._adjCache = adj;
+		return adj;
+
+	}// next conn
+
+
+	/**
+	 * Returns true if adding an edge FROM -> TO would close a cycle.
+	 * FROM is the node whose OUTPUT socket is the source.
+	 * TO is the node whose INPUT socket is the target.
+	 */
+	_wouldCreateLoop(fromNode, toNode){
+
+		// trivial self-edge
+		if( !fromNode || !toNode )
+			return false;
+
+		if( fromNode === toNode )
+			return true;
+
+		const adj = this._buildGraphCache();
+
+		// adding fromNode -> toNode is a cycle if toNode can already reach fromNode
+		const stack = [toNode];
+		const visited = new Set();
+
+		while( stack.length ){
+			const n = stack.pop();
+
+			if( n === fromNode )
+				return true;
+
+			if( visited.has(n) )
+				continue;
+
+			visited.add(n);
+
+			const next = adj.get(n);
+			if( !next ) continue;
+
+			for( const m of next ){
+				if( !visited.has(m) )
+					stack.push(m);
+			}
+		}// wend
+
+		return false;
+	}
+
+
+
+	/**
+	 * Helper for hoverSocket(): tell me if snapping here would create a loop.
+	 * 
+	 *	- Hovering an INPUT	 → from = fixed "input end" (attaches to an OUTPUT socket)
+	 *	- Hovering an OUTPUT → from = hovered node (its OUTPUT), to = fixed "output end"
+	 */
+	_wouldCreateLoopForHover(node, isInputSocket){
+
+		let fromNode = null, toNode = null;
+
+		if( isInputSocket ){
+
+			// hovering an INPUT; we started drag from an OUTPUT
+			// edge would be: connection.inputNode (producer) -> hovered node (consumer)
+			fromNode = this.connectionBeingDragged?.inputNode || null;
+			toNode = node || null;
+
+		}else{
+			// hovering an OUTPUT; we started drag from an INPUT
+			// edge would be: hovered node (producer) -> connection.outputNode (consumer)
+			fromNode = node || null;
+			toNode = this.connectionBeingDragged?.outputNode || null;
+		}
+
+		return this._wouldCreateLoop(fromNode, toNode);
 	}
 
 }
