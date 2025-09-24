@@ -315,8 +315,8 @@ export class ConnectionManager {
 		// cursorPopup.show(`${node.slug}_${field.name}`);
 
 		// loop check: bail if this snap would create a cycle
-		if( this._wouldCreateLoopForHover(node, isInputSocket) ){
-			
+		if (this._wouldCreateLoopForHover(node, isInputSocket)) {
+
 			cursorPopup.show('Loops not allowed');
 			return;
 		}
@@ -521,6 +521,7 @@ export class ConnectionManager {
 	 * @returns {Object} - an object with the x and y offsets in world units from the center of the socket to the click position.
 	 */
 	socketClickWorldOffset(evt, scale = this.editor.zoomScale.value) {
+		
 		const el = evt.currentTarget || evt.target;
 		if (!el || !el.getBoundingClientRect) return { x: 0, y: 0 };
 
@@ -550,30 +551,39 @@ export class ConnectionManager {
 
 	/**
 	 * Build the adjacency map from the current wires list (only fully attached wires).
+	 * 
+	 * @returns {Map<NWNode, Set<NWNode>>} - the adjacency map representing the graph.
 	 */
-	_buildGraphCache(){
+	_buildGraphCache() {
 
-		if( this._adjCache )
+		// return the cached version if we have it
+		if (this._adjCache)
 			return this._adjCache;
 
 		/** @type {Map<NWNode, Set<NWNode>>} */
 		const adj = new Map();
 
-		for(const conn of this.wires.value){
+		for (const conn of this.wires.value) {
 
 			// skip partial wires while dragging
 			const producer = conn?.inputNode || null;	// upstream
 			const consumer = conn?.outputNode || null;	// downstream
-			if( !producer || !consumer ) continue;
+			if (!producer || !consumer) continue;
 
+			// get or create a set for this source (producer) Node
 			let set = adj.get(producer);
-			if( !set ){
+			if (!set) {
 				set = new Set();
 				adj.set(producer, set);
 			}
-			set.add(consumer);
-		}
 
+			// add the downstream (consumer) Node to the set
+			set.add(consumer);
+
+		}// next conn
+
+		// now a this point, adj should be a map of nodes, and their sets of downstream nodes
+		// save our cache & return it
 		this._adjCache = adj;
 		return adj;
 
@@ -584,71 +594,104 @@ export class ConnectionManager {
 	 * Returns true if adding an edge FROM -> TO would close a cycle.
 	 * FROM is the node whose OUTPUT socket is the source.
 	 * TO is the node whose INPUT socket is the target.
+	 * 
+	 * @param {NWNode} fromNode - the node that would be the source of the edge.
+	 * @param {NWNode} toNode - the node that would be the target of the edge.
+	 * @returns {Boolean} - true if adding the edge would create a cycle.
 	 */
-	_wouldCreateLoop(fromNode, toNode){
+	_wouldCreateLoop(fromNode, toNode) {
 
-		// trivial self-edge
-		if( !fromNode || !toNode )
+		// gtfo if either node is null
+		if (!fromNode || !toNode)
 			return false;
 
-		if( fromNode === toNode )
+		// trivial self-edge
+		if (fromNode === toNode)
 			return true;
 
+		// get our build graph cache
 		const adj = this._buildGraphCache();
 
 		// adding fromNode -> toNode is a cycle if toNode can already reach fromNode
 		const stack = [toNode];
 		const visited = new Set();
 
-		while( stack.length ){
+		/*
+			depth-first search
+
+			So basically, we'll start with the node we're trying to connect TO (the consumer).
+
+			We'll walk all of it's downstream connections, then all of their downstream connections, etc.
+			recursively until we either find the node we're trying to connect FROM (the producer),
+			or we run out of nodes to walk.
+
+			If we the node we're connection FROM is found, then there's already a path to it,
+			we found a loop and we can return true. (_wouldCreateLoop = true)
+
+			If we run out of nodes to walk, then there's no path to it, and we can return false.
+		*/
+		while (stack.length) {
+
+			// our stack is a list of nodes to check, get the last one
 			const n = stack.pop();
 
-			if( n === fromNode )
+			// if we found fromNode, then there's a path to it
+			if (n === fromNode)
 				return true;
 
-			if( visited.has(n) )
+			// if we've already processed this node (i.e. walked its downstream edges), skip it
+			if (visited.has(n))
 				continue;
 
+			// note we've seen this one
 			visited.add(n);
 
+			// from our map, get all the downstream nodes
 			const next = adj.get(n);
-			if( !next ) continue;
+			if (!next)
+				continue;
 
-			for( const m of next ){
-				if( !visited.has(m) )
-					stack.push(m);
-			}
+			// loop over the downstream nodes, add them to the stack if we haven't seen them yet
+			for (const ds of next) {
+				if (!visited.has(ds))
+					stack.push(ds);
+			}// next ds
+
 		}// wend
 
 		return false;
 	}
-
-
+	
 
 	/**
 	 * Helper for hoverSocket(): tell me if snapping here would create a loop.
+	 * - Hovering an INPUT	 → from = fixed "input end" (attaches to an OUTPUT socket)
+	 * - Hovering an OUTPUT → from = hovered node (its OUTPUT), to = fixed "output end"
 	 * 
-	 *	- Hovering an INPUT	 → from = fixed "input end" (attaches to an OUTPUT socket)
-	 *	- Hovering an OUTPUT → from = hovered node (its OUTPUT), to = fixed "output end"
+	 * @param {NWNode} node - the node being hovered
+	 * @param {Boolean} isInputSocket - true if hovering an input socket
+	 * @returns {Boolean} - true if snapping here would create a loop
 	 */
-	_wouldCreateLoopForHover(node, isInputSocket){
+	_wouldCreateLoopForHover(node, isInputSocket) {
 
-		let fromNode = null, toNode = null;
+		let fromNode = null;
+		let toNode = null;
 
-		if( isInputSocket ){
+		if (isInputSocket) {
 
 			// hovering an INPUT; we started drag from an OUTPUT
 			// edge would be: connection.inputNode (producer) -> hovered node (consumer)
 			fromNode = this.connectionBeingDragged?.inputNode || null;
 			toNode = node || null;
 
-		}else{
+		} else {
 			// hovering an OUTPUT; we started drag from an INPUT
 			// edge would be: hovered node (producer) -> connection.outputNode (consumer)
 			fromNode = node || null;
 			toNode = this.connectionBeingDragged?.outputNode || null;
 		}
 
+		// now that we have both ends, we can check if there's a loop
 		return this._wouldCreateLoop(fromNode, toNode);
 	}
 
