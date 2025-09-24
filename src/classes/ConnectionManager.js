@@ -280,35 +280,6 @@ export class ConnectionManager {
 	 * @param {CursorPopup} cursorPopup - optional cursor popup instance to show info about the socket.
 	 * @returns {void}
 	 */
-	hoverSocket_old(node, field, isInputSocket = true, cursorPopup = null) {
-
-		// if we're not dragging a wire, just GTFO
-		if (!this.draggingWire.value) return;
-
-		// if we're dragging the wire from an output socket, then we need to snap to the input socket
-		if (this.dragEnd.value === SOCKET_TYPE.OUTPUT && !isInputSocket) return;
-
-		// if we're dragging the wire from an input socket, then we need to snap to the output socket
-		if (this.dragEnd.value === SOCKET_TYPE.INPUT && isInputSocket) return;
-
-		// for now we'll just show the socket name,
-		// later we'll show conversion or other info
-		cursorPopup.show(`${node.slug}_${field.name}`);
-
-		// if we're here, then we need to snap to the socket
-		if (isInputSocket) {
-
-			// set the input for the connection
-			this.connectionBeingDragged.setOutput(node, field);
-			this.isSnappedToSocket.value = true;
-		} else {
-
-			// set the output for the connection
-			this.connectionBeingDragged.setInput(node, field);
-			this.isSnappedToSocket.value = true;
-		}
-	}
-
 	hoverSocket(node, field, isInputSocket = true, cursorPopup = null) {
 
 		// if we're not dragging a wire, just GTFO
