@@ -13,7 +13,7 @@
 */
 
 // vue
-import { shallowRef } from "vue";
+import { shallowRef, ref } from "vue";
 
 // app
 import NWEditor from "./NWEditor";
@@ -34,6 +34,9 @@ export class ConnectionManager {
 
 		// the wires array
 		this.wires = this.editor.graph.wires;
+
+		// version tick for reactive dependents (Node.vue, etc)
+		this.wiresVersion = ref(0);
 
 		// while the user is dragging out a wire, we'll store some state here
 		this.draggingWire = shallowRef(false);
@@ -79,8 +82,9 @@ export class ConnectionManager {
 		// add to the wires array
 		this.wires.value = [...this.wires.value, conn];
 
-		// invalidate the graph cache
+		// invalidate the graph cache & tick the version
 		this._invalidateGraphCache();
+		this.wiresVersion.value++;
 
 		return conn;
 	}
@@ -101,8 +105,9 @@ export class ConnectionManager {
 		// remove the connection from the wires array
 		this.wires.value = this.wires.value.filter(c => c.id !== conn.id);
 
-		// invalidate the graph cache
+		// invalidate the graph cache & tick the version
 		this._invalidateGraphCache();
+		this.wiresVersion.value++;
 	}
 
 
@@ -445,6 +450,9 @@ export class ConnectionManager {
 		const grabOffsetX = startWorldX - startMouseWorld.x;
 		const grabOffsetY = startWorldY - startMouseWorld.y;
 
+		if(startFromOutput)
+			this.wiresVersion.value++;
+		
 		this.editor.dragHelper.dragStart(
 			(dx, dy) => {
 
@@ -479,6 +487,7 @@ export class ConnectionManager {
 				// if the wire doesn't have both an input and output, we need to destroy it
 				if (!conn.inputNode || !conn.outputNode) {
 					conn.destroy();
+					this.wiresVersion.value++;
 					return;
 				}
 
@@ -495,6 +504,8 @@ export class ConnectionManager {
 					for (const otherConn of otherConnections)
 						otherConn.destroy();
 				}
+
+				this.wiresVersion.value++;
 
 			}
 		);
@@ -540,7 +551,7 @@ export class ConnectionManager {
 	 * Build the adjacency map from the current wires list (only fully attached wires).
 	 */
 	_buildGraphCache(){
-		
+
 		if( this._adjCache )
 			return this._adjCache;
 
