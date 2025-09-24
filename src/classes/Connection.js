@@ -137,6 +137,25 @@ export class Connection {
 
 
 	/**
+	 * Ticks the wire rendering versions of the input and output nodes.
+	 */
+	getNodeWireTickFn(){
+
+		// cache the nodes
+		const nodeA = this.inputNode;
+		const nodeB = this.outputNode;
+
+		// return a function that will tick the wire versions of both nodes
+		return function(){
+			if(nodeA)
+				nodeA.wiresVersion.value++;
+			if(nodeB)
+				nodeB.wiresVersion.value++;
+		};
+	}
+
+
+	/**
 	 * Destroys this connection.
 	 * 
 	 * This will remove the connection from the connection manager
@@ -147,10 +166,16 @@ export class Connection {
 		// set destroying to true to fade it out & then kill self
 		this.isBeingDestroyed.value = true;
 
+		// make sure our nodes update their wire versions
+		const tickFn = this.getNodeWireTickFn();
+
 		// clear input and output refs
 		this.setInput(null, null);
 		this.setOutput(null, null);
 
+		// tick the nodes so they update their wire versions
+		tickFn();
+		
 		// wait ab it & kill self
 		setTimeout(() => {
 

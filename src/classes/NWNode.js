@@ -251,6 +251,11 @@ export default class NWNode {
 	// when the editor adds a node it will add itself here
 	editor = null;
 
+	// version tick for reactive dependents (Node.vue, etc)
+	// whenever a connection is plugged or unplugged from this node,
+	// we'll increment this version to force updates of dependents
+	wiresVersion = ref(0);
+
 	// resets the static properties of the class for subclasses
 	static init(){
 

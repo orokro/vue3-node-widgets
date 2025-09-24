@@ -35,9 +35,6 @@ export class ConnectionManager {
 		// the wires array
 		this.wires = this.editor.graph.wires;
 
-		// version tick for reactive dependents (Node.vue, etc)
-		this.wiresVersion = ref(0);
-
 		// while the user is dragging out a wire, we'll store some state here
 		this.draggingWire = shallowRef(false);
 		this.dragEnd = shallowRef(SOCKET_TYPE.OUTPUT);
@@ -84,7 +81,9 @@ export class ConnectionManager {
 
 		// invalidate the graph cache & tick the version
 		this._invalidateGraphCache();
-		this.wiresVersion.value++;
+
+		// tell nodes in the connection to tick their wire versions
+		conn.getNodeWireTickFn()();
 
 		return conn;
 	}
@@ -107,7 +106,9 @@ export class ConnectionManager {
 
 		// invalidate the graph cache & tick the version
 		this._invalidateGraphCache();
-		this.wiresVersion.value++;
+
+		// tell nodes in the connection to tick their wire versions
+		conn.getNodeWireTickFn()();
 	}
 
 
@@ -192,6 +193,9 @@ export class ConnectionManager {
 				conn = existingConn;
 				node = existingConn.inputNode;
 				field = existingConn.inputField;
+
+				// tell nodes in the connection to tick their wire versions	
+				conn.getNodeWireTickFn()();
 
 				// clear it's output b/c we're moving it
 				this.dragOriginNode.value = node;
@@ -450,9 +454,6 @@ export class ConnectionManager {
 		const grabOffsetX = startWorldX - startMouseWorld.x;
 		const grabOffsetY = startWorldY - startMouseWorld.y;
 
-		if(startFromOutput)
-			this.wiresVersion.value++;
-		
 		this.editor.dragHelper.dragStart(
 			(dx, dy) => {
 
@@ -487,7 +488,7 @@ export class ConnectionManager {
 				// if the wire doesn't have both an input and output, we need to destroy it
 				if (!conn.inputNode || !conn.outputNode) {
 					conn.destroy();
-					this.wiresVersion.value++;
+					conn.getNodeWireTickFn()();
 					return;
 				}
 
@@ -505,7 +506,7 @@ export class ConnectionManager {
 						otherConn.destroy();
 				}
 
-				this.wiresVersion.value++;
+				conn.getNodeWireTickFn()();
 
 			}
 		);

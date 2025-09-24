@@ -219,7 +219,7 @@ const wiresRef = props.nwSystem.graph.wires;
 const connectedInputsKeySet = computed(()=>{
 
 	// force recalc when wires change
-	const _ver = props.nwSystem.connMgr.wiresVersion.value;
+	const _ver = props.node.wiresVersion.value;
 
 	// build a set of all connected INPUT endpoints
 	const set = new Set();
