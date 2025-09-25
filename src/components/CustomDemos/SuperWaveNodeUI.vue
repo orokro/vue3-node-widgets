@@ -10,7 +10,41 @@
 
 	<div class="super-wave-node">
 
-		asd
+		<!-- controls for changing amplitude -->
+		<div class="number-box amplitude">
+			<div class="btn minus" @click="amplitude = Math.max(0, amplitude - 0.1)"><span>-</span></div>
+			<div class="value"><span>{{ amplitude.toFixed(1) }}</span></div>
+			<div class="btn plus" @click="amplitude = Math.min(10, amplitude + 0.1)"><span>+</span></div>
+		</div>
+
+		<!-- controls for changing wavelength -->
+		<div class="number-box wavelength">
+			<div class="btn minus" @click="wavelength = Math.max(1, wavelength - 0.1)"><span>-</span></div>
+			<div class="value"><span>{{ wavelength.toFixed(1) }}</span></div>
+			<div class="btn plus" @click="wavelength = Math.min(20, wavelength + 0.1)"><span>+</span></div>
+		</div>
+
+		<!-- LED for when we're in degrees mode -->
+		<div class="led degrees" :class="{'on': degrees}">
+			<div class="led-inner"></div>
+		</div>
+
+		<!-- LED for when we're in radians mode -->
+		<div class="led radians" :class="{'on': !degrees}">
+			<div class="led-inner"></div>
+		</div>
+
+		<!-- toggle switch for degrees v radians -->
+		<div 
+			class="angle-toggle" 
+				@click="degrees = !degrees"
+			>
+			<div
+				class="toggle-inner"
+				:class="{'degrees': degrees, 'radians': !degrees}"
+			/>
+		</div>
+
 	</div>
 </template>
 <script setup>
@@ -36,6 +70,20 @@ const props = defineProps({
 });
 
 
+// make the fields reactive for our template
+const theta = shallowRef(props.node.fieldState.theta.val);
+watch(()=>theta.value, (newVal) => { props.node.fieldState.theta.val = newVal; });
+
+const amplitude = shallowRef(props.node.fieldState.amplitude.val);
+watch(()=>amplitude.value, (newVal) => { props.node.fieldState.amplitude.val = newVal; });
+
+const wavelength = shallowRef(props.node.fieldState.wavelength.val);
+watch(()=>wavelength.value, (newVal) => { props.node.fieldState.wavelength.val = newVal; });
+
+const degrees = shallowRef(props.node.fieldState.degrees.val);
+watch(()=>degrees.value, (newVal) => { props.node.fieldState.degrees.val = newVal; });
+
+
 // set our socket positions when mounted
 onMounted(() => {
 
@@ -44,17 +92,18 @@ onMounted(() => {
 });
 
 
+/**
+ * Sets the socket positions for our custom node
+ */
 function setSocketPositions(){
 
-	const node = props.node;
-
 	// input side
-	node.fieldState.theta.data.inputYPos.value = 20;
-	node.fieldState.amplitude.data.inputYPos.value = 172;
-	node.fieldState.wavelength.data.inputYPos.value = 196;
+	props.node.fieldState.theta.data.inputYPos.value = 20;
+	props.node.fieldState.amplitude.data.inputYPos.value = 172;
+	props.node.fieldState.wavelength.data.inputYPos.value = 196;
 
 	// output side
-	node.fieldState.result.data.outputYPos.value = 20;
+	props.node.fieldState.result.data.outputYPos.value = 20;
 }
 
 </script>
@@ -65,6 +114,9 @@ function setSocketPositions(){
 		// for debug
 		/* border: 1px solid red; */
 
+		// so we can absolutely position children
+		position: relative;
+
 		// fixed size
 		width: 322em;
 		height: 245em;
@@ -74,6 +126,175 @@ function setSocketPositions(){
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
+
+		// the boxes that let us change amplitude & wavelength
+		.number-box {
+
+			// for debug
+			/* border: 1px solid red; */
+			/* background: rgba(255, 0, 0, 0.6); */
+
+			// fixed size & pos
+			position: absolute;			
+			top: 156em;
+			width: 120em;
+			height: 32em;
+
+			// just the amplitude box
+			&.amplitude {
+				left: 21em;
+			}
+
+			// just the wavelength box
+			&.wavelength {
+				left: 182em;
+			}
+
+			// flex settings for the buttons & display row
+			display: flex;
+			flex-direction: row;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0em 4em 0em 4em;
+
+			// the buttons
+			.btn {
+				width: 28em;
+				height: 28em;
+				background: #222;
+				border: 2em solid black;
+				border-radius: 6em;
+
+				// center the text
+				display: flex;
+				justify-content: center;
+				align-items: center;
+
+				// text styles
+				span { font-size: 16em;	}
+				font-weight: bold;
+				color: rgb(129, 129, 129);
+
+				// cursor
+				cursor: pointer;
+
+				// user select none
+				user-select: none;
+
+				// hover effect
+				&:hover {
+					background: #444;
+				}
+			}// .btn
+
+			// the value 
+			.value {
+
+				// box settings
+				min-width: 50em;
+				background: #444;
+				box-shadow: inset 0em 0em 4em rgba(0,0,0,0.5);
+				border-radius: 2em;
+				padding: 2em 8em;
+				
+				// text settings
+				span { 
+					font-size: 16em;
+					filter: drop-shadow(0em 0em 0.1em rgba(255,0,0,0.7));
+				}
+				font-weight: bold;
+				color: rgb(235, 29, 29);
+				font-family: monospace;				
+				text-align: center;
+				text-shadow: 1em 1em 1em rgba(0,0,0,0.7);
+				
+			}// .value
+
+		}// .number-box
+
+		// leds
+		.led {
+
+			// fixed pos
+			position: absolute;
+			top: 213em;
+
+			// round circle base
+			width: 14em;
+			height: 14em;
+			border: 2em solid black;
+			border-radius: 50%;
+			background: #222;
+			box-shadow: inset 0em 0em 6em rgba(0,0,0,0.7);
+
+			// the bulb itself
+			.led-inner {
+				width: 9em;
+				height: 9em;
+				border-radius: 50%;
+				background: rgb(97, 2, 2);
+				margin: 0.5em;
+				box-shadow: inset 0em 0em 4em rgba(0,0,0,0.7);
+				transition: background 0.3s;
+			}// .led-inner
+
+			// light up when on
+			&.on {
+				.led-inner {
+					background: rgb(255, 0, 0);
+					box-shadow: 0em 0em 20em rgba(255,0,0,0.8), inset 0em 0em 4em rgba(0,0,0,0.7);
+					filter: drop-shadow(0em 0em 4em rgba(255,0,0,1));
+				}
+			}
+
+			&.degrees {				
+				left: 100em;
+			}
+
+			&.radians {
+				left: 210em;
+			}
+		}// led
+
+		// the toggle switch for degrees/radians
+		.angle-toggle {
+
+			// for debug
+			/* border: 1px solid red; */
+			/* background: rgba(255, 0, 0, 0.5); */
+
+			// fixed pos
+			position: absolute;
+			top: 203em;
+			height: 34em;
+			left: 118em;
+			width: 87em;
+
+			// look like a clickable button
+			cursor: pointer;
+
+			// the actual image that will switch
+			.toggle-inner {
+
+				// for debug
+				/* border: 1px solid blue; */
+
+				// fixed size & position
+				position: absolute;
+				inset: -10em 5em 5em 5em;
+
+				// background image
+				background: url('/SuperWave/switch.png');
+				background-size: 100% 100%;
+				background-repeat: no-repeat;
+
+			}// .toggle-inner
+
+			// mirror toggle when in radian mode
+			.toggle-inner.radians {
+				transform: scaleX(-1);
+			}
+		}// .angle-toggle
 
 	}// .super-wave-node
 	
