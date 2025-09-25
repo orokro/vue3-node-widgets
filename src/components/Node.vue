@@ -365,6 +365,11 @@ function getOffsetInEm(rowEl) {
  */
 function measureFieldPositions(){
 
+	// don't measure if we have a custom component,
+	// because it will specify it's own socket positions
+	if(props.node.constructor.customComponent!==null)
+		return;
+
 	// loop through all the fields in the node
 	for (const field of props.node.constructor.fields) {
 

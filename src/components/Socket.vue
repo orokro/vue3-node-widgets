@@ -17,6 +17,7 @@
 		:style="{
 			top: `${y}em`,
 		}"
+		:title="`${field.name} (${field.valueType.name})`"
 		@mousedown="onMouseDown"
 		@mouseover="onMouseOver"
 		@mouseleave="onMouseLeave"

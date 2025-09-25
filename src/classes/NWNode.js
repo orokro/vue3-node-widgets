@@ -294,6 +294,26 @@ export default class NWNode {
 
 
 	/**
+	 * Sets a custom Vue component to use for rendering the node's body.
+	 * 
+	 * @param {Function} component - a Vue component constructor to use for rendering the node's body
+	 */
+	static setCustomComponent(component) {
+
+		// error if we already have a custom component set
+		if (this.customComponent)
+			throw new Error('Custom component can only be set once');
+
+		// validate the component
+		// if (typeof component !== 'object' && typeof component !== 'function')
+		// 	throw new Error('Custom component must be a Vue component');
+
+		// save the component
+		this.customComponent = component;
+	}
+
+
+	/**
 	 * Adds a field to our node.
 	 * 
 	 * @param {string} fieldType - the type of field to add, one of FIELD_TYPE constants
