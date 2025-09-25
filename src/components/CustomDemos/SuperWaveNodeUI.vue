@@ -13,14 +13,14 @@
 		<!-- controls for changing amplitude -->
 		<div class="number-box amplitude">
 			<div class="btn minus" @click="amplitude = Math.max(0, amplitude - 0.1)"><span>-</span></div>
-			<div class="value"><span>{{ amplitude.toFixed(1) }}</span></div>
+			<div class="value" @mousedown="dragAmplitude"><span>{{ amplitude.toFixed(1) }}</span></div>
 			<div class="btn plus" @click="amplitude = Math.min(10, amplitude + 0.1)"><span>+</span></div>
 		</div>
 
 		<!-- controls for changing wavelength -->
 		<div class="number-box wavelength">
-			<div class="btn minus" @click="wavelength = Math.max(1, wavelength - 0.1)"><span>-</span></div>
-			<div class="value"><span>{{ wavelength.toFixed(1) }}</span></div>
+			<div class="btn minus" @click="wavelength = Math.max(0.01, wavelength - 0.1)"><span>-</span></div>
+			<div class="value" @mousedown="dragWavelength"><span>{{ wavelength.toFixed(1) }}</span></div>
 			<div class="btn plus" @click="wavelength = Math.min(20, wavelength + 0.1)"><span>+</span></div>
 		</div>
 
@@ -45,12 +45,28 @@
 			/>
 		</div>
 
+		<!-- the screen to show the sine wave -->
+		<div ref="screenBoxEl" class="screen">
+			<SineScreen 
+				:width="screenResolutionWidth"
+				:height="screenResolutionHeight"
+				:amplitude="amplitude"
+				:wavelength="wavelength"
+				:degrees="degrees"
+				:xscale="screenResolutionWidth/6"
+				:color="'#aaFF00'"
+			/>
+		</div>
+
 	</div>
 </template>
 <script setup>
 
 // vue
-import { ref, onMounted, computed, shallowRef, watch, inject } from 'vue';
+import { ref, onMounted, onBeforeUnmount, computed, shallowRef, watch, inject } from 'vue';
+
+// components
+import SineScreen from './SineScreen.vue';
 
 // props
 const props = defineProps({
@@ -69,6 +85,13 @@ const props = defineProps({
 
 });
 
+// get our drag helper for later
+const dh = inject('dh');
+
+// refs
+const screenBoxEl = ref(null);
+const screenResolutionWidth = ref(277);
+const screenResolutionHeight = ref(78);
 
 // make the fields reactive for our template
 const theta = shallowRef(props.node.fieldState.theta.val);
@@ -84,12 +107,54 @@ const degrees = shallowRef(props.node.fieldState.degrees.val);
 watch(()=>degrees.value, (newVal) => { props.node.fieldState.degrees.val = newVal; });
 
 
+// resize observer to keep screen rendering correctly sized
+let resizeObserver = null;
+
 // set our socket positions when mounted
 onMounted(() => {
 
+	// set our socket positions
 	setSocketPositions();
 
+	// watch screen size
+	watchScreenSize();
 });
+
+
+// clean up on unmount
+onBeforeUnmount(() => {
+
+	// disconnect our resize observer
+	if (resizeObserver) {
+		resizeObserver.disconnect();
+	}
+});
+
+
+/**
+ * Set up a resize observer to watch our screen box element, and update our screen resolution refs
+ */
+function watchScreenSize(){
+
+	// create a resize observer to watch the screen box element
+	resizeObserver = new ResizeObserver(entries => {
+		for (let entry of entries) {
+			if (entry.contentBoxSize) {
+				const width = entry.contentRect.width;
+				const height = entry.contentRect.height;
+
+				// update our screen resolution refs
+				screenResolutionWidth.value = Math.floor(width);
+				screenResolutionHeight.value = Math.floor(height);
+			}
+		}
+	});
+
+	// start observing the screen box element
+	if (screenBoxEl.value) {
+		resizeObserver.observe(screenBoxEl.value);
+	}
+}
 
 
 /**
@@ -104,6 +169,64 @@ function setSocketPositions(){
 
 	// output side
 	props.node.fieldState.result.data.outputYPos.value = 20;
+}
+
+
+/**
+ * Handles dragging to change amplitude
+ * 
+ * @param {MouseEvent} e - the mouse event
+ */
+function dragAmplitude(e){
+
+	// save initial value
+	const startValue = amplitude.value;
+
+	// start drag
+	dh.dragStart(
+		(dx, dy)=>{
+			// calculate new value
+			let newValue = startValue - dx * 0.05;
+
+			// lint it
+			newValue = Math.min(10, Math.max(0, newValue));
+
+			// set it
+			amplitude.value = newValue;
+		},
+		(dx, dy) => {
+			// on drag end, do nothing for now
+		},
+	);
+}
+
+
+/**
+ * Handles dragging to change wavelength
+ * 
+ * @param {MouseEvent} e - the mouse event
+ */
+function dragWavelength(e){
+
+	// save initial value
+	const startValue = wavelength.value;
+
+	// start drag
+	dh.dragStart(
+		(dx, dy)=>{
+			// calculate new value
+			let newValue = startValue - dx * 0.05;
+
+			// lint it
+			newValue = Math.min(20, Math.max(0.1, newValue));
+
+			// set it
+			wavelength.value = newValue;
+		},
+		(dx, dy) => {
+			// on drag end, do nothing for now
+		},
+	);
 }
 
 </script>
@@ -197,6 +320,9 @@ function setSocketPositions(){
 				border-radius: 2em;
 				padding: 2em 8em;
 				
+				// look draggable
+				cursor: ew-resize;
+
 				// text settings
 				span { 
 					font-size: 16em;
@@ -294,7 +420,20 @@ function setSocketPositions(){
 			.toggle-inner.radians {
 				transform: scaleX(-1);
 			}
+		
 		}// .angle-toggle
+
+		// container where we'll mount our sine wave screen
+		.screen {
+
+			// for debug
+			border: 1px solid greenyellow;
+
+			position: absolute;
+			inset: 48em 24em auto 21em;
+			height: 78em;
+			
+		}// .screen
 
 	}// .super-wave-node
 	
