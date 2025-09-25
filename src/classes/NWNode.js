@@ -348,7 +348,8 @@ export default class NWNode {
 		// base object to mix in things
 		const baseField = {
 			fieldType,
-			name: options.name, 
+			name: options.name,
+			component: options.component,
 		};
 
 		switch(fieldType){
@@ -595,7 +596,6 @@ export default class NWNode {
 		if (this.editor && this.editor.connMgr)
 			this.editor.connMgr.moveWires(this);
 	}
-
 
 
 	/**

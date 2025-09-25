@@ -8,6 +8,7 @@
 // import all our node types
 import AllTypesNode from './AllTypesNode';
 import AllTypesOutNode from './AllTypesOutNode';
+import ABMathKnobNode from './ABMathKnobNode';
 
 import ABMathNode from './ABMathNode';
 import ABCompareNode from './ABCompareNode';
@@ -68,6 +69,7 @@ const defaultNodeList = [
 	// debug nodes
 	{ class: AllTypesNode, menuPath: '/Debug' },
 	{ class: AllTypesOutNode, menuPath: '/Debug/' },
+	{ class: ABMathKnobNode, menuPath: '/Debug/' },
 
 	// mathematical nodes
 	{ class: ABMathNode, menuPath: '/Math (Scalar)' },

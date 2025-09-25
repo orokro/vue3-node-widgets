@@ -94,7 +94,7 @@
 							<!-- otherwise, if we're processing node we'll mount it's component-->
 							<component
 								v-if="showWidgetFor(field)"
-								:is="field.valueType.nodeWidgetComponent"
+								:is="getFieldComponent(field)"
 								:key="index"
 								:nwSystem="nwSystem"
 								:node="node"
@@ -248,11 +248,34 @@ function fieldHasInput(field){
 // - and EITHER it's not an INPUT field OR it is an INPUT without a wire
 function showWidgetFor(field){
 
+	// only show widgets for processing nodes or PROP fields
 	const isProcOrProp = props.node.constructor.nodeType == NODE_TYPE.PROCESSING || field.fieldType == FIELD_TYPE.PROP;
-	if(!isProcOrProp) return false;
-	if(field.fieldType == FIELD_TYPE.INPUT && fieldHasInput(field)) return false;
+	if(!isProcOrProp)
+		return false;
+
+	// if something is plugged into this input kind, hide the widget
+	if(field.fieldType == FIELD_TYPE.INPUT && fieldHasInput(field)) 
+		return false;
+
+	// otherwise show the widget
 	return true;
 }
+
+
+/**
+ * Gets the component to use for a given field.
+ * 
+ * @param field - the field to get the component for
+ * @return The component to use for the field
+ */
+function getFieldComponent(field){
+
+	// return the fields custom component if it has one, otherwise the valueType's component
+	if(field.component!=null)
+		return field.component;
+	else
+		return field.valueType.nodeWidgetComponent;
+} 
 
 
 // when wires change, widgets can appear/disappear → row heights change → remeasure
