@@ -36,7 +36,7 @@
 			<!-- close button -->
 			<div 
 				class="delete-button"
-				@click.stop.prevent="nwSystem.removeNode(node)"
+				@click.stop.prevent="nwSystem.rootGraph.removeNode(node)"
 			>
 				<i class="material-icons">close</i>
 			</div>
@@ -212,7 +212,7 @@ const props = defineProps({
 const contentEl = ref(null);
 
 // wires list lives on the editor graph; shallowRef so changes are reactive
-const wiresRef = props.nwSystem.graph.wires;
+const wiresRef = props.nwSystem.rootGraph.wires;
 
 
 // cache of connected INPUT endpoints, keyed by "nodeId::fieldName"
@@ -418,7 +418,7 @@ onMounted(()=>{
 
 		// after the DOM updates, move wires
 		nextTick(()=>{			
-			props.nwSystem.connMgr.moveWires(props.node);
+			props.nwSystem.rootGraph.connMgr.moveWires(props.node);
 		});
 	});
 	ro.observe(contentEl.value);

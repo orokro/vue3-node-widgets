@@ -19,6 +19,7 @@ import DevErrors from './DevErrors';
 import { VTypeRegistry } from './VTypeRegistry';
 import { Connection } from './Connection';
 import { ConnectionManager } from './ConnectionManager';
+import { NWGraph } from './NWGraph';
 
 // lib/misc
 import DragHelper from 'gdraghelper';
@@ -69,6 +70,7 @@ export default class NWEditor {
 	// reusable drag helper
 	dragHelper = new DragHelper();
 
+
 	/**
 	 * Constructor
 	 *
@@ -103,13 +105,7 @@ export default class NWEditor {
 			NOTE: we will use shallowRefs for these, because they will be arrays of instantiated JS classes,
 			and they will have their own Vue Refs and reactivity that we don't want to "unwrap"
 		*/
-		this.graph = {
-			nodes: shallowRef([]),
-			wires: shallowRef([]),
-		};
-
-		// make new manager for our connections
-		this.connMgr = new ConnectionManager(this);
+		this.rootGraph = new NWGraph(this);
 
 		// whenever the user changes the graph, we can build a single functional "compute" function
 		// that represents the entire graph, and can be called with inputs to get outputs
@@ -253,7 +249,7 @@ export default class NWEditor {
 		}
 
 		// add the node to our graph
-		this.graph.nodes.value = [...this.graph.nodes.value, newNode];
+		this.rootGraph.nodes.value = [...this.rootGraph.nodes.value, newNode];
 
 		return newNode;
 	}
@@ -269,7 +265,7 @@ export default class NWEditor {
 
 		// if we were passed in a slug, find the node by slug
 		if(t.isDefined(slug) && t.isString(slug)){
-			return this.graph.nodes.value.find(n => n.slug === slug);
+			return this.rootGraph.nodes.value.find(n => n.slug === slug);
 		}
 
 		// if we weren't passed in a slug, return null
@@ -285,13 +281,13 @@ export default class NWEditor {
 	removeNode(nodeOrNodeID){
 
 		// find the node by id or reference
-		const node = t.isDefined(nodeOrNodeID) ? this.graph.nodes.value.find(n => n.id === nodeOrNodeID || n === nodeOrNodeID) : null;
+		const node = t.isDefined(nodeOrNodeID) ? this.rootGraph.nodes.value.find(n => n.id === nodeOrNodeID || n === nodeOrNodeID) : null;
 
 		// if we found the node, remove it
 		if(node){
 
 			// delete the node
-			this.graph.nodes.value = this.graph.nodes.value.filter(n => n !== node);
+			this.rootGraph.nodes.value = this.rootGraph.nodes.value.filter(n => n !== node);
 
 			// break any connections this node may have
 			this.connMgr.breakConnectionsByNode(node);

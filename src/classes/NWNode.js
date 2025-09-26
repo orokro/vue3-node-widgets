@@ -613,8 +613,8 @@ export default class NWNode {
 		this.y.value = y;
 
 		// tell connections manager to update connections
-		if (this.editor && this.editor.connMgr)
-			this.editor.connMgr.moveWires(this);
+		if (this.editor && this.editor.rootGraph.connMgr)
+			this.editor.rootGraph.connMgr.moveWires(this);
 	}
 
 

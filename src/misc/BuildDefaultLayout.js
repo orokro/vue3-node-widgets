@@ -156,10 +156,10 @@ function buildNaturalLayout01(ctx) {
 	nextTick(() => {
 	
 		// get both nodes
-		const cartesianNode = ctx.graph.nodes.value[0];
-		const polarNode = ctx.graph.nodes.value[1];
-		const checkerNode = ctx.graph.nodes.value[4];
-		const outputNode = ctx.graph.nodes.value[3];
+		const cartesianNode = ctx.rootGraph.nodes.value[0];
+		const polarNode = ctx.rootGraph.nodes.value[1];
+		const checkerNode = ctx.rootGraph.nodes.value[4];
+		const outputNode = ctx.rootGraph.nodes.value[3];
 
 		// get relevant fields:
 		const thetaField = polarNode.static.fields[2];
@@ -170,9 +170,9 @@ function buildNaturalLayout01(ctx) {
 		const outColorField = outputNode.static.fields[0];
 
 		// make new connections
-		const newConnTheta = ctx.connMgr.addConnectionBasic();
-		const newConnCoords = ctx.connMgr.addConnectionBasic();
-		const newConnOut = ctx.connMgr.addConnectionBasic();
+		const newConnTheta = ctx.rootGraph.connMgr.addConnectionBasic();
+		const newConnCoords = ctx.rootGraph.connMgr.addConnectionBasic();
+		const newConnOut = ctx.rootGraph.connMgr.addConnectionBasic();
 
 		// wire it up
 		newConnTheta.setInput(polarNode, thetaField);

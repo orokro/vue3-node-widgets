@@ -25,15 +25,15 @@ export class ConnectionManager {
 	/**
 	 * Constructs a new ConnectionManager instance.
 	 * 
-	 * @param {NWEditor} editor - the NWEditor instance that this ConnectionManager will be associated with.
+	 * @param {NWGraph} graph - the NWGraph instance that this ConnectionManager will be associated with.
 	 */
-	constructor(editor) {
+	constructor(graph) {
 
 		// save the editor instance
-		this.editor = editor;
+		this.graph = graph;
 
 		// the wires array
-		this.wires = this.editor.graph.wires;
+		this.wires = this.graph.wires;
 
 		// while the user is dragging out a wire, we'll store some state here
 		this.draggingWire = shallowRef(false);
@@ -226,7 +226,7 @@ export class ConnectionManager {
 		this.connectionBeingDragged = conn;
 
 		// we'll store the initial scale of zoom when drag was started incase someone zoom-scrolls while dragging
-		const startScale = this.editor.zoomScale.value;
+		const startScale = this.graph.editor.zoomScale.value;
 
 		// set the start & node the positions
 		let startX = 0;
@@ -355,7 +355,7 @@ export class ConnectionManager {
 
 		} else {
 
-			const willCoalesce = this.editor.typeRegistry.willCoalesce(fromType, toType);
+			const willCoalesce = this.graph.editor.typeRegistry.willCoalesce(fromType, toType);
 
 			// different type → see if we can coalesce FROM → TO
 			if (willCoalesce != false) {
@@ -418,9 +418,9 @@ export class ConnectionManager {
 	 */
 	screenToWorld(clientX, clientY) {
 
-		const scale = this.editor.zoomScale.value;
-		const panX = this.editor.panX.value;
-		const panY = this.editor.panY.value;
+		const scale = this.graph.editor.zoomScale.value;
+		const panX = this.graph.editor.panX.value;
+		const panY = this.graph.editor.panY.value;
 		return {
 			x: (clientX - panX) / scale,
 			y: (clientY - panY) / scale
@@ -454,7 +454,7 @@ export class ConnectionManager {
 		const grabOffsetX = startWorldX - startMouseWorld.x;
 		const grabOffsetY = startWorldY - startMouseWorld.y;
 
-		this.editor.dragHelper.dragStart(
+		this.graph.editor.dragHelper.dragStart(
 			(dx, dy) => {
 
 				// gtfo if we're snapped
@@ -520,7 +520,7 @@ export class ConnectionManager {
 	 * @param {Number} scale - the zoom scale to use for the conversion. Defaults to the current editor zoom scale.
 	 * @returns {Object} - an object with the x and y offsets in world units from the center of the socket to the click position.
 	 */
-	socketClickWorldOffset(evt, scale = this.editor.zoomScale.value) {
+	socketClickWorldOffset(evt, scale = this.graph.editor.zoomScale.value) {
 		
 		const el = evt.currentTarget || evt.target;
 		if (!el || !el.getBoundingClientRect) return { x: 0, y: 0 };
