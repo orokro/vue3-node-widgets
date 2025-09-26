@@ -82,7 +82,7 @@ function addNode(item){
 	}
 
 	// add the item!	
-	props.nwSystem.addNode(item.item);
+	props.nwSystem.rootGraph.addNode(item.item);
 }
 
 </script>

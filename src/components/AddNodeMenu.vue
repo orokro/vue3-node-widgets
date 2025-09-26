@@ -8,13 +8,22 @@
 <template>
 
 	<!-- outer most wrapper, fill parent div -->
-	<div v-show="nwSystem.showMenu.value" class="add-node-menu-layer" @click="closeMenu"
-		@click.right="nwSystem.showMenu.value && closeMenu" @mouseup.stop>
+	<div 
+		v-show="nwSystem.showMenu.value"
+		class="add-node-menu-layer"
+		@click="closeMenu"
+		@click.right="nwSystem.showMenu.value && closeMenu" 
+		@mouseup.stop
+	>
 
-		<div class="menu-container" @click.stop :style="{
+		<div 
+			class="menu-container" 
+			@click.stop 
+			:style="{
 				left: `${nwSystem.menuX.value}px`,
 				top: `${nwSystem.menuY.value}px`,
-			}">
+			}"
+		>
 
 			<!-- search box -->
 			<div class="search-box">
@@ -24,12 +33,20 @@
 				</div>
 
 				<div class="search-input-wrapper">
-					<input ref="searchBoxEl" type="text" placeholder="Search for a node..." v-model="searchQuery" />
+					<input 
+						ref="searchBoxEl"
+						type="text"
+						placeholder="Search for a node..."
+						v-model="searchQuery"
+					/>
 				</div>
 			</div>
 
 			<!-- this will spawn the list of menu items and sub-menu items -->
-			<AddMenuList :nwSystem="nwSystem" :listItems="rootMenuItems" />
+			<AddMenuList
+				:nwSystem="nwSystem"
+				:listItems="rootMenuItems"
+			/>
 		</div>
 	</div>
 
