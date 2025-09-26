@@ -21,7 +21,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, provide } from 'vue';
 import NWEditor from './classes/NWEditor.js';
 import WindowManager from 'vue-win-mgr';
 import GraphWindow from './dev_components/GraphWindow.vue';
@@ -75,9 +75,22 @@ const defaultWindowLayout = [
 ];
 
 
+// we'll use a global ctx for the graphs to windows both render the same state
+const nodeCtx = new NWEditor();
 
+// will stick stuffs on here
+const app = {
 
+	// the main NWEditor instance
+	nwSystem: nodeCtx,
 
+};
+
+// for debug
+window.app = app;
+
+// provide it to the app
+provide('app', app);
 
 // helpers
 import { 
@@ -87,32 +100,27 @@ import {
 } from './misc/BuildDefaultLayout';
 
 
-let ctx = null;
-
 onMounted(() => {
 	
+	// for debug, provide our window manager context to console
 	const wm = winMgrEl.value;
 	const wmCtx = wm.getContext();
 	window.wm = wmCtx;
 	console.log('wmCtx:', wmCtx);
 	
-	// // expose our graph to the window for debugging
-	// window.mg = myGraph.value;
 
-	// ctx = mg.getContext();
-	// window.ctx = ctx;
+	const ctx = app.nwSystem;
+	buildNaturalLayout01(ctx);
+	
 
-	// buildNaturalLayout01(ctx);
-	// // addBuildInNodesBatch01(ctx);
-
-	// // add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
-	// window.addEventListener('keydown', (e) => {
-	// 	if (e.key === 'Home') {
-	// 		ctx.zoomScale.value = 1;
-	// 		ctx.panX.value = 0;
-	// 		ctx.panY.value = 0;
-	// 	}0
-	// });
+	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
+	window.addEventListener('keydown', (e) => {
+		if (e.key === 'Home') {
+			ctx.zoomScale.value = 1;
+			ctx.panX.value = 0;
+			ctx.panY.value = 0;
+		}0
+	});
 });
 
 
