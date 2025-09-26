@@ -10,6 +10,7 @@
 		<NWEditorGraph 
 			ref="myGraph" 
 			class="my-graph" 
+			:stateCtx="app.nwSystem"
 			:showDevErrors="true" 
 		/>
 	</div>
@@ -18,13 +19,16 @@
 <script setup>
 
 // vue
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, inject } from 'vue';
 
 // our app
 import NWEditorGraph from '@Components/NWEditorGraph.vue';
 
 // ref to our graph, so we can expose to window for debugging
 const myGraph = ref(null);
+
+// get our app data
+const app = inject('app');
 
 </script>
 <style lang="scss" scoped>
