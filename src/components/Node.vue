@@ -401,8 +401,10 @@ watch(()=>ctxRef.value.zoomScale.value, (newZoom)=>{
 	measureFieldPositions();
 });
 
+
 // resize observer to remeasure field positions when the content element resizes
 let ro = null;
+
 
 // on mount, measure field positions
 onMounted(()=>{

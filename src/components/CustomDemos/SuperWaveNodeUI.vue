@@ -11,14 +11,20 @@
 	<div class="super-wave-node">
 
 		<!-- controls for changing amplitude -->
-		<div class="number-box amplitude">
+		<div 
+			class="number-box amplitude"
+			:class="{'disabled': fieldHasInput(props.node.fieldState.amplitude)}"
+		>
 			<div class="btn minus" @click="amplitude = Math.max(0, amplitude - 0.1)"><span>-</span></div>
 			<div class="value" @mousedown="dragAmplitude"><span>{{ amplitude.toFixed(1) }}</span></div>
 			<div class="btn plus" @click="amplitude = Math.min(10, amplitude + 0.1)"><span>+</span></div>
 		</div>
 
 		<!-- controls for changing wavelength -->
-		<div class="number-box wavelength">
+		<div 
+			class="number-box wavelength"
+			:class="{'disabled': fieldHasInput(props.node.fieldState.wavelength)}"
+		>
 			<div class="btn minus" @click="wavelength = Math.max(0.01, wavelength - 0.1)"><span>-</span></div>
 			<div class="value" @mousedown="dragWavelength"><span>{{ wavelength.toFixed(1) }}</span></div>
 			<div class="btn plus" @click="wavelength = Math.min(20, wavelength + 0.1)"><span>+</span></div>
@@ -229,6 +235,39 @@ function dragWavelength(e){
 	);
 }
 
+
+// wires list lives on the editor graph; shallowRef so changes are reactive
+const wiresRef = props.nwSystem.graph.wires;
+
+
+// cache of connected INPUT endpoints, keyed by "nodeId::fieldName"
+const connectedInputsKeySet = computed(()=>{
+
+	// force recalc when wires change
+	const _ver = props.node.wiresVersion.value;
+
+	// build a set of all connected INPUT endpoints
+	const set = new Set();
+	for(const c of wiresRef.value){
+
+		// NOTE: a field gets its value when it is the OUTPUT end of a connection
+		// (connection.outputNode/outputField is the consumer/input socket)
+		if(c?.outputNode && c?.outputField)
+			set.add(`${c.outputNode.id}::${c.outputField.name}`);
+		
+	}// next c
+
+	return set;
+});
+
+
+// true iff THIS node's given field has an INPUT wire
+function fieldHasInput(field){
+
+	return connectedInputsKeySet.value.has(`${props.node.id}::${field.name}`);
+}
+
+
 </script>
 <style lang="scss" scoped>
 
@@ -335,6 +374,16 @@ function dragWavelength(e){
 				text-shadow: 1em 1em 1em rgba(0,0,0,0.7);
 				
 			}// .value
+			
+			// when a wire is plugged in, disable the field
+			&.disabled {
+				.btn, .value {
+					opacity: 0.4;
+					pointer-events: none;
+					cursor: default;
+				}
+				.value span { opacity: 0; }
+			}// &.disabled
 
 		}// .number-box
 
@@ -427,7 +476,8 @@ function dragWavelength(e){
 		.screen {
 
 			// for debug
-			border: 1px solid greenyellow;
+			/* border: 1px solid greenyellow; */
+			border: 1em solid rgb(66, 100, 11);
 
 			position: absolute;
 			inset: 48em 24em auto 21em;
