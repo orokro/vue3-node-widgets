@@ -255,7 +255,7 @@ export default class NWEditor {
 		// add the node to our graph
 		this.graph.nodes.value = [...this.graph.nodes.value, newNode];
 
-		return newNode
+		return newNode;
 	}
 
 

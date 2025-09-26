@@ -80,11 +80,6 @@
 </template>
 <script setup>
 
-function a(a){
-	console.log('a', a);
-	return a;
-}
-
 // vue
 import { ref, shallowRef, onMounted, provide } from 'vue';
 
