@@ -291,7 +291,7 @@ function onMouseDown(event) {
 	// console.log(props.node, props.field, props.socketType);
 
 	// start the wire dragging process
-	ctx.connMgr.startWire(
+	ctx.rootGraph.connMgr.startWire(
 		props.node,
 		props.field,
 		props.socketType == SOCKET_TYPE.OUTPUT,
@@ -310,7 +310,7 @@ function onMouseOver(event) {
 	// console.log('Mouse over socket:', props.node, props.field, props.socketType);
 
 	// notify the connection manager that we're hovering over this socket
-	ctx.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT, cursorPopupEl.value);
+	ctx.rootGraph.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT, cursorPopupEl.value);
 }
 
 
@@ -327,7 +327,7 @@ function onMouseLeave(event) {
 	cursorPopupEl.value.hide();
 
 	// notify the connection manager that we're no longer hovering over this socket
-	ctx.connMgr.leaveSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
+	ctx.rootGraph.connMgr.leaveSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
 }
 
 </script>

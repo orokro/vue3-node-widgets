@@ -9,7 +9,7 @@
 	<div class="wire-renderer-container">
 
 		<Wire
-			v-for="(wire, index) in props.nwSystem.graph.wires.value" 
+			v-for="(wire, index) in props.nwSystem.rootGraph.wires.value" 
 			:key="wire.id" 
 			:nwSystem="props.nwSystem"
 			:wire="wire"

@@ -44,7 +44,7 @@
 					
 					<!-- loop through all the nodes and render them -->
 					<Node 
-						v-for="(node, index) in ctxRef.graph.nodes.value" 
+						v-for="(node, index) in ctxRef.rootGraph.nodes.value" 
 						:key="index" 
 						:nwSystem="ctxRef"
 						:node="node"

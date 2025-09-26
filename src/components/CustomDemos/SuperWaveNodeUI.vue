@@ -237,7 +237,7 @@ function dragWavelength(e){
 
 
 // wires list lives on the editor graph; shallowRef so changes are reactive
-const wiresRef = props.nwSystem.graph.wires;
+const wiresRef = props.nwSystem.rootGraph.wires;
 
 
 // cache of connected INPUT endpoints, keyed by "nodeId::fieldName"
