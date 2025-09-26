@@ -8,15 +8,12 @@
 	<main @contextmenu="disableContextMenu">
 		<div class="positioning-box">
 
-			<!-- our main node-editor system -->
-			<NWEditorGraph ref="myGraph" class="my-graph" :showDevErrors="true" />
-		</div>
-
-		<!-- test junk -->
-		<div v-if="false" class="testJunk">
-			<h1>{{ myValueA }}</h1>
-			<button @click="myValueA = 5">Set A 5</button>
-			<button @click="myValueB = 10">Set B 10</button>
+			<WindowManager
+				ref="winMgrEl"
+				:availableWindows="availableWindows"
+				:defaultLayout="defaultWindowLayout"
+			/>
+			
 		</div>
 
 	</main>
@@ -25,9 +22,62 @@
 
 // vue
 import { ref, onMounted } from 'vue';
+import NWEditor from './classes/NWEditor.js';
+import WindowManager from 'vue-win-mgr';
+import GraphWindow from './dev_components/GraphWindow.vue';
 
-// components
-import NWEditorGraph from './components/NWEditorGraph.vue';
+// styles
+import 'vue-win-mgr/dist/style.css';
+
+// refs
+const winMgrEl = ref(null);
+
+// build our list of available windows for the window mananger
+const availableWindows = [
+	{
+		title: 'Graph Window',
+		window: GraphWindow,
+		slug: 'graph',
+	}
+];
+
+// default layout
+const defaultWindowLayout = [
+    {
+        "name": "window",
+        "top": 0,
+        "left": 0,
+        "bottom": 941,
+        "right": 1290
+    },
+    {
+        "name": "frame_0",
+        "style": 10,
+        "windows": [
+            "graph"
+        ],
+        "top": 0,
+        "bottom": 937,
+        "left": 0,
+        "right": 640
+    },
+    {
+        "name": "frame_2",
+        "style": 10,
+        "windows": [
+            "graph"
+        ],
+        "top": 0,
+        "bottom": 937,
+        "left": 640,
+        "right": 1290
+    }
+];
+
+
+
+
+
 
 // helpers
 import { 
@@ -36,34 +86,33 @@ import {
 	buildNaturalLayout01,
 } from './misc/BuildDefaultLayout';
 
-// ref to our graph, so we can expose to window for debugging
-const myGraph = ref(null);
-
-// for vue testing
-const myValueA = ref(0);
-const myValueB = myValueA;
 
 let ctx = null;
 
 onMounted(() => {
 	
-	// expose our graph to the window for debugging
-	window.mg = myGraph.value;
+	const wm = winMgrEl.value;
+	const wmCtx = wm.getContext();
+	window.wm = wmCtx;
+	console.log('wmCtx:', wmCtx);
+	
+	// // expose our graph to the window for debugging
+	// window.mg = myGraph.value;
 
-	ctx = mg.getContext();
-	window.ctx = ctx;
+	// ctx = mg.getContext();
+	// window.ctx = ctx;
 
-	buildNaturalLayout01(ctx);
-	// addBuildInNodesBatch01(ctx);
+	// buildNaturalLayout01(ctx);
+	// // addBuildInNodesBatch01(ctx);
 
-	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
-	window.addEventListener('keydown', (e) => {
-		if (e.key === 'Home') {
-			ctx.zoomScale.value = 1;
-			ctx.panX.value = 0;
-			ctx.panY.value = 0;
-		}0
-	});
+	// // add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
+	// window.addEventListener('keydown', (e) => {
+	// 	if (e.key === 'Home') {
+	// 		ctx.zoomScale.value = 1;
+	// 		ctx.panX.value = 0;
+	// 		ctx.panY.value = 0;
+	// 	}0
+	// });
 });
 
 
@@ -83,6 +132,10 @@ function disableContextMenu(e) {
 
 </script>
 <style lang="scss" scoped>
+
+	main {
+		font-family: sans-serif;
+	}
 
 	// box to test positioning / layout of our component
 	.positioning-box {
