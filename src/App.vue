@@ -12,6 +12,9 @@
 				ref="winMgrEl"
 				:availableWindows="availableWindows"
 				:defaultLayout="defaultWindowLayout"
+
+				:topBarComponent="HeaderBar"
+				:showTopBar="true"
 			/>
 			
 		</div>
@@ -24,7 +27,9 @@
 import { ref, onMounted, provide } from 'vue';
 import NWEditor from './classes/NWEditor.js';
 import WindowManager from 'vue-win-mgr';
-import GraphWindow from './dev_components/GraphWindow.vue';
+import GraphWindow from './dev_src/GraphWindow.vue';
+import HeaderBar from './dev_src/HeaderBar.vue';
+import { DevApp } from './dev_src/DevApp.js';
 
 // styles
 import 'vue-win-mgr/dist/style.css';
@@ -32,7 +37,7 @@ import 'vue-win-mgr/dist/style.css';
 // refs
 const winMgrEl = ref(null);
 
-// build our list of available windows for the window mananger
+// build our list of available windows for the window manager
 const availableWindows = [
 	{
 		title: 'Graph Window',
@@ -75,30 +80,12 @@ const defaultWindowLayout = [
 ];
 
 
-// we'll use a global ctx for the graphs to windows both render the same state
-const nodeCtx = new NWEditor();
-
-// will stick stuffs on here
-const app = {
-
-	// the main NWEditor instance
-	nwSystem: nodeCtx,
-
-};
-
-// for debug
+// make new Dev app which will include our NWEditor instance(s)
+const app = new DevApp();
 window.app = app;
 
 // provide it to the app
 provide('app', app);
-
-// helpers
-import { 
-	addBuildInNodesBatch01,
-	addBuildInNodesBatch02,
-	buildNaturalLayout01,
-} from './misc/BuildDefaultLayout';
-
 
 onMounted(() => {
 	
@@ -107,15 +94,12 @@ onMounted(() => {
 	const wmCtx = wm.getContext();
 	window.wm = wmCtx;
 	console.log('wmCtx:', wmCtx);
-	
-
-	const ctx = app.nwSystem;
-	buildNaturalLayout01(ctx);
-	
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {
+
 		if (e.key === 'Home') {
+			const ctx = app.currentGraph.value;
 			ctx.zoomScale.value = 1;
 			ctx.panX.value = 0;
 			ctx.panY.value = 0;

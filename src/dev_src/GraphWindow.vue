@@ -10,7 +10,7 @@
 		<NWEditorGraph 
 			ref="myGraph" 
 			class="my-graph" 
-			:stateCtx="app.nwSystem"
+			:stateCtx="app.currentGraph.value"
 			:showDevErrors="true" 
 		/>
 	</div>
