@@ -224,9 +224,6 @@ export const SOCKET_TYPE = {
 // main export class
 export default class NWNode {
 
-	// id counter for nodes
-	static idCounter = 0;
-
 	// static properties for the class
 	static nodeName = 'unnamed node';
 	static icon = null;
@@ -501,13 +498,25 @@ export default class NWNode {
 
 
 	/**
+	 * Generates a unique id for this node instance.
+	 * 
+	 * @returns {String} - a unique id for this node instance
+	 */
+	generateNodeUUID() {
+		
+		// don't use the counter, use a random string
+		return `node_${Math.random().toString(36).substr(2, 9)}`;
+	}
+
+
+	/**
 	 * Constructor
 	 */
 	constructor() {
 
 		// unique id for this node
-		this.id = `node_${++NWNode.idCounter}`;
-
+		this.id = this.generateNodeUUID();
+		
 		// when the vue component is mounted for this node it will store it's el ref here:
 		this.nodeEl = shallowRef(null);
 
