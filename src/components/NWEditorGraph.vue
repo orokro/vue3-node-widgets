@@ -57,14 +57,14 @@
 					<!-- if the user wants to see dev errors, they can enable this component -->
 					<DevErrors 
 						v-if="ctxRef != null && showDevErrors" 
-						:nwSystem="ctx"
+						:nwSystem="ctxRef"
 					/>
 
 					<!-- this is both a menu that pops up, but also and entire layer
 					 that overlaps everything. Mostly invisible. -->
 					<AddNodeMenu
 						v-if="ctxRef != null"
-						:nwSystem="ctx"
+						:nwSystem="ctxRef"
 					/>
 
 				</div>
@@ -81,7 +81,7 @@
 <script setup>
 
 // vue
-import { ref, shallowRef, onMounted, provide } from 'vue';
+import { ref, shallowRef, onMounted, provide, watch } from 'vue';
 
 // components
 import DevErrors from '@Components/DevErrors.vue';
@@ -150,6 +150,15 @@ onMounted(() => {
 		ctx = new NWEditor();
 	}
 	ctxRef.value = ctx;
+});
+
+
+// update ctx if the prop changes
+watch(() => props.stateCtx, (newVal) => {
+	if (newVal) {
+		ctx = newVal;
+		ctxRef.value = ctx;
+	}
 });
 
 
