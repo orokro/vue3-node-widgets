@@ -348,7 +348,7 @@ export class ConnectionManager {
 		}
 
 		// same type → no conversion
-		if (fromType === toType) {
+		if (fromType.typeName === toType.typeName) {
 
 			// cursorPopup.show(`${node.slug}_${field.name} (${toType})`);
 			cursorPopup.show(`Same Type: ${fromType.typeName}`);
