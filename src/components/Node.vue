@@ -17,7 +17,6 @@
 
 	<!-- main outer wrapper -->
 	<div 
-		:ref="node.nodeEl"
 		class="node-box"
 		:style="{
 			left: `${node.x?.value}em`,
@@ -89,7 +88,7 @@
 							</div>	
 
 							<!-- area to spawn sockets below -->
-							<div :ref="node.fieldState[field.name]?.data.rowEl"	 class="socket-ref-el"/>
+							<div :ref="el => setSocketRef(field.name, el)" class="socket-ref-el"/>
 
 							<!-- otherwise, if we're processing node we'll mount it's component-->
 							<component
@@ -216,6 +215,9 @@ const {
 	zoomScale,
 } = inject('viewport');
 
+// a map of the socket row refs for this component
+// (instead of storing them on state like we used to)
+const fieldRowRefs = new Map();
 
 // ref to the element where we spawn content
 const contentEl = ref(null);
@@ -243,6 +245,13 @@ const connectedInputsKeySet = computed(()=>{
 
 	return set;
 });
+
+
+// helper to set a socket ref for a given field name
+function setSocketRef(fieldName, el){
+
+	fieldRowRefs.set(fieldName, el);
+}
 
 
 // true iff THIS node's given field has an INPUT wire
@@ -382,7 +391,8 @@ function measureFieldPositions(){
 		}
 
 		// get the row element for this field
-		const rowEl = props.node.fieldState[field.name]?.data.rowEl?.value[0];
+		// const rowEl = props.node.fieldState[field.name]?.data.rowEl?.value[0];
+		const rowEl = fieldRowRefs.get(field.name);
 
 		if (!rowEl) {
 			console.warn(`No row element found for field ${field.name}`);
