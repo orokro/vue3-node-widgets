@@ -17,7 +17,7 @@
 		ref="containerEl"
 		class="editor-container fill-parent" 
 		tabindex="0"
-		@mousedown="startPanDrag"		
+		@mousedown.prevent="startPanDrag"		
 		@mouseup="checkAddMenu"		
 		@keydown="handleKeyDown"
 		@wheel="handleWheelZoom"		
@@ -167,6 +167,10 @@ const MIN_ZOOM = 0.1;
  */
 function startPanDrag(e){
 	
+	// prevent default behaviors
+	e.cancelBubble = true;
+	e.preventDefault();
+
 	// gtfo if not right-click
 	if (e.button !== 2)
 		return;
