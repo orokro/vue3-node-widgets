@@ -147,12 +147,6 @@ function buildNaturalLayout01(g) {
 	// some random stuff in the middle
 	g.addNode(TexChecker, 320, 20, 'checker');
 
-	// set up a wire
-	// ctx.connMgr.addConnectionBasic(
-	// 	9*20, 5.4*20,
-	// 	16*20, 3.8*20
-	// );
-
 	nextTick(() => {
 	
 		// get both nodes
@@ -186,7 +180,6 @@ function buildNaturalLayout01(g) {
 	});
 
 }
-
 
 export {
 	addBuildInNodesBatch01,

@@ -30,9 +30,14 @@ export class NWGraph {
 
 	/**
 	 * Constructs a new NWGraph instance.
+	 * 
+	 * @param {Boolean} subGraph - Whether this graph is a subgraph (for node groups). Default is false.
 	 */
-	constructor() {
+	constructor(subGraph = false) {
 
+		// save whether this is a subgraph
+		this.subGraph = subGraph;
+		
 		// our list of instantiated nodes and connections
 		this.nodes = shallowRef([]);
 		this.wires = shallowRef([]);

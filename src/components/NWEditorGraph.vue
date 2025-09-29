@@ -24,6 +24,7 @@
 				:editor="ctxRef"
 				:graph="ctxRef.rootGraph"
 				:backgroundScale="backgroundScale"
+				@showAddMenu="showAddMenu"
 			/>
 		</div>
 
@@ -41,6 +42,7 @@
 			<AddNodeMenu
 				v-if="ctxRef != null"
 				:nwSystem="ctxRef"
+				:graphCtx="menuGraphCtx"
 			/>
 
 		</div>
@@ -96,6 +98,11 @@ const props = defineProps({
 const cursorPopupEl = ref(null);
 provide('cursorPopupEl', cursorPopupEl);
 
+// when we show a menu, we'll save the contextual graph for which to add nodes
+const menuGraphCtx = shallowRef({
+	graph: props.graph
+});
+
 // our context will either be passed in via the props, or one we made locally
 let ctx = null;
 const ctxRef = shallowRef(null);
@@ -145,11 +152,39 @@ defineExpose({
 });
 
 
+/**
+ * Shows the add node menu at the mouse position
+ * 
+ * @param context - the context of the event, including event, graph, viewport, etc
+ */
+function showAddMenu(context){
 
-function showAddMenu(){
+	// destructure the context
+	const { event, graph, viewport } = context;
+
+	// get client x/y
+	const x = event.clientX;
+	const y = event.clientY;
+
+	// get viewport bounding box
+	const rect = viewport.el.getBoundingClientRect();
+
+	// compute the mouse position in graph space
+	const menuX = x - rect.left;
+	const menuY = y - rect.top;
+
+	// save graph for the menu to add nodes to
+	menuGraphCtx.value = {
+		...context,
+		ctx,
+		pos: {
+			x: menuX,
+			y: menuY
+		}
+	};
 
 	// show the add node menu
-	ctx.showAddNodeMenu(e.clientX, e.clientY);
+	ctx.showAddNodeMenu(menuX, menuY);
 }
 
 

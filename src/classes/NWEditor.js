@@ -17,8 +17,6 @@ import { ref, shallowRef, reactive } from 'vue';
 import NodeWidget from './NWNode';
 import DevErrors from './DevErrors';
 import { VTypeRegistry } from './VTypeRegistry';
-import { Connection } from './Connection';
-import { ConnectionManager } from './ConnectionManager';
 import { NWGraph } from './NWGraph';
 
 // lib/misc
@@ -51,7 +49,6 @@ const types = [
 
 // external libs/misc
 import t from 'typical';
-import NWNode from './NWNode';
 
 // main export class
 export default class NWEditor {

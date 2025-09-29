@@ -202,12 +202,12 @@ function startPanDrag(e){
 /**
  * If the user right-clicked, we want to show the add node menu
  * 
- * @param {MouseEvent} e - the mouse event
+ * @param {MouseEvent} event - the mouse event
  */
- function checkAddMenu(e) {
+ function checkAddMenu(event) {
 
 	// if its not right click, gtfo
-	if (e.button !== 2)
+	if (event.button !== 2)
 		return;
 
 	// this function is bound to @mouseup, but there's a chance the user was right-click panning
@@ -221,9 +221,13 @@ function startPanDrag(e){
 	didPan.value = false;
 
 	// prevent default context menu
-	e.preventDefault();
+	event.preventDefault();
 
-	emits('showAddMenu');	
+	emits('showAddMenu', {
+		event, 
+		graph: props.graph,
+		viewport
+	});	
 }
 
 

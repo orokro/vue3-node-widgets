@@ -40,7 +40,6 @@ onMounted(() => {
 	// get the context of our node graph
 	ctx = myGraph.value.getContext();
 	ctxRef.value = ctx;
-
 });
 
 </script>

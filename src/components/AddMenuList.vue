@@ -14,7 +14,7 @@
 			<!-- loop over the list items and display them -->
 			<template v-for="(item, index) in listItems" :key="index">
 
-				<div class="list-item" @click.stop="addNode(item)">
+				<div class="list-item" @click.stop="e=>addNode(e, item)">
 
 					<!-- the icon box -->
 					<div class="icon-box">
@@ -34,6 +34,7 @@
 					<div v-if="t.isDefined(item.items)" class="sub-menu">
 						<AddMenuList 
 							:nwSystem="nwSystem"
+							:graphCtx="graphCtx"
 							:listItems="item.items"
 						/>
 					</div>
@@ -66,6 +67,11 @@ const props = defineProps({
 		default: () => []
 	},
 
+	// the current graph context for the menu
+	graphCtx: {
+		type: Object,
+		required: true
+	}
 });
 
 
@@ -73,7 +79,7 @@ const props = defineProps({
  * Adds a node to the graph (if its an item and not a menu)
  * @param item - The item to add
  */
-function addNode(item){
+function addNode(event, item){
 
 	// if it doesn't have the item key, it was probably a menu item
 	if (!t.isDefined(item.item)) {
@@ -81,8 +87,13 @@ function addNode(item){
 		return;
 	}
 
-	// add the item!	
-	props.nwSystem.rootGraph.addNode(item.item);
+	const graph = props.graphCtx.graph;
+	const pos = props.graphCtx.pos;
+	const ctx = props.graphCtx.ctx;
+
+	// add the item & close the menu
+	graph.addNode(item.item, pos.x, pos.y);
+	ctx.showMenu.value = false;
 }
 
 </script>

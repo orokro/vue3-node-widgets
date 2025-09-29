@@ -15,7 +15,6 @@
 		@click.right="nwSystem.showMenu.value && closeMenu" 
 		@mouseup.stop
 	>
-
 		<div 
 			class="menu-container" 
 			@click.stop 
@@ -45,6 +44,7 @@
 			<!-- this will spawn the list of menu items and sub-menu items -->
 			<AddMenuList
 				:nwSystem="nwSystem"
+				:graphCtx="graphCtx"
 				:listItems="rootMenuItems"
 			/>
 		</div>
@@ -67,6 +67,12 @@ const props = defineProps({
 		type: Object,
 		required: true
 	},
+
+	// the current graph context for the menu
+	graphCtx: {
+		type: Object,
+		required: true
+	}
 });
 
 // store the hierarchy of the menu

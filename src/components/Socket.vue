@@ -120,7 +120,6 @@ onMounted(() => {
 });
 
 
-
 /**
  * Builds the socket style based on the socketStyle prop
  */
