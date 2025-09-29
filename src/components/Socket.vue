@@ -10,10 +10,13 @@
 	<div
 		:ref="getElRef()"
 		class="socket"
-		:class="{
-			'socket-input': socketType === FIELD_TYPE.INPUT,
-			'socket-output': socketType === FIELD_TYPE.OUTPUT,
-		}"
+		:class="[
+			`${node.id}_${field.id}_${socketType}`,
+			{
+				'socket-input': socketType === FIELD_TYPE.INPUT,
+				'socket-output': socketType === FIELD_TYPE.OUTPUT,
+			}
+		]"
 		:style="{
 			top: `${y}em`,
 		}"

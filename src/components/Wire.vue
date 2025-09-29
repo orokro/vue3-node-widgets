@@ -47,7 +47,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, computed, watch, inject } from 'vue';
 
 // props
 const props = defineProps({
@@ -70,6 +70,35 @@ const props = defineProps({
 // TODO: move to a global debug settings flags object
 const showWireIDs = ref(false);
 
+// get our current viewport details
+const viewport = inject('viewport');
+
+function getSocketPos(node, field, kind){
+
+	// gtfo if missing data
+	if(!node || !field || !kind)
+		return null;
+
+	// generate query string
+	const queryStr = `.${node.id}_${field.id}_${kind}`;
+
+	// search within our viewport
+	const socketEl = viewport.el.querySelector(queryStr);
+
+	// get viewport bounding box also
+	const viewportRect = viewport.el.getBoundingClientRect();
+
+	// if we found it, get the bounding rect
+	if(socketEl){
+		const rect = socketEl.getBoundingClientRect();
+		return {
+			x: rect.left + (rect.width / 2) - viewport.panX.value - viewportRect.left,
+			y: rect.top + (rect.height / 2) - viewport.panY.value - viewportRect.top,
+		};
+	}
+}
+
+
 // generate the SVG details for the wire
 const SVGDetails = computed(()=>{
 
@@ -80,6 +109,20 @@ const SVGDetails = computed(()=>{
 		endX,
 		endY,
 	} = props.wire.positions;
+
+	// get positions of sockets if we're plugged in
+	const inSockPos = getSocketPos(props.wire.inputNode, props.wire.inputField, 'output');
+	const outSockPos = getSocketPos(props.wire.outputNode, props.wire.outputField, 'input');
+
+	// if they aren't null, replace our start/end positions
+	if(inSockPos){
+		startX = inSockPos.x / viewport.zoomScale.value;
+		startY = inSockPos.y / viewport.zoomScale.value;
+	}
+	if(outSockPos){
+		endX = outSockPos.x / viewport.zoomScale.value;
+		endY = outSockPos.y / viewport.zoomScale.value;
+	}
 
 	// get te width and height of the start/end points
 	let width = Math.abs(endX - startX);

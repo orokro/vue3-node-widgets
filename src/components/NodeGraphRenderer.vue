@@ -14,6 +14,7 @@
 
 	<!-- this is the actual scrollable area where nodes, wires, etc appear and are editable. This clips/clamps overflow -->
 	<div 
+		ref="containerEl"
 		class="editor-container fill-parent" 
 		tabindex="0"
 		@mousedown="startPanDrag"		
@@ -95,13 +96,22 @@ const panX = ref(0);
 const panY = ref(0);
 const zoomScale = ref(1);
 
+const containerEl = ref(null);
+
 // pack up & provide these refs
 const viewport = {
 	panX,
 	panY,
 	zoomScale,
+	el: null,
 };
 provide('viewport', viewport);
+
+onMounted(()=>{
+
+	// assign the el ref now that we're mounted
+	viewport.el = containerEl.value;
+});
 
 // true if the user right-moused-wn and moved the mouse
 const didPan = ref(false);

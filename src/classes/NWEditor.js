@@ -60,12 +60,6 @@ export default class NWEditor {
 	showMenu = ref(false);
 	menuX = ref(0);
 	menuY = ref(0);
-
-	// pan & zoom
-	// we gotta save these here, so we can do math on them when adding nodes and the link
-	panX = ref(0);
-	panY = ref(0);
-	zoomScale = ref(1);
 	
 	// reusable drag helper
 	dragHelper = new DragHelper();

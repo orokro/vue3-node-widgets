@@ -242,6 +242,9 @@ export default class NWNode {
 	static inputs = {};
 	static outputs = {};
 	
+	// the id field of the node
+	id = '';
+
 	// just a helpful shorthand
 	static = this.constructor;
 
@@ -360,12 +363,15 @@ export default class NWNode {
 		};
 
 		// base object to mix in things
+		// all fields will get these properties
 		const baseField = {
+			id: this.generateUUID('field'),
 			fieldType,
 			name: options.name,
 			component: options.component,
 		};
 
+		// add specific props for each type
 		switch(fieldType){
 
 			case FIELD_TYPE.LABEL:
@@ -497,12 +503,13 @@ export default class NWNode {
 	/**
 	 * Generates a unique id for this node instance.
 	 * 
+	 * @param {String} prefix - optional prefix for the id
 	 * @returns {String} - a unique id for this node instance
 	 */
-	generateNodeUUID() {
+	static generateUUID(prefix='node') {
 		
 		// don't use the counter, use a random string
-		return `node_${Math.random().toString(36).substr(2, 9)}`;
+		return `${prefix}_${Math.random().toString(36).substr(2, 9)}`;
 	}
 
 
@@ -512,7 +519,7 @@ export default class NWNode {
 	constructor() {
 
 		// unique id for this node
-		this.id = this.generateNodeUUID();
+		this.id = this.constructor.generateUUID();
 		
 		// when the vue component is mounted for this node it will store it's el ref here:
 		this.nodeEl = shallowRef(null);
@@ -632,7 +639,7 @@ export default class NWNode {
 	 * @param {String} socketType - one of the SOCKET_TYPE constants, either INPUT or OUTPUT
 	 * @returns {Object|null} - an object with x and y properties in EM units, or null if the socket is not found
 	 */
-	getSocketPosition(field, socketType) {
+	getSocketPosition_DEPRECATED(field, socketType) {
 
 		// 1) resolve node element
 		const nodeEl = this.nodeEl && this.nodeEl.value;

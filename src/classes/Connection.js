@@ -79,15 +79,7 @@ export class Connection {
 		// if it was nulled (cleared) then we can just GTFO now
 		if(node === null || field === null)
 			return;
-		
-		// update the start position
-		try {
-			const socketPos = node.getSocketPosition(field, SOCKET_TYPE.OUTPUT);
-			this.positions.startX = socketPos.x;
-			this.positions.startY = socketPos.y;
-		}catch(e){
-			// k
-		}
+	
 	}
 
 
@@ -111,14 +103,6 @@ export class Connection {
 		if(node === null || field === null)
 			return;
 
-		// update the end position
-		try {
-			const socketPos = node.getSocketPosition(field, SOCKET_TYPE.INPUT);
-			this.positions.endX = socketPos.x;
-			this.positions.endY = socketPos.y;
-		}catch(e){
-			// k
-		}
 	}
 
 
@@ -127,20 +111,20 @@ export class Connection {
 	 */
 	updatePositions(which = 'both'){
 
-		if(which === SOCKET_TYPE.INPUT || which === 'both'){
-			if(this.inputNode && this.inputField){
-				const socketPos = this.inputNode.getSocketPosition(this.inputField, SOCKET_TYPE.OUTPUT);
-				this.positions.startX = socketPos.x;
-				this.positions.startY = socketPos.y;
-			}
-		}
-		if(which === SOCKET_TYPE.OUTPUT || which === 'both'){
-			if(this.outputNode && this.outputField){
-				const socketPos = this.outputNode.getSocketPosition(this.outputField, SOCKET_TYPE.INPUT);
-				this.positions.endX = socketPos.x;
-				this.positions.endY = socketPos.y;
-			}
-		}
+		// if(which === SOCKET_TYPE.INPUT || which === 'both'){
+		// 	if(this.inputNode && this.inputField){
+		// 		const socketPos = this.inputNode.getSocketPosition(this.inputField, SOCKET_TYPE.OUTPUT);
+		// 		this.positions.startX = socketPos.x;
+		// 		this.positions.startY = socketPos.y;
+		// 	}
+		// }
+		// if(which === SOCKET_TYPE.OUTPUT || which === 'both'){
+		// 	if(this.outputNode && this.outputField){
+		// 		const socketPos = this.outputNode.getSocketPosition(this.outputField, SOCKET_TYPE.INPUT);
+		// 		this.positions.endX = socketPos.x;
+		// 		this.positions.endY = socketPos.y;
+		// 	}
+		// }
 	}
 
 

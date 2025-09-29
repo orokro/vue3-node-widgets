@@ -399,8 +399,8 @@ function measureFieldPositions(){
 }
 
 
-const ctxRef = inject('ctx', null);
-watch(()=>ctxRef.value.zoomScale.value, (newZoom)=>{
+const viewport = inject('viewport');
+watch(()=>viewport.zoomScale.value, (newZoom)=>{
 	measureFieldPositions();
 });
 
