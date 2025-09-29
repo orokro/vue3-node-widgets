@@ -17,7 +17,7 @@
 import { ref, shallowRef, reactive, nextTick } from 'vue';
 
 // our app
-import NWEditor from '@Classes/NWEditor';
+import { NWGraph } from '@/classes/NWGraph';
 import { 
 	addBuildInNodesBatch01,
 	addBuildInNodesBatch02,
@@ -54,7 +54,7 @@ export class DevApp {
 
 		// if not provided, make new one
 		if(!graph)
-			graph = new NWEditor();
+			graph = new NWGraph();
 		
 		// if this is the first graph, also select it
 		if(this.graphs.value.length === 0)
@@ -95,14 +95,14 @@ export class DevApp {
 		await nextTick();
 		
 		// make one first new app
-		const naturalLayoutCTX = new NWEditor();
-		buildNaturalLayout01(naturalLayoutCTX);
-		this.addGraph(naturalLayoutCTX);
+		const nlGraph = new NWGraph();
+		buildNaturalLayout01(nlGraph);
+		this.addGraph(nlGraph);
 
 		// make a second one as well
-		const batch01CTX = new NWEditor();
-		addBuildInNodesBatch01(batch01CTX);
-		this.addGraph(batch01CTX);
+		const batch01Graph = new NWGraph();
+		addBuildInNodesBatch01(batch01Graph);
+		this.addGraph(batch01Graph);
 	}
 
 }

@@ -245,9 +245,6 @@ export default class NWNode {
 	// just a helpful shorthand
 	static = this.constructor;
 
-	// when the editor adds a node it will add itself here
-	editor = null;
-
 	// version tick for reactive dependents (Node.vue, etc)
 	// whenever a connection is plugged or unplugged from this node,
 	// we'll increment this version to force updates of dependents
@@ -622,8 +619,8 @@ export default class NWNode {
 		this.y.value = y;
 
 		// tell connections manager to update connections
-		if (this.editor && this.editor.rootGraph.connMgr)
-			this.editor.rootGraph.connMgr.moveWires(this);
+		// if (this.editor && this.editor.rootGraph.connMgr)
+		// 	this.editor.rootGraph.connMgr.moveWires(this);
 	}
 
 

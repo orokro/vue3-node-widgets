@@ -9,9 +9,9 @@
 	<div class="wire-renderer-container">
 
 		<Wire
-			v-for="(wire, index) in props.nwSystem.rootGraph.wires.value" 
+			v-for="(wire, index) in graph.wires.value" 
 			:key="wire.id" 
-			:nwSystem="props.nwSystem"
+			:graph="graph"
 			:wire="wire"
 		/>
 
@@ -29,8 +29,8 @@ import Wire from './Wire.vue';
 // define some props
 const props = defineProps({
 	
-	// the NWSystem is the context of the graph, which contains the graph and other properties
-	nwSystem: {
+	// the graph we're in
+	graph: {
 		type: Object,
 		required: true,
 	},
@@ -38,8 +38,8 @@ const props = defineProps({
 });
 
 onMounted(()=>{
-	// console.log("from WireRenderer.vue, nwSystem:", props.nwSystem);
-})
+	
+});
 
 
 </script>

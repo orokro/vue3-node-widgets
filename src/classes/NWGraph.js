@@ -30,13 +30,8 @@ export class NWGraph {
 
 	/**
 	 * Constructs a new NWGraph instance.
-	 * 
-	 * @param {NWEditor} editor - The parent NWEditor instance.
 	 */
-	constructor(editor) {
-
-		// save reference to parent editor
-		this.editor = editor;
+	constructor() {
 
 		// our list of instantiated nodes and connections
 		this.nodes = shallowRef([]);
@@ -59,19 +54,19 @@ export class NWGraph {
 	 */
 	addNode(nodeClass, x = 0, y = 0, slug = null) {
 
-		// if x and y are 0, use the current menu position
-		if (x === 0 && y === 0) {
-			x = this.editor.menuX.value;
-			y = this.editor.menuY.value;
-		}
+		// // if x and y are 0, use the current menu position
+		// if (x === 0 && y === 0) {
+		// 	x = this.poop.menuX.value;
+		// 	y = this.poop.menuY.value;
+		// }
 
-		// now using the pan & zoom values, adjust the x and y positions
-		x = (x - this.editor.panX.value) / this.editor.zoomScale.value;
-		y = (y - this.editor.panY.value) / this.editor.zoomScale.value;
+		// // now using the pan & zoom values, adjust the x and y positions
+		// x = (x - this.poop.panX.value) / this.poop.zoomScale.value;
+		// y = (y - this.poop.panY.value) / this.poop.zoomScale.value;
 
-		// hide the menu if it's open
-		if (this.editor.showMenu.value)
-			this.editor.showMenu.value = false;
+		// // hide the menu if it's open
+		// if (this.poop.showMenu.value)
+		// 	this.poop.showMenu.value = false;
 
 		let newNode = null;
 
@@ -84,9 +79,6 @@ export class NWGraph {
 		else if (t.isObject(nodeClass) && t.isDefined(nodeClass.class)) {
 			newNode = new nodeClass.class();
 		}
-
-		// set ourself
-		newNode.editor = this.editor;
 
 		// set the position of the node
 		newNode.setPosition(x, y);

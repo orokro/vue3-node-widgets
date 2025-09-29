@@ -52,8 +52,8 @@ import { ref, onMounted, computed, watch } from 'vue';
 // props
 const props = defineProps({
 
-	// the NWSystem is the context of the graph, which contains the graph and other properties
-	nwSystem: {
+	// the graph we're in
+	graph: {
 		type: Object,
 		required: true,
 	},

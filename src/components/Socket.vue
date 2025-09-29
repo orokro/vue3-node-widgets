@@ -286,9 +286,6 @@ function generateCornerStyle(input, themeColor = '#000') {
  * @param event - the mouse down event
  */
 function onMouseDown(event) {
-	// Placeholder for future drag-and-drop functionality
-	// props.nwSystem.startWire(props.node, props.field, socketType, $event)
-	// console.log(props.node, props.field, props.socketType);
 
 	// start the wire dragging process
 	ctx.rootGraph.connMgr.startWire(

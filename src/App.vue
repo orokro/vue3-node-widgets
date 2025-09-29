@@ -93,7 +93,6 @@ onMounted(() => {
 	const wm = winMgrEl.value;
 	const wmCtx = wm.getContext();
 	window.wm = wmCtx;
-	console.log('wmCtx:', wmCtx);
 
 	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
 	window.addEventListener('keydown', (e) => {

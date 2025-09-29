@@ -79,7 +79,7 @@ export default class NWEditor {
 	 *	@param {VTypeRegistry} [options.typeRegistry] - An instance of VTypeRegistry to use for type management and coalescing.
 	 *	@param {Object} [options.graphToLoad] - An object representing a graph to load into the editor.
 	 */
-	constructor({nodesList, typeRegistry, graphToLoad} = {}){
+	constructor({nodesList, typeRegistry, graphToLoad, graph} = {}){
 
 		// true once we have at least one available node
 		this.isReady = ref(false);
@@ -105,7 +105,10 @@ export default class NWEditor {
 			NOTE: we will use shallowRefs for these, because they will be arrays of instantiated JS classes,
 			and they will have their own Vue Refs and reactivity that we don't want to "unwrap"
 		*/
-		this.rootGraph = new NWGraph(this);
+		this.rootGraph = graph ? graph : new NWGraph();
+
+		// dynamic version
+		this.rootGraphRef = shallowRef(this.rootGraph);
 
 		// whenever the user changes the graph, we can build a single functional "compute" function
 		// that represents the entire graph, and can be called with inputs to get outputs
@@ -130,6 +133,17 @@ export default class NWEditor {
 		// if we were passed in a graph to load, do so
 		if(t.isDefined(graphToLoad))
 			this.loadGraph(graphToLoad);
+	}
+
+
+	/**
+	 * Sets the root graph for the editor.
+	 * 
+	 * @param {NWGraph} newGraph - the new root graph to set
+	 */
+	setRootGraph(newGraph){
+		this.rootGraph = newGraph;
+		this.rootGraphRef.value = newGraph;
 	}
 
 

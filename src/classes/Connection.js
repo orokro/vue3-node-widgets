@@ -81,9 +81,13 @@ export class Connection {
 			return;
 		
 		// update the start position
-		const socketPos = node.getSocketPosition(field, SOCKET_TYPE.OUTPUT);
-		this.positions.startX = socketPos.x;
-		this.positions.startY = socketPos.y;
+		try {
+			const socketPos = node.getSocketPosition(field, SOCKET_TYPE.OUTPUT);
+			this.positions.startX = socketPos.x;
+			this.positions.startY = socketPos.y;
+		}catch(e){
+			// k
+		}
 	}
 
 
@@ -108,9 +112,13 @@ export class Connection {
 			return;
 
 		// update the end position
-		const socketPos = node.getSocketPosition(field, SOCKET_TYPE.INPUT);
-		this.positions.endX = socketPos.x;
-		this.positions.endY = socketPos.y;
+		try {
+			const socketPos = node.getSocketPosition(field, SOCKET_TYPE.INPUT);
+			this.positions.endX = socketPos.x;
+			this.positions.endY = socketPos.y;
+		}catch(e){
+			// k
+		}
 	}
 
 

@@ -77,8 +77,8 @@ import SineScreen from './SineScreen.vue';
 // props
 const props = defineProps({
 
-	// reference to the NWEditor instance
-	nwSystem: {
+	// reference to the graph we're in
+	graph: {
 		type: Object,
 		required: true
 	},
@@ -237,7 +237,7 @@ function dragWavelength(e){
 
 
 // wires list lives on the editor graph; shallowRef so changes are reactive
-const wiresRef = props.nwSystem.rootGraph.wires;
+const wiresRef = props.graph.wires;
 
 
 // cache of connected INPUT endpoints, keyed by "nodeId::fieldName"

@@ -36,7 +36,7 @@
 			<!-- close button -->
 			<div 
 				class="delete-button"
-				@click.stop.prevent="nwSystem.rootGraph.removeNode(node)"
+				@click.stop.prevent="graph.removeNode(node)"
 			>
 				<i class="material-icons">close</i>
 			</div>
@@ -95,8 +95,7 @@
 							<component
 								v-if="showWidgetFor(field)"
 								:is="getFieldComponent(field)"
-								:key="index"
-								:nwSystem="nwSystem"
+								:key="index"								
 								:node="node"
 								:field="field"
 								:read-only="field.fieldType == FIELD_TYPE.OUTPUT"
@@ -113,8 +112,6 @@
 
 						</template>
 
-
-
 					</div>
 
 				</div>
@@ -124,8 +121,8 @@
 			<template v-else>
 				<component
 					:is="node.constructor.customComponent"
-					:nwSystem="nwSystem"
 					:node="node"
+					:graph="graph"
 				/>
 			</template>
 
@@ -195,7 +192,7 @@ import NFieldNameWidget from './TypeWidgets/NFieldNameWidget.vue';
 const props = defineProps({
 
 	// reference to the NWEditor instance
-	nwSystem: {
+	graph: {
 		type: Object,
 		required: true
 	},
@@ -207,12 +204,22 @@ const props = defineProps({
 	}
 });
 
+// get our re-usable drag helper
+const dh = inject('dh');
+
+// get the viewport details for the view we're in
+const {
+	panX,
+	panY,
+	zoomScale,
+} = inject('viewport');
+
 
 // ref to the element where we spawn content
 const contentEl = ref(null);
 
 // wires list lives on the editor graph; shallowRef so changes are reactive
-const wiresRef = props.nwSystem.rootGraph.wires;
+const wiresRef = props.graph.wires;
 
 
 // cache of connected INPUT endpoints, keyed by "nodeId::fieldName"
@@ -314,12 +321,6 @@ function startDrag(e) {
 	const initialX = props.node.x.value;
 	const initialY = props.node.y.value;
 
-	// get the zoom scale from the NWEditor instance
-	const zoomScale = props.nwSystem.zoomScale.value;
-
-	// get the drag helper instances from the NWEditor instance &  ste the drag helpers zoom scale
-	const dh = props.nwSystem.dragHelper;
-
 	dh.dragStart(
 
 		(dx, dy) => {
@@ -418,7 +419,7 @@ onMounted(()=>{
 
 		// after the DOM updates, move wires
 		nextTick(()=>{			
-			props.nwSystem.rootGraph.connMgr.moveWires(props.node);
+			props.graph.connMgr.moveWires(props.node);
 		});
 	});
 	ro.observe(contentEl.value);
