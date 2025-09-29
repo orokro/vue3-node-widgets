@@ -19,7 +19,12 @@
 			v-if="ctxRef != null"
 			class="positioning-reset"			
 		>
-			asd
+			<!-- always show our contexts root graph -->
+			<NodeGraphRenderer
+				:editor="ctxRef"
+				:graph="ctxRef.rootGraph"
+				:backgroundScale="backgroundScale"
+			/>
 		</div>
 
 		<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
@@ -52,14 +57,13 @@
 import { ref, shallowRef, onMounted, provide, watch } from 'vue';
 
 // components
+import NodeGraphRenderer from '@Components/NodeGraphRenderer.vue';
 import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
-import Node from '@Components/Node.vue';
-import WireRenderer from '@Components/WireRenderer.vue';
-import CursorPopup from './CursorPopup.vue';
+import CursorPopup from '@Components/CursorPopup.vue';
 
 // our app
-import NWEditor from '../classes/NWEditor.js';
+import NWEditor from '@src/classes/NWEditor.js';
 
 // lib/misc
 import DragHelper from 'gdraghelper';
@@ -107,6 +111,10 @@ onMounted(() => {
 	// make new context if one wasn't provided
 	ctx = new NWEditor();
 	ctxRef.value = ctx;
+
+	// if we have a graph prop, set it as the root graph
+	if (props.graph)
+		ctx.setRootGraph(props.graph);
 });
 
 // update root graph if the prop changes

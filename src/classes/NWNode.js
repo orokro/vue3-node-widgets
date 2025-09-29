@@ -617,7 +617,8 @@ export default class NWNode {
 		// set the position of the node
 		this.x.value = x;
 		this.y.value = y;
-
+		
+		
 		// tell connections manager to update connections
 		// if (this.editor && this.editor.rootGraph.connMgr)
 		// 	this.editor.rootGraph.connMgr.moveWires(this);

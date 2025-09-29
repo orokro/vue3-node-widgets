@@ -7,10 +7,11 @@
 <template>
 
 	<div class="graph-window">
+
 		<NWEditorGraph 
 			ref="myGraph" 
 			class="my-graph" 
-			:stateCtx="app.currentGraph.value"
+			:graph="app.currentGraph.value"
 			:showDevErrors="true" 
 		/>
 	</div>
@@ -29,6 +30,18 @@ const myGraph = ref(null);
 
 // get our app data
 const app = inject('app');
+
+// get context of the editor graph
+let ctx = null;
+const ctxRef = ref(null);
+
+onMounted(() => {
+
+	// get the context of our node graph
+	ctx = myGraph.value.getContext();
+	ctxRef.value = ctx;
+
+});
 
 </script>
 <style lang="scss" scoped>

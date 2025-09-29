@@ -16,10 +16,10 @@
 import { shallowRef, ref } from "vue";
 
 // app
-import NWEditor from "./NWEditor";
 import { Connection } from "./Connection";
 import NWNode, { SOCKET_TYPE } from "./NWNode";
 
+// main export
 export class ConnectionManager {
 
 	/**
@@ -29,7 +29,7 @@ export class ConnectionManager {
 	 */
 	constructor(graph) {
 
-		// save the editor instance
+		// save the graph we're for
 		this.graph = graph;
 
 		// the wires array
@@ -159,13 +159,14 @@ export class ConnectionManager {
 	/**
 	 * Starts dragging a wire from a node's socket.
 	 * 
+	 * @param {Object} ctx - context about the component (if needed).
 	 * @param {NWNode} node - the node that the wire is being started from.
 	 * @param {Object} field - the field on the node that the wire is being started from.
 	 * @param {Boolean} startFromOutput - whether the wire is being started from an output socket (true) or an input socket (false).
 	 * @param {MouseEvent} event - the mouse event that triggered the wire start (if applicable).
 	 * @returns {void}
 	 */
-	startWire(node, field, startFromOutput = true, event) {
+	startWire(ctx, node, field, startFromOutput = true, event) {
 
 		// save our stats about our drag origin
 		// note on this: users can drag from an output socket or an input socket
@@ -226,7 +227,7 @@ export class ConnectionManager {
 		this.connectionBeingDragged = conn;
 
 		// we'll store the initial scale of zoom when drag was started incase someone zoom-scrolls while dragging
-		const startScale = this.graph.editor.zoomScale.value;
+		const startScale = ctx.viewport.zoomScale.value;
 
 		// set the start & node the positions
 		let startX = 0;
@@ -247,7 +248,7 @@ export class ConnectionManager {
 
 
 		//	shift start to the *click point* (center -> click delta in world units)
-		const offset = this.socketClickWorldOffset(event, startScale);
+		const offset = this.socketClickWorldOffset(ctx, event, startScale);
 		startX += offset.x;
 		startY += offset.y;
 
@@ -255,7 +256,7 @@ export class ConnectionManager {
 		this.draggingWire.value = true;
 
 		// do the drag
-		this.attachWireDrag(conn, startFromOutput, startX, startY, event);
+		this.attachWireDrag(ctx, conn, startFromOutput, startX, startY, event);
 
 		return conn;
 	}
@@ -293,13 +294,14 @@ export class ConnectionManager {
 	/**
 	 * When the user hovers over a socket, we might wanna snap to it if we're in the middle of dragging a wire.
 	 * 
+	 * @param {Object} ctx - context about the component (if needed).
 	 * @param {NWNode} node - the node that the socket belongs to.
 	 * @param {Object} field - the field on the node that the socket belongs to.
 	 * @param {Boolean} isInputSocket - whether the socket is an input socket (true) or an output socket (false).
 	 * @param {CursorPopup} cursorPopup - optional cursor popup instance to show info about the socket.
 	 * @returns {void}
 	 */
-	hoverSocket(node, field, isInputSocket = true, cursorPopup = null) {
+	hoverSocket(ctx, node, field, isInputSocket = true, cursorPopup = null) {
 
 		// if we're not dragging a wire, just GTFO
 		if (!this.draggingWire.value) return;
@@ -355,7 +357,7 @@ export class ConnectionManager {
 
 		} else {
 
-			const willCoalesce = this.graph.editor.typeRegistry.willCoalesce(fromType, toType);
+			const willCoalesce = ctx.editor.typeRegistry.willCoalesce(fromType, toType);
 
 			// different type → see if we can coalesce FROM → TO
 			if (willCoalesce != false) {
@@ -392,8 +394,10 @@ export class ConnectionManager {
 
 	/**
 	 * When the user stops hovering over a socket, we need to detach the drag end.
+	 * 
+	 * @param {Object} ctx - context about the component (if needed).
 	 */
-	leaveSocket() {
+	leaveSocket(ctx) {
 
 		// gtfo if we're not in the middle of dragging a wire
 		if (!this.draggingWire.value) return;
@@ -412,15 +416,16 @@ export class ConnectionManager {
 	/**
 	 * Helper to convert screen coordinates to world coordinates.
 	 * 
+	 * @param {Object} ctx - context about the component (if needed).
 	 * @param {Number} clientX - the X position of the mouse in screen coordinates.
 	 * @param {Number} clientY - the Y position of the mouse in screen coordinates.
 	 * @returns {Object} - an object with the world coordinates of the mouse position, adjusted for the current pan and zoom.
 	 */
-	screenToWorld(clientX, clientY) {
+	screenToWorld(ctx, clientX, clientY) {
 
-		const scale = this.graph.editor.zoomScale.value;
-		const panX = this.graph.editor.panX.value;
-		const panY = this.graph.editor.panY.value;
+		const scale = ctx.viewport.zoomScale.value;
+		const panX = ctx.viewport.panX.value;
+		const panY = ctx.viewport.panY.value;
 		return {
 			x: (clientX - panX) / scale,
 			y: (clientY - panY) / scale
@@ -431,20 +436,21 @@ export class ConnectionManager {
 	/**
 	 * Does the drag-logic for a new wire connection.
 	 * 
+	 * @param {Object} ctx - context about the component (if needed).
 	 * @param {Connection} conn - the connection to attach the drag handler to.
 	 * @param {Boolean} startFromOutput - whether the wire is being started from an output socket (true) or an input socket (false).
 	 * @param {Number} startX - the X position to start dragging from.
 	 * @param {Number} startY - the Y position to start dragging from.	
 	 * @param {MouseEvent} startEvent - the mouse event that triggered the wire start (if applicable).
 	 */
-	attachWireDrag(conn, startFromOutput, startX, startY, startEvent) {
+	attachWireDrag(ctx, conn, startFromOutput, startX, startY, startEvent) {
 
 		//	mouse screen position at drag start
 		const startClientX = startEvent?.clientX ?? 0;
 		const startClientY = startEvent?.clientY ?? 0;
 
 		//	mouse world position at drag start
-		const startMouseWorld = this.screenToWorld(startClientX, startClientY);
+		const startMouseWorld = this.screenToWorld(ctx, startClientX, startClientY);
 
 		//	world pos of the grabbed end at drag start
 		const startWorldX = startX;
@@ -454,7 +460,7 @@ export class ConnectionManager {
 		const grabOffsetX = startWorldX - startMouseWorld.x;
 		const grabOffsetY = startWorldY - startMouseWorld.y;
 
-		this.graph.editor.dragHelper.dragStart(
+		ctx.dh.dragStart(
 			(dx, dy) => {
 
 				// gtfo if we're snapped
@@ -465,7 +471,7 @@ export class ConnectionManager {
 				const curClientY = startClientY - dy;
 
 				//	project through the *current* view (handles mid-drag zoom/pan)
-				const curMouseWorld = this.screenToWorld(curClientX, curClientY);
+				const curMouseWorld = this.screenToWorld(ctx, curClientX, curClientY);
 
 				const newX = curMouseWorld.x + grabOffsetX;
 				const newY = curMouseWorld.y + grabOffsetY;
@@ -516,14 +522,17 @@ export class ConnectionManager {
 	/**
 	 * Helper to adjust wire drag pos based where the cursor clicked the origin socket
 	 * 
+	 * @param {Object} ctx - context about the component (if needed).
 	 * @param {MouseEvent} evt - the mouse event that triggered the click.
-	 * @param {Number} scale - the zoom scale to use for the conversion. Defaults to the current editor zoom scale.
+	 * @param {Number} scale - the zoom scale to use for the conversion. Defaults to the current zoom scale.
 	 * @returns {Object} - an object with the x and y offsets in world units from the center of the socket to the click position.
 	 */
-	socketClickWorldOffset(evt, scale = this.graph.editor.zoomScale.value) {
+	socketClickWorldOffset(ctx, evt, scale) {
 		
 		const el = evt.currentTarget || evt.target;
 		if (!el || !el.getBoundingClientRect) return { x: 0, y: 0 };
+
+		scale = scale || ctx.viewport.zoomScale.value;
 
 		const rect = el.getBoundingClientRect();
 		const centerClientX = rect.left + rect.width * 0.5;

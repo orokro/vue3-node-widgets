@@ -94,16 +94,6 @@ onMounted(() => {
 	const wmCtx = wm.getContext();
 	window.wm = wmCtx;
 
-	// add event listener to window, such that if 'home' is pressed, we set ctx.zoomScale.value = 1;
-	window.addEventListener('keydown', (e) => {
-
-		if (e.key === 'Home') {
-			const ctx = app.currentGraph.value;
-			ctx.zoomScale.value = 1;
-			ctx.panX.value = 0;
-			ctx.panY.value = 0;
-		}0
-	});
 });
 
 

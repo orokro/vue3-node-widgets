@@ -15,8 +15,10 @@
 	<!-- this is the actual scrollable area where nodes, wires, etc appear and are editable. This clips/clamps overflow -->
 	<div 
 		class="editor-container fill-parent" 
+		tabindex="0"
 		@mousedown="startPanDrag"		
 		@mouseup="checkAddMenu"		
+		@keydown="handleKeyDown"
 		@wheel="handleWheelZoom"		
 		:style="{
 			fontSize: `${zoomScale}px`,
@@ -50,7 +52,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted, inject, computed } from 'vue';
+import { ref, onMounted, provide, inject, computed } from 'vue';
 
 // components
 import DevErrors from '@Components/DevErrors.vue';
@@ -208,6 +210,22 @@ function startPanDrag(e){
 
 	emits('showAddMenu');	
 }
+
+
+/**
+ * Handle key down events for shortcuts, etc
+ * 
+ * @param {KeyboardEvent} event - The keyboard event
+ */
+function handleKeyDown(event) {
+
+	if(event.key === 'Home') {
+		zoomScale.value = 1;
+		panX.value = 0;
+		panY.value = 0;
+	}
+}
+
 
 </script>
 <style lang="scss" scoped>

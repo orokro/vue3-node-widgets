@@ -140,6 +140,7 @@
 							v-if="[FIELD_TYPE.INPUT].includes(field.fieldType)"
 							:y="node.fieldState[field.name]?.data.inputYPos.value"
 							:node="node"
+							:graph="graph"
 							:field="field"
 							:socketType="SOCKET_TYPE.INPUT"
 							:socketStyle="field.valueType.socketStyle"
@@ -164,6 +165,7 @@
 							"
 							:y="node.fieldState[field.name]?.data.outputYPos.value"
 							:node="node"
+							:graph="graph"
 							:field="field"
 							:socketType="SOCKET_TYPE.OUTPUT"
 							:socketStyle="field.valueType.socketStyle"
@@ -326,8 +328,8 @@ function startDrag(e) {
 		(dx, dy) => {
 
 			props.node.setPosition(
-				initialX - dx / zoomScale,
-				initialY - dy / zoomScale
+				initialX - dx / zoomScale.value,
+				initialY - dy / zoomScale.value
 			);
 		},
 		(dx, dy) => {

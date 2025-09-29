@@ -56,6 +56,12 @@ const props = defineProps({
 		required: true
 	},
 
+	// the graph this node belongs to
+	graph: {
+		type: Object,
+		required: true
+	},
+
 	// the field this widget is for
 	field: {
 		type: Object,
@@ -78,6 +84,12 @@ const props = defineProps({
 // get our graph context
 const ctx = inject('ctx').value;
 
+// get our reusable drag helper
+const dh = inject('dh');
+
+// get our viewport context objects
+const viewport = inject('viewport');
+
 // ref to the socket element
 const elRef = ref(null);
 
@@ -87,7 +99,19 @@ const socketFormat = ref('unknown');
 // if 'corner' format, this will hold the generated style object
 const cornerStyle = shallowRef({});
 
+// get the cursor popup element
 const cursorPopupEl = inject('cursorPopupEl');
+
+// get context for our connection logic
+const eventCtx = computed(()=>{
+	return {
+		editor: ctx,
+		viewport,
+		dh,
+		graph: props.graph,
+		node: props.node,
+	};
+});
 
 // when we mount we should figure out how to render this socket
 onMounted(() => {
@@ -288,7 +312,8 @@ function generateCornerStyle(input, themeColor = '#000') {
 function onMouseDown(event) {
 
 	// start the wire dragging process
-	ctx.rootGraph.connMgr.startWire(
+	props.graph.connMgr.startWire(
+		eventCtx.value,
 		props.node,
 		props.field,
 		props.socketType == SOCKET_TYPE.OUTPUT,
@@ -307,7 +332,13 @@ function onMouseOver(event) {
 	// console.log('Mouse over socket:', props.node, props.field, props.socketType);
 
 	// notify the connection manager that we're hovering over this socket
-	ctx.rootGraph.connMgr.hoverSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT, cursorPopupEl.value);
+	props.graph.connMgr.hoverSocket(
+		eventCtx.value,
+		props.node,
+		props.field,
+		props.socketType == SOCKET_TYPE.INPUT,
+		cursorPopupEl.value
+	);
 }
 
 
@@ -324,7 +355,12 @@ function onMouseLeave(event) {
 	cursorPopupEl.value.hide();
 
 	// notify the connection manager that we're no longer hovering over this socket
-	ctx.rootGraph.connMgr.leaveSocket(props.node, props.field, props.socketType == SOCKET_TYPE.INPUT);
+	props.graph.connMgr.leaveSocket(
+		eventCtx.value,
+		props.node,
+		props.field,
+		props.socketType == SOCKET_TYPE.INPUT
+	);
 }
 
 </script>
