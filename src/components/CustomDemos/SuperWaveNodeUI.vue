@@ -8,7 +8,10 @@
 -->
 <template>
 
-	<div class="super-wave-node">
+	<div 
+		ref="mainEl"
+		class="super-wave-node"
+	>
 
 		<!-- controls for changing amplitude -->
 		<div 
@@ -88,13 +91,13 @@ const props = defineProps({
 		type: Object,
 		required: true
 	}
-
 });
 
 // get our drag helper for later
 const dh = inject('dh');
 
 // refs
+const mainEl = ref(null);
 const screenBoxEl = ref(null);
 const screenResolutionWidth = ref(277);
 const screenResolutionHeight = ref(78);
@@ -164,17 +167,33 @@ function watchScreenSize(){
 
 
 /**
+ * Sets the position of a field's socket in the global socketPositions map
+ * 
+ * @param {Object} node - the node instance
+ * @param {Object} field - the field instance
+ * @param {number} y - the y position of the socket relative to the top of the node
+ */
+function setFieldPos(node, field, y){
+
+	const boundingRect = mainEl.value.getBoundingClientRect();
+	const key = `${node.id}::${field.id}`;
+	const socketPositions = inject('socketPositions');
+	socketPositions.set(key, { top: y, right: boundingRect.width });
+}
+
+
+/**
  * Sets the socket positions for our custom node
  */
 function setSocketPositions(){
 
 	// input side
-	props.node.fieldState.theta.data.inputYPos.value = 20;
-	props.node.fieldState.amplitude.data.inputYPos.value = 172;
-	props.node.fieldState.wavelength.data.inputYPos.value = 196;
+	setFieldPos(props.node, props.node.fieldState.theta, 20);
+	setFieldPos(props.node, props.node.fieldState.amplitude, 172);
+	setFieldPos(props.node, props.node.fieldState.wavelength, 196);
 
 	// output side
-	props.node.fieldState.result.data.outputYPos.value = 20;
+	setFieldPos(props.node, props.node.fieldState.result, 20);	
 }
 
 

@@ -537,6 +537,7 @@ export default class NWNode {
 				
 				this.fieldState[field.name] = this.wrapFieldValue(
 					field.name, 
+					field.id,
 					new field.valueType()
 				);
 			}
@@ -548,14 +549,16 @@ export default class NWNode {
 	 * Wraps a field value so we can track changes to it.
 	 * 
 	 * @param {String} name - the name of the field to wrap
+	 * @param {String} id - the id of the field to wrap
 	 * @param {Value} value - the value to wrap
 	 * @returns {Object} - object with get & set that has side effect of calling requestComputeUpdate()
 	 */
-	wrapFieldValue(name, value) {
+	wrapFieldValue(name, id, value) {
 
 		// create base object
 		const wrapped = { 
 			name,
+			id,
 			_valueObj: value,
 			data: {}
 		};
