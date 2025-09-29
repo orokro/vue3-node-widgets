@@ -135,28 +135,6 @@ export class ConnectionManager {
 
 
 	/**
-	 * When a node is moved, we should update the x/y positions of any wires connected to it.
-	 * 
-	 * @param {NWNode|NWNode[]} node 
-	 */
-	moveWires(node) {
-
-		// convert to array if not already
-		if (!Array.isArray(node))
-			node = [node];
-
-		// filter out all the connections that wire into this node
-		this.wires.value.map(conn => {
-			if (node.includes(conn.inputNode))
-				conn.updatePositions(SOCKET_TYPE.INPUT);
-			if (node.includes(conn.outputNode))
-				conn.updatePositions(SOCKET_TYPE.OUTPUT);
-			return conn;
-		});
-	}
-
-
-	/**
 	 * Starts dragging a wire from a node's socket.
 	 * 
 	 * @param {Object} ctx - context about the component (if needed).
@@ -449,17 +427,21 @@ export class ConnectionManager {
 		const startClientX = startEvent?.clientX ?? 0;
 		const startClientY = startEvent?.clientY ?? 0;
 
-		//	mouse world position at drag start
-		const startMouseWorld = this.screenToWorld(ctx, startClientX, startClientY);
+		// get viewport bounding box
+		const vpRect = ctx.viewport.el.getBoundingClientRect();
+		const grabOffsetX = vpRect.left;
+		const grabOffsetY = vpRect.top;
 
-		//	world pos of the grabbed end at drag start
-		const startWorldX = startX;
-		const startWorldY = startY;
-
-		//	fixed offset so the grabbed point stays under the cursor
-		const grabOffsetX = startWorldX - startMouseWorld.x;
-		const grabOffsetY = startWorldY - startMouseWorld.y;
-
+		//	project through the *current* view (handles mid-drag zoom/pan)
+		const startMouseWorld = this.screenToWorld(ctx, startClientX-grabOffsetX, startClientY-grabOffsetY);
+		if (startFromOutput) {
+			conn.positions.endX = startMouseWorld.x;
+			conn.positions.endY = startMouseWorld.y;
+		} else {
+			conn.positions.startX = startMouseWorld.x;
+			conn.positions.startY = startMouseWorld.y;
+		}
+	
 		ctx.dh.dragStart(
 			(dx, dy) => {
 
@@ -471,10 +453,10 @@ export class ConnectionManager {
 				const curClientY = startClientY - dy;
 
 				//	project through the *current* view (handles mid-drag zoom/pan)
-				const curMouseWorld = this.screenToWorld(ctx, curClientX, curClientY);
+				const curMouseWorld = this.screenToWorld(ctx, curClientX-grabOffsetX, curClientY-grabOffsetY);
 
-				const newX = curMouseWorld.x + grabOffsetX;
-				const newY = curMouseWorld.y + grabOffsetY;
+				const newX = curMouseWorld.x;
+				const newY = curMouseWorld.y;
 
 				if (startFromOutput) {
 					conn.positions.endX = newX;

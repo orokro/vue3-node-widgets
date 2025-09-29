@@ -76,46 +76,73 @@ const showWireIDs = ref(false);
 // get our current viewport details
 const viewport = inject('viewport');
 
+
+/**
+ * Get the position of a socket on a node
+ * 
+ * @param {NWNode} node - the node object
+ * @param {Object} field - the field object from the node
+ * @param {String} kind - 'input' or 'output'
+ * @returns {Object|null} - { x, y } position of the socket in em units, or null if not found
+ */
 function getSocketPos(node, field, kind){
 
 	// gtfo if missing data
 	if(!node || !field || !kind)
 		return null;
 
-	// generate query string
-	const queryStr = `.${node.id}_${field.id}_${kind}`;
+	// get our current zoom scale
+	const zoom = viewport.zoomScale.value;
 
-	// search within our viewport
-	const socketEl = viewport.el.querySelector(queryStr);
+	// get node pos
+	const nodeX = node?.x?.value || 0;
+	const nodeY = node?.y?.value || 0;
 
-	// get viewport bounding box also
-	const viewportRect = viewport.el.getBoundingClientRect();
+	// get the recorded top and right offsets for this socket
+	const measuredPos = socketPositions.get(`${node.id}::${field.id}`) || { 
+		top: 0,
+		right: 0,
+	};
 
-	// if we found it, get the bounding rect
-	if(socketEl){
-		const rect = socketEl.getBoundingClientRect();
-		return {
-			x: rect.left + (rect.width / 2) - viewport.panX.value - viewportRect.left,
-			y: rect.top + (rect.height / 2) - viewport.panY.value - viewportRect.top,
-		};
+	const pos = {
+		x: (nodeX + (kind=='input' ? 0 : measuredPos.right))  * zoom,
+		y: (nodeY + measuredPos.top + 25) * zoom,
 	}
+	return pos;
 }
 
-function getSocketPos2(node, field, kind){
 
-	// use old code
-	const pos = getSocketPos(node, field, kind);
-	if(pos==null)
-		return null;
+function getWirePositions(wire){
 
-	// get the node Y pos & field pos from socketPositions map
-	const nodeY = node?.y?.value || 0;
-	const fieldY = socketPositions.get(`${node.id}::${field.id}`) || 0;
+	// first get the reactive positions on the wire itself
+	const {
+		startX,
+		startY,
+		endX,
+		endY,
+	} = wire.positions;
 
-	// change pos to computed one
-	pos.y = (nodeY + fieldY+25) * viewport.zoomScale.value;
+	// next, attempt to see if we can get the positions of the sockets
+	const inSockPos = getSocketPos(props.wire.ends.inputNode, props.wire.inputField, 'output');
+	const outSockPos = getSocketPos(props.wire.ends.outputNode, props.wire.outputField, 'input');
 
-	return pos;
+	// if they aren't null, replace them on the wire
+	if(inSockPos){
+		wire.lastPositions.startX = inSockPos.x / viewport.zoomScale.value;
+		wire.lastPositions.startY = inSockPos.y / viewport.zoomScale.value;
+	}
+	if(outSockPos){
+		wire.lastPositions.endX = outSockPos.x / viewport.zoomScale.value;
+		wire.lastPositions.endY = outSockPos.y / viewport.zoomScale.value;
+	}
+
+	// return updated positions
+	return {
+		startX: inSockPos ? wire.lastPositions.startX : startX,
+		startY: inSockPos ? wire.lastPositions.startY : startY,
+		endX: outSockPos ? wire.lastPositions.endX : endX,
+		endY: outSockPos ? wire.lastPositions.endY : endY,
+	};
 }
 
 
@@ -128,27 +155,7 @@ const SVGDetails = computed(()=>{
 		startY,
 		endX,
 		endY,
-	} = props.wire.positions;
-
-	// touching these in the computed when the nodes associated with this wire move
-	const inputNodeX = props.wire.ends.inputNode?.x.value || 0;
-	const inputNodeY = props.wire.ends.inputNode?.y.value || 0;
-	const outputNodeX = props.wire.ends.outputNode?.x.value || 0;	
-	const outputNodeY = props.wire.ends.outputNode?.y.value || 0;
-
-	// get positions of sockets if we're plugged in
-	const inSockPos = getSocketPos2(props.wire.ends.inputNode, props.wire.inputField, 'output');
-	const outSockPos = getSocketPos2(props.wire.ends.outputNode, props.wire.outputField, 'input');
-
-	// if they aren't null, replace our start/end positions
-	if(inSockPos){
-		startX = inSockPos.x / viewport.zoomScale.value;
-		startY = inSockPos.y / viewport.zoomScale.value;
-	}
-	if(outSockPos){
-		endX = outSockPos.x / viewport.zoomScale.value;
-		endY = outSockPos.y / viewport.zoomScale.value;
-	}
+	} = getWirePositions(props.wire);
 
 	// get te width and height of the start/end points
 	let width = Math.abs(endX - startX);

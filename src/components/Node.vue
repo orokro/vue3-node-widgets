@@ -141,7 +141,7 @@
 								&&
 								[FIELD_TYPE.INPUT].includes(field.fieldType)
 							"
-							:y="socketPositions.get(`${node.id}::${field.id}`)"
+							:y="socketPositions.get(`${node.id}::${field.id}`).top"
 							:node="node"
 							:graph="graph"
 							:field="field"
@@ -168,7 +168,7 @@
 									(field.fieldType == FIELD_TYPE.INPUT && field.valuePassThrough)
 								)
 							"
-							:y="socketPositions.get(`${node.id}::${field.id}`)"
+							:y="socketPositions.get(`${node.id}::${field.id}`).top"
 							:node="node"
 							:graph="graph"
 							:field="field"
@@ -373,14 +373,17 @@ function getOffsetInEm(rowEl) {
 
 	// get rectangles for the row element and its parent
 	const elRect = rowEl.getBoundingClientRect();
-	const parentRect = parentEl.getBoundingClientRect() ?? { top: 0 };
+	const parentRect = parentEl.getBoundingClientRect() ?? { top: 0, left: 0, width: 0, height: 0 };
 
 	// calculate the pixel offset of the row element relative to its parent
 	const pixelOffset = elRect.top - parentRect.top;
 
 	// convert the pixel offset to ems based on the font size of the row element
 	const emSize = parseFloat(getComputedStyle(parentEl).fontSize) || 1;
-	return pixelOffset / emSize
+	return {
+			top: pixelOffset / emSize + 9, 
+			right: parentRect.width / emSize
+	};
 }
 
 
@@ -412,7 +415,7 @@ function measureFieldPositions(){
 		}
 		
 		// get the offset of the row element in ems relative to its parent
-		const offsetInEm = getOffsetInEm(rowEl) + 9;
+		const offsetInEm = getOffsetInEm(rowEl);
 
 		// get unique key for these fields
 		const key = `${props.node.id}::${field.id}`;
@@ -443,10 +446,6 @@ onMounted(()=>{
 		// remeasure field positions
 		measureFieldPositions();
 
-		// after the DOM updates, move wires
-		nextTick(()=>{			
-			// props.graph.connMgr.moveWires(props.node);
-		});
 	});
 	ro.observe(contentEl.value);
 });

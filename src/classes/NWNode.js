@@ -557,19 +557,7 @@ export default class NWNode {
 		const wrapped = { 
 			name,
 			_valueObj: value,
-			data: {
-
-				// positions of sockets
-				inputYPos: ref(0),
-				outputYPos: ref(0),
-				
-				// elements to mounted sockets (if exist)
-				inputSocketEl: shallowRef(null),
-				outputSocketEl: shallowRef(null),
-
-				// ref to the row element in the DOM
-				rowEl: ref(null),
-			}
+			data: {}
 		};
 
 		const node = this;
@@ -603,7 +591,6 @@ export default class NWNode {
 		// for now, just print
 		if(false)
 			console.log(`Requesting compute update for node "${this.id}", field "${name}" as`, value);
-
 	}
 
 
@@ -621,11 +608,6 @@ export default class NWNode {
 		// set the position of the node
 		this.x.value = x;
 		this.y.value = y;
-		
-		
-		// tell connections manager to update connections
-		// if (this.editor && this.editor.rootGraph.connMgr)
-		// 	this.editor.rootGraph.connMgr.moveWires(this);
 	}
 
 }

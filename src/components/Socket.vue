@@ -8,7 +8,6 @@
 <template>
 
 	<div
-		:ref="getElRef()"
 		class="socket"
 		:class="[
 			`${node.id}_${field.id}_${socketType}`,
@@ -93,9 +92,6 @@ const dh = inject('dh');
 // get our viewport context objects
 const viewport = inject('viewport');
 
-// ref to the socket element
-const elRef = ref(null);
-
 // either 'corner' or 'svg' or 'unknown'
 const socketFormat = ref('unknown');
 
@@ -119,38 +115,10 @@ const eventCtx = computed(()=>{
 // when we mount we should figure out how to render this socket
 onMounted(() => {
 
-	// set the element reference in the node's field state
-	// setElRef();
-
 	// configure our socket style
 	buildSocketStyle();
 });
 
-
-function getElRef(){
-
-	const fieldName = props.field.name;
-	const fieldState = props.node.fieldState[fieldName];
-
-	return props.socketType === FIELD_TYPE.INPUT
-		? fieldState.data.inputSocketEl
-		: fieldState.data.outputSocketEl;
-}
-
-/**
- * Sets the element reference in the node's field state for this socket
- */
-function setElRef(){
-
-	const fieldName = props.field.name;
-	const fieldState = props.node.fieldState[fieldName];
-
-	if(props.socketType === FIELD_TYPE.INPUT){
-		fieldState.data.inputSocketEl = elRef.value;
-	}else if(props.socketType === FIELD_TYPE.OUTPUT){
-		fieldState.data.outputSocketEl = elRef.value;
-	}
-}
 
 
 /**
@@ -331,8 +299,6 @@ function onMouseDown(event) {
  * @param event - the mouse over event
  */
 function onMouseOver(event) {
-	// Placeholder for future hover functionality
-	// console.log('Mouse over socket:', props.node, props.field, props.socketType);
 
 	// notify the connection manager that we're hovering over this socket
 	props.graph.connMgr.hoverSocket(
@@ -351,9 +317,7 @@ function onMouseOver(event) {
  * @param event - the mouse leave event
  */
 function onMouseLeave(event) {
-	// Placeholder for future hover out functionality
-	// console.log('Mouse leave socket:', props.node, props.field, props.socketType);
-	
+
 	// hide the cursor popup if it's showing
 	cursorPopupEl.value.hide();
 

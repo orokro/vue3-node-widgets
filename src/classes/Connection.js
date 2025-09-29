@@ -25,10 +25,26 @@ export class Connection {
 		// the connection manager
 		this.mgr = mgr;
 
-		// while we could derive the position data from the node & socket positions,
-		// that would require some cpu work to calculate the positions.
-		// instead we'll store the positions (which is used for the rendering of components)
-		// in this reactive object & just update it when nodes are moved or sockets are changed.
+		/*
+			NOTE on positions:
+
+			Originally we stored positions purely in state & all was good.
+
+			But, then I wanted to make it so we could have multiple components mount and share
+			the same state data. This caused bugs with storing and updating positions.
+
+			Below is a reactive versions of positions are manually set when wires are dragged.
+
+			However, the actual code that render wires will compute positions if the nodes and fields are set.
+			This means that if nodes/fields are set, the positions here are ignored.
+
+			However, if the nodes/fields are cleared (like if a node is deleted or unplugged),
+			then it will fall back to these values.
+
+			However, they may have gotten out of sync, so we also store the last known positions
+			in a non-reactive object, so if the nodes/fields are cleared,
+			we can fall back to the last known positions.
+		*/
 		this.positions = reactive({
 
 			// for bezier, the start and end points
@@ -37,6 +53,14 @@ export class Connection {
 			endX: 0,
 			endY: 0,
 		});
+
+		// save last know positions (either computed, or stored), for when nodes/fields are cleared
+		this.lastPositions = {
+			startX: null,
+			startY: null,
+			endX: null,
+			endY: null,
+		};
 
 		/*
 			NOTE:
@@ -87,9 +111,13 @@ export class Connection {
 		this.ends.inputField = field;
 
 		// if it was nulled (cleared) then we can just GTFO now
-		if(node === null || field === null)
+		if(node === null || field === null){
+			this.positions.startX = this.lastPositions.startX || this.positions.startX;
+			this.positions.startY = this.lastPositions.startY || this.positions.startY;
+			this.lastPositions.startX = null;
+			this.lastPositions.startY = null;
 			return;
-	
+		}	
 	}
 
 
@@ -112,31 +140,13 @@ export class Connection {
 		this.ends.outputField = field;
 
 		// if it was nulled (cleared) then we can just GTFO now
-		if(node === null || field === null)
+		if(node === null || field === null){
+			this.positions.endX = this.lastPositions.endX || this.positions.endX;
+			this.positions.endY = this.lastPositions.endY || this.positions.endY;
+			this.lastPositions.endX = null;
+			this.lastPositions.endY = null;
 			return;
-
-	}
-
-
-	/**
-	 * Updates the positions of the connection's start and end points.
-	 */
-	updatePositions(which = 'both'){
-
-		// if(which === SOCKET_TYPE.INPUT || which === 'both'){
-		// 	if(this.inputNode && this.inputField){
-		// 		const socketPos = this.inputNode.getSocketPosition(this.inputField, SOCKET_TYPE.OUTPUT);
-		// 		this.positions.startX = socketPos.x;
-		// 		this.positions.startY = socketPos.y;
-		// 	}
-		// }
-		// if(which === SOCKET_TYPE.OUTPUT || which === 'both'){
-		// 	if(this.outputNode && this.outputField){
-		// 		const socketPos = this.outputNode.getSocketPosition(this.outputField, SOCKET_TYPE.INPUT);
-		// 		this.positions.endX = socketPos.x;
-		// 		this.positions.endY = socketPos.y;
-		// 	}
-		// }
+		}
 	}
 
 
@@ -185,6 +195,7 @@ export class Connection {
 
 			// am kil
 			this.mgr.destroyConnection(this.id);
+
 		}, 210);
 	}
 
