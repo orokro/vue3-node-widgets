@@ -66,6 +66,9 @@ const props = defineProps({
 
 });
 
+// get our component socket position store
+const socketPositions = inject('socketPositions');
+
 // debug toggle
 // TODO: move to a global debug settings flags object
 const showWireIDs = ref(false);
@@ -98,6 +101,23 @@ function getSocketPos(node, field, kind){
 	}
 }
 
+function getSocketPos2(node, field, kind){
+
+	// use old code
+	const pos = getSocketPos(node, field, kind);
+	if(pos==null)
+		return null;
+
+	// get the node Y pos & field pos from socketPositions map
+	const nodeY = node?.y?.value || 0;
+	const fieldY = socketPositions.get(`${node.id}::${field.id}`) || 0;
+
+	// change pos to computed one
+	pos.y = (nodeY + fieldY+25) * viewport.zoomScale.value;
+
+	return pos;
+}
+
 
 // generate the SVG details for the wire
 const SVGDetails = computed(()=>{
@@ -110,9 +130,15 @@ const SVGDetails = computed(()=>{
 		endY,
 	} = props.wire.positions;
 
+	// touching these in the computed when the nodes associated with this wire move
+	const inputNodeX = props.wire.ends.inputNode?.x.value || 0;
+	const inputNodeY = props.wire.ends.inputNode?.y.value || 0;
+	const outputNodeX = props.wire.ends.outputNode?.x.value || 0;	
+	const outputNodeY = props.wire.ends.outputNode?.y.value || 0;
+
 	// get positions of sockets if we're plugged in
-	const inSockPos = getSocketPos(props.wire.inputNode, props.wire.inputField, 'output');
-	const outSockPos = getSocketPos(props.wire.outputNode, props.wire.outputField, 'input');
+	const inSockPos = getSocketPos2(props.wire.ends.inputNode, props.wire.inputField, 'output');
+	const outSockPos = getSocketPos2(props.wire.ends.outputNode, props.wire.outputField, 'input');
 
 	// if they aren't null, replace our start/end positions
 	if(inSockPos){

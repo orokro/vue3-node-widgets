@@ -53,7 +53,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted, provide, inject, computed } from 'vue';
+import { ref, onMounted, provide, inject, reactive, computed } from 'vue';
 
 // components
 import DevErrors from '@Components/DevErrors.vue';
@@ -96,6 +96,11 @@ const panX = ref(0);
 const panY = ref(0);
 const zoomScale = ref(1);
 
+// we'll keep a global map of socket positions
+const socketPositions = reactive(new Map());
+provide('socketPositions', socketPositions);
+
+// ref to our container	
 const containerEl = ref(null);
 
 // pack up & provide these refs

@@ -133,11 +133,15 @@
 					<template
 
 						v-for="(field, index) in node.constructor.fields"
-						:key="index"
+						:key="field.id"
 					>
 						<Socket
-							v-if="[FIELD_TYPE.INPUT].includes(field.fieldType)"
-							:y="node.fieldState[field.name]?.data.inputYPos.value"
+							v-if="
+								socketPositions.has(`${node.id}::${field.id}`)
+								&&
+								[FIELD_TYPE.INPUT].includes(field.fieldType)
+							"
+							:y="socketPositions.get(`${node.id}::${field.id}`)"
 							:node="node"
 							:graph="graph"
 							:field="field"
@@ -150,10 +154,12 @@
 					<template
 
 						v-for="(field, index) in node.constructor.fields"
-						:key="index"
+						:key="field.id"
 					>
 						<Socket
 							v-if="
+								socketPositions.has(`${node.id}::${field.id}`)
+								&&
 								node.constructor.nodeType != NODE_TYPE.OUTPUT 
 								&& 
 								(
@@ -162,7 +168,7 @@
 									(field.fieldType == FIELD_TYPE.INPUT && field.valuePassThrough)
 								)
 							"
-							:y="node.fieldState[field.name]?.data.outputYPos.value"
+							:y="socketPositions.get(`${node.id}::${field.id}`)"
 							:node="node"
 							:graph="graph"
 							:field="field"
@@ -208,6 +214,9 @@ const props = defineProps({
 // get our re-usable drag helper
 const dh = inject('dh');
 
+// get our global socket positions
+const socketPositions = inject('socketPositions');
+
 // get the viewport details for the view we're in
 const {
 	panX,
@@ -217,7 +226,7 @@ const {
 
 // a map of the socket row refs for this component
 // (instead of storing them on state like we used to)
-const fieldRowRefs = new Map();
+const fieldRowData = new Map();
 
 // ref to the element where we spawn content
 const contentEl = ref(null);
@@ -250,7 +259,8 @@ const connectedInputsKeySet = computed(()=>{
 // helper to set a socket ref for a given field name
 function setSocketRef(fieldName, el){
 
-	fieldRowRefs.set(fieldName, el);
+	// otherwise create a new entry
+	fieldRowData.set(fieldName, el);
 }
 
 
@@ -340,6 +350,8 @@ function startDrag(e) {
 				initialX - dx / zoomScale.value,
 				initialY - dy / zoomScale.value
 			);
+
+			measureFieldPositions();
 		},
 		(dx, dy) => {
 
@@ -392,7 +404,7 @@ function measureFieldPositions(){
 
 		// get the row element for this field
 		// const rowEl = props.node.fieldState[field.name]?.data.rowEl?.value[0];
-		const rowEl = fieldRowRefs.get(field.name);
+		const rowEl = fieldRowData.get(field.name);
 
 		if (!rowEl) {
 			console.warn(`No row element found for field ${field.name}`);
@@ -402,9 +414,9 @@ function measureFieldPositions(){
 		// get the offset of the row element in ems relative to its parent
 		const offsetInEm = getOffsetInEm(rowEl) + 9;
 
-		// set the input and output Y positions based on the offset
-		props.node.fieldState[field.name].data.inputYPos.value = offsetInEm;
-		props.node.fieldState[field.name].data.outputYPos.value = offsetInEm;
+		// get unique key for these fields
+		const key = `${props.node.id}::${field.id}`;
+		socketPositions.set(`${key}`, offsetInEm);
 	}
 }
 
@@ -421,6 +433,8 @@ let ro = null;
 
 // on mount, measure field positions
 onMounted(()=>{
+
+	// once initially mounted, measure field positions	
 	measureFieldPositions();
 
 	// set up a resize observer to re-measure field positions when the content element resizes
@@ -431,11 +445,12 @@ onMounted(()=>{
 
 		// after the DOM updates, move wires
 		nextTick(()=>{			
-			props.graph.connMgr.moveWires(props.node);
+			// props.graph.connMgr.moveWires(props.node);
 		});
 	});
 	ro.observe(contentEl.value);
 });
+
 
 // clean up resize observer on unmount
 onUnmounted(()=>{
@@ -444,6 +459,7 @@ onUnmounted(()=>{
 		ro = null;
 	}
 });
+
 
 </script>
 <style lang="scss" scoped>

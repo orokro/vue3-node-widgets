@@ -6,7 +6,7 @@
 	in our connection manager.
 */
 
-import { reactive, ref } from "vue";
+import { reactive, ref, shallowReactive } from "vue";
 import { ConnectionManager } from "./ConnectionManager";
 import NWNode, { SOCKET_TYPE } from "./NWNode";
 
@@ -55,6 +55,14 @@ export class Connection {
 		this.outputNode = null;
 		this.outputField = null;
 
+		// reactive versions
+		this.ends = shallowReactive({
+			inputNode: null,
+			inputField: null,
+			outputNode: null,
+			outputField: null,
+		});
+
 		// true if being destroyed
 		this.isBeingDestroyed = ref(false);
 	}
@@ -75,6 +83,8 @@ export class Connection {
 		// save the input node & field
 		this.inputNode = node;
 		this.inputField = field;
+		this.ends.inputNode = node;
+		this.ends.inputField = field;
 
 		// if it was nulled (cleared) then we can just GTFO now
 		if(node === null || field === null)
@@ -98,6 +108,8 @@ export class Connection {
 		// save the output node & field
 		this.outputNode = node;
 		this.outputField = field;
+		this.ends.outputNode = node;
+		this.ends.outputField = field;
 
 		// if it was nulled (cleared) then we can just GTFO now
 		if(node === null || field === null)
