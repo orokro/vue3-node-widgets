@@ -13,6 +13,7 @@ import { VBoolean } from './VBoolean.js';
 import { VText } from './VText.js';
 import { VCharacter } from './VCharacter.js';
 import { VEnum } from './VEnum.js';
+import { VGraph } from './VGraph.js';
 import VType from '../VType.js';
 
 // Register cross-type coalescers
@@ -134,5 +135,6 @@ export {
 	VText,
 	VCharacter,
 	VEnum,
+	VGraph,
 	VType
 };

@@ -1,6 +1,6 @@
 /*
-	VColor3
-	-------
+	VColor3.js
+	----------
 
 	Represents a color using red, green, and blue floating-point components.
 */

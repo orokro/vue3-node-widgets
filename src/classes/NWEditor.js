@@ -53,6 +53,9 @@ import t from 'typical';
 // main export class
 export default class NWEditor {
 
+	// make a unique id for this editor instance
+	id = NWEditor.generateUUID('editor');
+
 	// menu vars
 	showMenu = ref(false);
 	menuX = ref(0);
@@ -202,6 +205,19 @@ export default class NWEditor {
 
 		// show the menu
 		this.showMenu.value = true;
+	}
+
+
+	/**
+	 * Generates a unique id for this node instance.
+	 * 
+	 * @param {String} prefix - optional prefix for the id
+	 * @returns {String} - a unique id for this node instance
+	 */
+	static generateUUID(prefix='node') {
+		
+		// don't use the counter, use a random string
+		return `${prefix}_${Math.random().toString(36).substr(2, 9)}`;
 	}
 
 }

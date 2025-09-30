@@ -203,6 +203,7 @@ export const NODE_TYPE = {
 	INPUT: 'input',
 	OUTPUT: 'output',
 	PROCESSING: 'processing',
+	GROUP: 'group',
 };
 
 // the kinds of fields
@@ -247,6 +248,9 @@ export default class NWNode {
 
 	// just a helpful shorthand
 	static = this.constructor;
+
+	// the live list of fields for template
+	fieldsList = shallowRef(this.static.fields);
 
 	// version tick for reactive dependents (Node.vue, etc)
 	// whenever a connection is plugged or unplugged from this node,
@@ -618,4 +622,31 @@ export default class NWNode {
 		this.y.value = y;
 	}
 
+
+	addDynamicField(fieldType, options) {
+
+		const field = {
+			id: this.static.generateUUID('field'),
+			fieldType: fieldType,
+			valueType: options.type,
+			name: options.name,
+			title: options.title || '',
+			description: options.title || '',
+			component: null,
+			valuePassThrough: false,
+			validateFn: (value) => true,
+			lintFn: (value) => value,
+		};
+
+		this.fieldsList.value = [...this.fieldsList.value, field];
+
+		if([FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)) {
+				
+			this.fieldState[field.name] = this.wrapFieldValue(
+				field.name, 
+				field.id,
+				new field.valueType()
+			);
+		}
+	}
 }

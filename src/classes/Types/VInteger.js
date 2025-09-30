@@ -1,6 +1,6 @@
 /*
-	VInteger
-	--------
+	VInteger.js
+	-----------
 
 	Represents a whole number without decimal places.
 */

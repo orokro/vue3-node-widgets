@@ -1,6 +1,6 @@
 /*
-	VColor4
-	-------
+	VColor4.js
+	----------
 
 	Represents a color using red, green, blue, and alpha floating-point components.
 */

@@ -1,6 +1,6 @@
 /*
-	VCharacter
-	----------
+	VCharacter.js
+	-------------
 
 	Represents a single character.
 */

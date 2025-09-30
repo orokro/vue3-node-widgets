@@ -121,13 +121,13 @@ onMounted(() => {
 
 	// if we have a graph prop, set it as the root graph
 	if (props.graph)
-		ctx.setRootGraph(props.graph);
+		ctxRef.value.setRootGraph(props.graph);
 });
 
 // update root graph if the prop changes
 watch(() => props.graph, (newVal) => {
 	if (newVal)
-		ctx.setRootGraph(newVal);
+		ctxRef.value.setRootGraph(newVal);
 });
 
 

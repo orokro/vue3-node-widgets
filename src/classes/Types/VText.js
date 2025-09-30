@@ -1,6 +1,6 @@
 /*
-	VText
-	-----
+	VText.js
+	--------
 
 	Represents a string of one or more characters.
 */

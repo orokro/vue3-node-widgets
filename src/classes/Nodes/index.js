@@ -11,6 +11,9 @@ import AllTypesOutNode from './AllTypesOutNode';
 import ABMathKnobNode from './ABMathKnobNode';
 import SuperWaveNode from './SuperWaveNode';
 
+// special nodes
+import GroupNode from './GroupNode';
+
 import ABMathNode from './ABMathNode';
 import ABCompareNode from './ABCompareNode';
 import ClampValueNode from './ClampValueNode';
@@ -67,6 +70,9 @@ import TexLayer from './TexLayerNode';
 // make a reusable list of default nodes
 const defaultNodeList = [
 
+	// special nodes
+	{ class: GroupNode, menuPath: '/Special' },
+	
 	// debug nodes
 	{ class: AllTypesNode, menuPath: '/Debug' },
 	{ class: AllTypesOutNode, menuPath: '/Debug/' },
