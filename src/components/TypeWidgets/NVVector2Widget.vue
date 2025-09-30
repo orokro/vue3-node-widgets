@@ -94,19 +94,22 @@ const props = defineProps({
 });
 
 
-// we'll store the editable value here & run our state logic on it
-const xValue = shallowRef(props.node.fieldState[props.field.name].val.x);
-const yValue = shallowRef(props.node.fieldState[props.field.name].val.y);
 
-watch([xValue, yValue], ([newX, newY], [oldX, oldY]) => {
+const valueRef = props.node.fieldState[props.field.name].valueRef;
 
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = {
-		x: newX,
-		y: newY
-	};
-	
+const xValue = computed({
+	get() { return valueRef.value.x; },
+	set(newVal) {
+		valueRef.value = { ...valueRef.value, x: newVal,}
+	}
 });
+const yValue = computed({
+	get() { return valueRef.value.y; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, y: newVal}
+	}
+});
+
 
 
 const lintFloat = (value)=>{

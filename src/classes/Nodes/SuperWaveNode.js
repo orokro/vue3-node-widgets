@@ -61,6 +61,14 @@ export default class SuperWaveNode extends NWNode {
 			]),
 		});
 
+		this.addField(FIELD_TYPE.PROP, { 
+			name: 'xOffset',
+			title: 'xOffset', 
+			description: "Screen Scroll Offset",
+			type: VNumber,
+			valuePassThrough: false,
+		});	
+
 		this.addField(FIELD_TYPE.INPUT, { 
 			name: 'theta',
 			title: 'Theta', 

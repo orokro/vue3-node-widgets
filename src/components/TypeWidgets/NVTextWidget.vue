@@ -75,14 +75,7 @@ const props = defineProps({
 
 
 // we'll store the editable value here & run our state logic on it
-const textValue = shallowRef(props.node.fieldState[props.field.name].val);
-
-watch(()=>textValue.value, (newVal) => {
-
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = newVal;
-	
-});
+const textValue = props.node.fieldState[props.field.name].valueRef;
 
 
 const lint = (value)=>{

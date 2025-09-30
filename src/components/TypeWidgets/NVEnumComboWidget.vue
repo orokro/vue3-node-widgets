@@ -1,137 +1,217 @@
 <!--
-	NVEnumComboWidget.vue
-	---------------------
+    NVEnumComboWidget.vue
+    ---------------------
 
-	This will be the component used to display the NEnum type in the node UI.
-	It will be a combo box, with the enum values as options.
+    Custom dropdown replacement for enum values.
 -->
 <template>
 
 	<div 
-		class="n-enum-widget" 
-		:style="{
-			'text-align': align,
-		}"
+		class="n-enum-widget"		
+		:style="{ 'text-align': align }"
 	>
-		<!-- the outer most wrapper -->
+
 		<div class="input-wrapper">
 
 			<div class="enum-value-row">
 
-				<!-- gray wrapper for the select box -->
-				<div class="gray-wrapper">
-
-					<select
-						v-model="itemIndex"
-						:class="{
-							'input-enabled': !props.node.fieldState[props.field.name].readOnly,
-							'read-only': readOnly
-						}"
-						:disabled="readOnly"
+				<div 
+					class="gray-wrapper"
+					:class="{ 
+						'read-only': readOnly ,
+						'is-open': isOpen
+					}"
+				>
+					<!-- custom dropdown -->
+					<div 
+						class="dropdown"
+						@click="toggleOpen"
+						:class="{ open: isOpen }"
 					>
-						<option 
+						<div class="selected">{{ items[itemIndex] }}</div>
+						<span class="arrow"><span>▼</span></span>
+					</div>
+
+					<ul v-if="isOpen" class="dropdown-menu">
+						<li 
 							v-for="(item, index) in items" 
-							:key="index" 
-							:value="index"
+							:key="index"
+							@click="selectItem(index)"
 						>
-							{{ item }}
-						</option>
-					</select>
+							<span>{{ item }}</span>
+						</li>
+					</ul>
+
 				</div>
 			</div>
-
 		</div>
 	</div>
 </template>
+
 <script setup>
 
 // vue
-import { ref, onMounted, computed, shallowRef, watch } from 'vue';
+import { ref, watch } from "vue";
 
 // props
 const props = defineProps({
 
-	// the node this widget is for
-	node: {
+	node: { 
 		type: Object,
 		required: true
 	},
 
-	// the field this widget is for
 	field: {
 		type: Object,
 		required: true
 	},
 
-	// the alignment of the label text
 	align: {
 		type: String,
-		default: 'left'
+		default: "center"
 	},
-	
-	// true when read only
+
 	readOnly: {
 		type: Boolean,
 		default: false
 	},
 });
 
-// the items for the select box
+// items
 const items = props.field.valueType.items;
 
-// we'll store the editable value here & run our state logic on it
-const itemIndex = shallowRef(props.node.fieldState[props.field.name].val);
+// reactive index
+const itemIndex = props.node.fieldState[props.field.name].valueRef;
 
-watch(()=>itemIndex.value, (newVal) => {
+// open/close state
+const isOpen = ref(false);
 
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = newVal;
-});
 
-watch(()=>props.node.fieldState[props.field.name].val, (newVal) => {
+/**
+ * Toggle the dropdown open/closed
+ */
+function toggleOpen() {
+	if (!props.readOnly) {
+		isOpen.value = !isOpen.value;
+	}
+}
 
-	// update the itemIndex when the node's field state changes
-	itemIndex.value = newVal;
-});
 
+/**
+ * Select an item from the dropdown
+ * @param  {Number} index - index of the selected item
+ */
+function selectItem(index) {
+	itemIndex.value = index;
+	isOpen.value = false;
+}
 </script>
 <style lang="scss" scoped>
 
 	.n-enum-widget {
-		
+
 		.input-wrapper {
-			
-			overflow: clip;
 
 			position: relative;
+
 			.enum-value-row {
 
-				padding: 0em 0em 3em 0em;
-				
+				// pill shaped outer wrapper
 				.gray-wrapper {
+
+					position: relative;
 					border-radius: 10em;
-					background: gray;
-					height: 18em;
+					padding: 0em;
 
-					select {
+					// drop down element (previously was a select box)
+					.dropdown {
 
+						// box settings
 						background: gray;
 						border-radius: 10em;
-						width: calc(100% - 0.4em);
-						height: 100%;
+						padding: 2em 15em 2em 5em;
+						
+						//layout
+						/* display: flex; */
+						/* justify-content: space-between; */
+						align-items: center;
 
-						outline: none;
-						border: 0px none;
-
-						text-align: center;
+						// text settings
 						color: white;
-						font-size: 12em;
+						
+						// look so clickable
+						cursor: pointer;
 
-						&.read-only {
-							opacity: 0.5;
-							cursor: not-allowed;
+						.selected {
+							width: 100%;
+							font-size: 12em;
 						}
-					}// select
+
+					}// .dropdown
+
+					// arrow on drop down
+					.arrow {
+
+						// fixed on right
+						position: absolute;
+						top: 5em;
+						right: 5em;
+						width: 10em;
+
+						span {
+							font-size: 8em !important;
+						}
+					}// .arrow
+
+					// when open, change border radius of box & dropdown
+					&.is-open {
+						/* display: none; */
+						.dropdown {
+							border-radius: 10em 10em 0em 0em !important;
+							border: 2px solid #444;
+							border-bottom: none;
+							border-bottom: none;
+						}
+						.dropdown-menu {
+							border-radius: 0em 0em 8em 8em;
+						}
+					}// .is-open
+
+					// actual list of items that opens
+					.dropdown-menu {
+
+						// fixed under the box
+						position: absolute;
+						top: 100%;
+						left: 0;
+						right: 0;
+
+						// box settings
+						background: #666;
+						border: 2px solid #444;
+						border-radius: 0em 0em 8em 8em;
+						margin: 0em 0 0 0;
+						padding: 0;
+						overflow: clip;
+
+						// list settings
+						list-style: none;
+						z-index: 9999;
+
+						// the list items
+						li {
+							padding: 4em 8em;
+							color: white;
+							cursor: pointer;
+							span {
+								font-size: 12em;
+							}
+							&:hover {
+								background: #888;
+							}
+						}// li
+					
+					}// .dropdown-menu
 
 				}// .gray-wrapper
 

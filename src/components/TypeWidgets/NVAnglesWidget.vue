@@ -109,20 +109,25 @@ const props = defineProps({
 	},
 });
 
+const valueRef = props.node.fieldState[props.field.name].valueRef;
 
-// we'll store the editable value here & run our state logic on it
-const xValue = shallowRef(props.node.fieldState[props.field.name].val.x);
-const yValue = shallowRef(props.node.fieldState[props.field.name].val.y);
-const zValue = shallowRef(props.node.fieldState[props.field.name].val.z);
-
-watch([xValue, yValue, zValue], ([newX, newY, newZ], [oldX, oldY, oldZ]) => {
-
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = {
-		x: newX,
-		y: newY
-	};
-	
+const xValue = computed({
+	get() { return valueRef.value.x; },
+	set(newVal) {
+		valueRef.value = { ...valueRef.value, x: newVal,}
+	}
+});
+const yValue = computed({
+	get() { return valueRef.value.y; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, y: newVal}
+	}
+});
+const zValue = computed({
+	get() { return valueRef.value.z; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, z: newVal}
+	}
 });
 
 
@@ -155,7 +160,7 @@ const validateFloat = (value)=>{
 
 				// text alignment
 				text-align: var(--align, left);
-
+				white-space: nowrap;
 				// icon on left
 				.icon {
 					position: absolute;

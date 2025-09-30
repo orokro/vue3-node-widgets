@@ -164,25 +164,38 @@ const props = defineProps({
 const hexEditEl = ref(null);
 
 
-// const localValue = 
-// we'll store the editable value here & run our state logic on it
-const colorR = shallowRef(props.node.fieldState[props.field.name].val.r);
-const colorG = shallowRef(props.node.fieldState[props.field.name].val.g);
-const colorB = shallowRef(props.node.fieldState[props.field.name].val.b);
-const colorA = shallowRef(props.node.fieldState[props.field.name].val.a); 
+const valueRef = props.node.fieldState[props.field.name].valueRef;
+
+const colorR = computed({
+	get() { return valueRef.value.r; },
+	set(newVal) {
+		valueRef.value = { ...valueRef.value, r: newVal,}
+	}
+});
+const colorG = computed({
+	get() { return valueRef.value.g; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, g: newVal}
+	}
+});
+const colorB = computed({
+	get() { return valueRef.value.b; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, b: newVal}
+	}
+});
+const colorA = computed({
+	get() { return valueRef.value.a; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, a: newVal}
+	}
+});
+
 
 watch([colorR, colorG, colorB, colorA], ([nr, ng, nb, na], [or, og, ob, oa]) => {
 
 	// prevent watcher loop if values are the same
 	if (nr === or && ng === og && nb === ob && na == oa) return;
-
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = {
-		r: nr,
-		g: ng,
-		b: nb,
-		a: na
-	};
 
 	if(hexEditEl.value.inputEnabled==true){
 		// console.log('not updating hex value because input is enabled');

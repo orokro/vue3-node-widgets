@@ -91,13 +91,7 @@ const props = defineProps({
 const dh = inject('dh');
 
 // we'll store the editable value here & run our state logic on it
-const numberValue = shallowRef(props.node.fieldState[props.field.name].val);
-watch(()=>numberValue.value, (newVal) => {
-
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = newVal;
-	
-});
+const numberValue = props.node.fieldState[props.field.name].valueRef;
 
 
 // compute the angle for the CSS based on our value

@@ -64,6 +64,7 @@
 				:degrees="degrees"
 				:xscale="screenResolutionWidth/6"
 				:color="'#aaFF00'"
+				v-model:xOffset="xOffset"
 			/>
 		</div>
 
@@ -103,18 +104,11 @@ const screenResolutionWidth = ref(277);
 const screenResolutionHeight = ref(78);
 
 // make the fields reactive for our template
-const theta = shallowRef(props.node.fieldState.theta.val);
-watch(()=>theta.value, (newVal) => { props.node.fieldState.theta.val = newVal; });
-
-const amplitude = shallowRef(props.node.fieldState.amplitude.val);
-watch(()=>amplitude.value, (newVal) => { props.node.fieldState.amplitude.val = newVal; });
-
-const wavelength = shallowRef(props.node.fieldState.wavelength.val);
-watch(()=>wavelength.value, (newVal) => { props.node.fieldState.wavelength.val = newVal; });
-
-const degrees = shallowRef(props.node.fieldState.degrees.val);
-watch(()=>degrees.value, (newVal) => { props.node.fieldState.degrees.val = newVal; });
-
+const theta = props.node.fieldState.theta.valueRef;
+const xOffset = props.node.fieldState.xOffset.valueRef;
+const amplitude = props.node.fieldState.amplitude.valueRef;
+const wavelength = props.node.fieldState.wavelength.valueRef;
+const degrees = props.node.fieldState.degrees.valueRef;
 
 // resize observer to keep screen rendering correctly sized
 let resizeObserver = null;

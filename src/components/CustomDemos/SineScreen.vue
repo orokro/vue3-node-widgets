@@ -42,6 +42,7 @@ import { ref, watch, onMounted, computed, inject } from 'vue';
  * color:		pen color for axes, ticks, labels, and the curve.
  */
 const props = defineProps({
+	xOffset: { type: Number, default: 0 },
 	width: { type: Number, default: 600 },
 	height: { type: Number, default: 300 },
 	amplitude: { type: Number, default: 1 },
@@ -55,21 +56,31 @@ const props = defineProps({
 // get our drag helper for latter use
 const dh = inject('dh');
 
-/**
- * Internal reactive state
- * -----------------------
- * xOffset: horizontal scroll offset (in pixels). Positive values shift the curve/labels left (as if panning right).
- * NOTE: This is intentionally not a prop. You can change it from parent code by using a template ref to the
- * component instance and setting `instance.xOffset.value = ...`.
- */
-const xOffset = ref(-props.width/2);
+const emit = defineEmits(['update:xOffset']);
+
+// local backing state so dragging works even without v-model
+const internalXOffset = ref(props.xOffset);
+
+// sync with parent if prop changes
+watch(() => props.xOffset, (val) => {
+	internalXOffset.value = val;
+});
+
+// Local proxy that syncs prop <-> internal writes
+const xOffsetProxy = computed({
+	get: () => internalXOffset.value,
+	set: (val) => {
+		internalXOffset.value = val;
+		emit('update:xOffset', val);
+	}
+});
 
 
 /**
  * Expose the internal xOffset so a parent can update it programmatically.
  * This keeps the source of truth inside the component, while allowing external control.
  */
-defineExpose({ xOffset });
+defineExpose({ xOffsetProxy });
 
 
 /**
@@ -141,11 +152,12 @@ function toCanvasY(valueNormalized) {
 
 /**
  * Draw axes (X through center, Y at world X=0) and tick marks with labels.
- * The X axis is always at y=0 (center). The Y axis position depends on xOffset (it "scrolls" with content).
+ * The X axis is always at y=0 (center). The Y axis position depends on xOffsetProxy (it "scrolls" with content).
  *
  * @param {CanvasRenderingContext2D} ctx
  */
 function drawAxesAndTicks(ctx) {
+	
 	ctx.save();
 	ctx.strokeStyle = props.color;
 	ctx.fillStyle = props.color;
@@ -166,16 +178,17 @@ function drawAxesAndTicks(ctx) {
 	// ----- X Ticks & Labels -----
 	// World-to-canvas mapping:
 	// worldX = k * pxPer90
-	// canvasX = worldX - xOffset
+	// canvasX = worldX - xOffsetProxy
 	// For all integers k s.t. canvasX ∈ [0, width], place a tick.
 	const S = pxPer90.value;
 	if (S > 0) {
-		const kStart = Math.floor((xOffset.value) / S) - 1; // extend one step out to ensure coverage
-		const kEnd = Math.ceil((xOffset.value + props.width) / S) + 1;
+
+		const kStart = Math.floor((xOffsetProxy.value) / S) - 1; // extend one step out to ensure coverage
+		const kEnd = Math.ceil((xOffsetProxy.value + props.width) / S) + 1;
 
 		for (let k = kStart; k <= kEnd; k++) {
 			const worldX = k * S;
-			const canvasX = worldX - xOffset.value;
+			const canvasX = worldX - xOffsetProxy.value;
 			if (canvasX < -S || canvasX > props.width + S) continue;
 
 			// Tick
@@ -187,13 +200,16 @@ function drawAxesAndTicks(ctx) {
 			// Label every tick (0, 90°, 180°...) with degree or π notation
 			const label = formatXLabel(k);
 			ctx.fillText(label, canvasX, midY.value + tickSize / 2 + 2);
-		}
+		
+		}// next k
 	}
 
 	// ----- Y Axis (vertical at worldX=0) -----
-	// canvasX for y-axis is 0 - xOffset
-	const yAxisX = -xOffset.value;
+	// canvasX for y-axis is 0 - xOffsetProxy
+	const yAxisX = -xOffsetProxy.value;
 	if (yAxisX >= 0 && yAxisX <= props.width) {
+
+		// Y axis line
 		ctx.beginPath();
 		ctx.moveTo(yAxisX, 0);
 		ctx.lineTo(yAxisX, props.height);
@@ -247,6 +263,7 @@ function formatXLabel(k) {
 	}
 	// Radians in π units at 90° increments -> k * 0.5π
 	const halfPiUnits = k * 0.5;
+
 	// Keep a compact representation (avoid trailing .0 when possible)
 	const str = Number.isInteger(halfPiUnits) ? String(halfPiUnits) : String(halfPiUnits);
 	return `${str}π`;
@@ -255,7 +272,7 @@ function formatXLabel(k) {
 
 /**
  * Draw the sine curve using the current settings.
- * The curve scrolls horizontally with xOffset, and uses the same horizontal scale as the tick spacing.
+ * The curve scrolls horizontally with xOffsetProxy, and uses the same horizontal scale as the tick spacing.
  * Vertically, the curve always fits inside [-1, +1] visually, scaled by `visualAmplitude`.
  *
  * @param {CanvasRenderingContext2D} ctx
@@ -270,10 +287,13 @@ function drawSine(ctx) {
 	// Start at x=0
 	let first = true;
 	for (let x = 0; x <= props.width; x++) {
+
 		// worldX is the scrolled coordinate
-		const worldX = x + xOffset.value;
+		const worldX = x + xOffsetProxy.value;
+
 		// Convert to radians via radiansPerPixel
 		const theta = worldX * radiansPerPixel.value;
+
 		// Compute normalized y in [-1..+1] and apply visual amplitude clamp
 		const yNorm = Math.sin(theta) * visualAmplitude.value;
 		const yCanvas = toCanvasY(yNorm);
@@ -310,7 +330,7 @@ function drawAll() {
 /**
  * Watchers & lifecycle
  * --------------------
- * We redraw when relevant props or the xOffset ref changes.
+ * We redraw when relevant props or the xOffsetProxy ref changes.
  */
 onMounted(() => {
 	drawAll();
@@ -327,23 +347,29 @@ watch(
 		props.xscale,
 		props.degrees,
 		props.color,
-		xOffset.value
+		xOffsetProxy.value
 	],
 	drawAll,
 	{ flush: 'post' }
 );
 
 
+/**
+ * Start a drag operation to adjust xOffsetProxy (horizontal scroll).
+ * 
+ * @param {MouseEvent} e - the mousedown event
+ */
 function startScreenDrag(e){
 
 	// save initial offset
-	const initialOffset = xOffset.value;
-
+	const initialOffset = xOffsetProxy.value;
+	
 	// do the drag operation
 	dh.dragStart(
+
 		(dx, dy)=>{
-			// on drag, update the xOffset
-			xOffset.value = initialOffset + dx;
+			// on drag, update the xOffsetProxy
+			xOffsetProxy.value = initialOffset + dx;
 		},
 		(dx, dy)=>{
 			// on drag end, nothing to do

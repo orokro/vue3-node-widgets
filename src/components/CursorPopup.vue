@@ -84,13 +84,13 @@ defineExpose({
 
 		border-radius: 5px;
 		box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
-		padding: 0.3em 1em;
+		padding: 0.0em 1em;
 		background: rgba(0,0,0,0.75);
 		color: white;
 		font-size: 1em;
 		
 		pre {
-			font-size: 1.5em;
+			font-size: 1.0em;
 			letter-spacing: -0.05em;
 		}
 	}// .tool-tip-box

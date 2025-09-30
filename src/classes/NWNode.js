@@ -195,7 +195,7 @@
 
 // vue
 import { Value } from 'sass';
-import { ref, shallowRef } from 'vue';
+import { ref, shallowRef, watchEffect } from 'vue';
 
 // the kind of nodes
 export const NODE_TYPE = {
@@ -560,6 +560,7 @@ export default class NWNode {
 			name,
 			id,
 			_valueObj: value,
+			valueRef: shallowRef(value.value),
 			data: {}
 		};
 
@@ -572,10 +573,14 @@ export default class NWNode {
 			},
 			set: (newValue) => {
 				wrapped._valueObj.value = newValue;
+				wrapped.valueRef.value = newValue;
 				node.requestComputeUpdate(name, newValue);
 			},
 			enumerable: true,
 			configurable: true
+		});
+		wrapped.watch = watchEffect(() => {
+			wrapped._valueObj.value = wrapped.valueRef.value;
 		});
 
 		return wrapped;

@@ -146,24 +146,28 @@ const props = defineProps({
 
 const hexEditEl = ref(null);
 
+const valueRef = props.node.fieldState[props.field.name].valueRef;
 
-// const localValue = 
-// we'll store the editable value here & run our state logic on it
-const colorR = shallowRef(props.node.fieldState[props.field.name].val.r);
-const colorG = shallowRef(props.node.fieldState[props.field.name].val.g);
-const colorB = shallowRef(props.node.fieldState[props.field.name].val.b);
+const colorR = computed({
+	get() { return valueRef.value.r; },
+	set(newVal) {
+		valueRef.value = { ...valueRef.value, r: newVal,}
+	}
+});
+const colorG = computed({
+	get() { return valueRef.value.g; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, g: newVal}
+	}
+});
+const colorB = computed({
+	get() { return valueRef.value.b; },
+	set(newVal) {
+		valueRef.value = {...valueRef.value, b: newVal}
+	}
+});
 
 watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
-
-	// prevent watcher loop if values are the same
-	if (nr === or && ng === og && nb === ob) return;
-
-	// update the node's field state when the value changes
-	props.node.fieldState[props.field.name].val = {
-		r: nr,
-		g: ng,
-		b: nb
-	};
 
 	if(hexEditEl.value.inputEnabled==true){
 		// console.log('not updating hex value because input is enabled');
@@ -172,9 +176,7 @@ watch([colorR, colorG, colorB], ([nr, ng, nb], [or, og, ob]) => {
 
 	// update the hex value whenever the RGB values change
 	hexValue.value = rgbToHex(nr, ng, nb);
-	
 });
-
 
 
 // using colord convert floating point r-g-b-values to hex
