@@ -64,6 +64,9 @@ export default class NWEditor {
 	// reusable drag helper
 	dragHelper = new DragHelper();
 
+	// when we enter sub-graphs, we need to keep track of the parent editors
+	parentGraphs = shallowRef([]);
+
 
 	/**
 	 * Constructor
@@ -104,6 +107,9 @@ export default class NWEditor {
 		// dynamic version
 		this.rootGraphRef = shallowRef(this.rootGraph);
 
+		// name for current graph
+		this.graphName = ref('Root Graph');
+
 		// whenever the user changes the graph, we can build a single functional "compute" function
 		// that represents the entire graph, and can be called with inputs to get outputs
 		// this function will be stored here
@@ -136,8 +142,69 @@ export default class NWEditor {
 	 * @param {NWGraph} newGraph - the new root graph to set
 	 */
 	setRootGraph(newGraph){
+		
+		// clear stack of parent graphs, since we're setting a new root
+		this.parentGraphs.value = [];
+
+		// set it
 		this.rootGraph = newGraph;
 		this.rootGraphRef.value = newGraph;
+		this.graphName.value = 'Root Graph';
+	}
+
+
+	/**
+	 * Opens a sub-graph in the editor.
+	 * 
+	 * @param {String} graphName - the name of the sub-graph to open
+	 * @param {NWGraph} newSubGraph - the sub-graph to open
+	 */
+	openSubGraph(graphName, newSubGraph){
+
+		// add the current graph to the parent editors stack
+		this.parentGraphs.value = [
+			...this.parentGraphs.value, 
+			{
+				id: this.constructor.generateUUID('parent'),
+				name: this.graphName.value,
+				graph: this.rootGraph,
+			}
+		];
+
+		// set our graph but don't clear parents bc we're going deeper
+		this.rootGraph = newSubGraph;
+		this.rootGraphRef.value = newSubGraph;
+
+		// save our name
+		this.graphName.value = graphName;
+	}
+
+
+	/**
+	 * Selects a breadcrumb in the editor.
+	 * 
+	 * @param {Number} index - the index of the breadcrumb to select
+	 * @returns {void}
+	 */
+	selectBreadcrumb(index){
+
+		// if they clicked the last one, do nothing
+		if(index === this.parentGraphs.value.length)
+			return;
+
+		// otherwise, pop off the stack to the selected index
+		const newParents = this.parentGraphs.value.slice(0, index);
+		const selected = this.parentGraphs.value[index];
+
+		// set our graph but don't clear parents bc we're going deeper
+		this.rootGraph = selected.graph;
+		this.rootGraphRef.value = selected.graph;
+
+		// save our name
+		this.graphName.value = selected.name;
+
+		// set the new parents array
+		this.parentGraphs.value = newParents;
 	}
 
 

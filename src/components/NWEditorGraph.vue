@@ -31,6 +31,12 @@
 		<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
 		<div class="ui-container fill-parent">
 
+			<!-- The breadcrumb list, only shown if we're in a sub-graph -->
+			<BreadcrumbList 
+				v-if="ctxRef != null"
+				:editor="ctxRef"
+			/>
+
 			<!-- if the user wants to see dev errors, they can enable this component -->
 			<DevErrors 
 				v-if="ctxRef != null && showDevErrors" 
@@ -63,6 +69,7 @@ import NodeGraphRenderer from '@Components/NodeGraphRenderer.vue';
 import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import CursorPopup from '@Components/CursorPopup.vue';
+import BreadcrumbList from './BreadcrumbList.vue';
 
 // our app
 import NWEditor from '@src/classes/NWEditor.js';

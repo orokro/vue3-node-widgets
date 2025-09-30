@@ -66,17 +66,18 @@ const graph = props.node.fieldState[props.field.name].val;
 // get the context for the graph editor
 const ctxRef = inject('ctx');
 
+
+/**
+ * Open the sub graph editor for this graph
+ */
 function openGraph() {
 
-	// console.log(graph, ctx);
-	// ctx.openSubGraphEditor(props.node, props.field);
+	// get the graph name from the node's groupName field
+	const graphName = props.node.fieldState['groupName'].val;
 
+	// open the sub graph editor
 	const ctx = ctxRef.value;
-	ctx.setRootGraph(graph);
-
-	// ctx.menuX.value = 100;
-	// ctx.menuY.value = 100;
-	// ctx.showMenu.value = true;
+	ctx.openSubGraph(graphName, graph);
 }
 
 // debug mount test
