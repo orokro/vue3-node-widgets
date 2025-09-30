@@ -22,7 +22,7 @@
 			<!-- always show our contexts root graph -->
 			<NodeGraphRenderer
 				:editor="ctxRef"
-				:graph="ctxRef.rootGraph"
+				:graph="ctxRef.rootGraphRef.value"
 				:backgroundScale="backgroundScale"
 				@showAddMenu="showAddMenu"
 			/>
