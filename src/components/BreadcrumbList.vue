@@ -179,19 +179,21 @@ function clickCrumb(idx, e){
 
 					// force text to center
 					text-align: center;
-					
+
 				}// .close-button
 
 				// just the arrow
 				&:last-child {
 					
 					// hide arrow but don't break line flow
-					.arrow {
-						overflow: clip;
-						opacity: 0;
-						width: 0px;
-						display: inline-block;
-					}// .arrow
+					:not(first-child){
+						.arrow {
+							overflow: clip;
+							opacity: 0;
+							width: 0px;
+							display: inline-block;
+						}// .arrow
+					}
 
 					&:hover {
 						padding-right: 30px;
@@ -203,6 +205,24 @@ function clickCrumb(idx, e){
 					}
 
 				}// &:last-child
+
+				// never allow close button on first crumb
+				&:first-child {
+					
+					padding-right: 8px !important;
+
+					.close-button {
+						display: none !important;
+					}
+
+					&:hover {
+						padding-right: 8px !important;
+
+						.close-button {
+							display: none !important;
+						}
+					}
+				}// &:first-child
 
 			}// .breadcrumb-box
 
