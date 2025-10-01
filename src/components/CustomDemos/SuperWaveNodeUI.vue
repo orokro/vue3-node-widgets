@@ -469,7 +469,7 @@ function fieldHasInput(field){
 
 				// fixed size & position
 				position: absolute;
-				inset: -10em 5em 5em 5em;
+				inset: -5em 5em 5em 5em;
 
 				// background image
 				background: url('/SuperWave/switch.png');
