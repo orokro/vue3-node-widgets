@@ -36,6 +36,11 @@ import {
  } from '../Types/index.js';
  import { VType } from '../Types/index.js';
 
+// we'll always add input output nodes to the group node by default
+import GroupInputNode from './GroupInputNode.js';
+import GroupOutputNode from './GroupOutputNode.js';
+import ABMathNode from './ABMathNode.js';
+
 // main export
 export default class GroupNode extends NWNode {
 
@@ -68,6 +73,7 @@ export default class GroupNode extends NWNode {
 		});
 	}
 	
+
 	/**
 	 * Constructor
 	 */
@@ -76,6 +82,11 @@ export default class GroupNode extends NWNode {
 
 		this.fieldState.groupName.val = 'Group';
 
+		// build our built-in graph (which is just a default input & output node)
+		this.buildDefaultLayout();
+
+		// below was debug code for dynamic inputs
+		return;
 		this.addDynamicField(FIELD_TYPE.INPUT, {
 			name: 'foo',
 			title: 'Foo',
@@ -87,6 +98,23 @@ export default class GroupNode extends NWNode {
 			title: 'Bar',
 			type: VVector3,
 		});
+	}
+
+
+	/**
+	 * Build a default layout for the internal graph
+	 */
+	buildDefaultLayout(){
+
+		// get the actual NWGraph instance for this node
+		const ctx = this.fieldState.graph.val;
+
+		// add both an input & output node by default
+		ctx.addNode(GroupInputNode, 20, 200);
+		ctx.addNode(GroupOutputNode, 680, 200);
+
+		// for debug we'll also add a math node to the middle
+		ctx.addNode(ABMathNode, 350, 200);
 	}
 
 }

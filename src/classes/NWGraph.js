@@ -59,20 +59,6 @@ export class NWGraph {
 	 */
 	addNode(nodeClass, x = 0, y = 0, slug = null) {
 
-		// // if x and y are 0, use the current menu position
-		// if (x === 0 && y === 0) {
-		// 	x = this.poop.menuX.value;
-		// 	y = this.poop.menuY.value;
-		// }
-
-		// // now using the pan & zoom values, adjust the x and y positions
-		// x = (x - this.poop.panX.value) / this.poop.zoomScale.value;
-		// y = (y - this.poop.panY.value) / this.poop.zoomScale.value;
-
-		// // hide the menu if it's open
-		// if (this.poop.showMenu.value)
-		// 	this.poop.showMenu.value = false;
-
 		let newNode = null;
 
 		// if we were passed in a class, instantiate it

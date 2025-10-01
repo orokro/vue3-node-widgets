@@ -243,14 +243,14 @@ export default class NWNode {
 	static inputs = {};
 	static outputs = {};
 	
+	// true when this node is only available in sub-graphs
+	static isSubGraphOnly = false;
+	
 	// just a helpful shorthand
 	static = this.constructor;
 
 	// the id field of the node
 	id = '';
-
-	// true when this node is only available in sub-graphs
-	isSubGraphOnly = false;
 
 	// the live list of fields for template
 	fieldsList = shallowRef(this.static.fields);

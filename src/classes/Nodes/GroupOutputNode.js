@@ -39,10 +39,13 @@ export default class GroupOutputNode extends NWNode {
 
 		// reset things
 		this.init();
+
+		// this node should only be allowed in sub-graphs
+		this.isSubGraphOnly = true;
 		
 		// This functions as an input-type node
 		this.setNodeType(NODE_TYPE.OUTPUT);
-
+		
 		this.addField(FIELD_TYPE.LABEL, { name: 'lbl', text: 'Add Inputs Below', align:'center' });
 
 		// enumeration
@@ -62,9 +65,6 @@ export default class GroupOutputNode extends NWNode {
 	constructor() {
 
 		super();
-
-		// this node should only be allowed in sub-graphs
-		this.isSubGraphOnly = true;
 
 	}
 

@@ -23,7 +23,6 @@
 				top: `${nwSystem.menuY.value}px`,
 			}"
 		>
-
 			<!-- search box -->
 			<div class="search-box">
 
@@ -39,6 +38,7 @@
 						v-model="searchQuery"
 					/>
 				</div>
+
 			</div>
 
 			<!-- this will spawn the list of menu items and sub-menu items -->
@@ -58,6 +58,7 @@ import { ref, shallowRef, watch, computed } from 'vue';
 
 // components
 import AddMenuList from '@Components/AddMenuList.vue';
+import { NODE_TYPE } from '@/classes/NWNode';
 
 // define some props
 const props = defineProps({
@@ -88,9 +89,9 @@ const searchBoxEl = ref(null);
 const rootMenuItems = computed(() => {
 
 	// if the search query is empty, return the full menu hierarchy
-	if (searchQuery.value.trim() === '') {
-		return menuHierarchy.value;
-	}
+	// if (searchQuery.value.trim() === '') {
+	// 	return menuHierarchy.value;
+	// }
 
 	// otherwise, filter the menu hierarchy based on the search query
 	return filterMenuItems(props.nwSystem.availableNodes.value, searchQuery.value);
@@ -105,7 +106,12 @@ const rootMenuItems = computed(() => {
  * @returns {Array} - The filtered menu items
  */
 function filterMenuItems(items, query) {
+
+	// prepare some info about the query & graph context
 	const sanitizedQuery = query.trim().toLowerCase();
+	const queryIsEmpty = sanitizedQuery.length===0;
+	const outsideGroup = props.graphCtx.graph.subGraph==false;
+	const insideGroup = props.graphCtx.graph.subGraph==true;
 
 	/*
 		props.nwSystem.availableNodes.value
@@ -119,7 +125,26 @@ function filterMenuItems(items, query) {
 		where we do a match based on it's class.nodeName
 	*/	
 	let filteredItems = items.filter(item => {
-		return item.class.nodeName.toLowerCase().includes(sanitizedQuery);
+		
+		// get some info about the item		
+		const isInputType = item.class.nodeType===NODE_TYPE.INPUT;
+		const isOutputType = item.class.nodeType===NODE_TYPE.OUTPUT;
+		const isIOType = isInputType || isOutputType;		
+		const itemIsSubGraphOnly = item.class.isSubGraphOnly===true;
+
+		// true if we match the query
+		const matchesQueryFilter = queryIsEmpty || item.class.nodeName.toLowerCase().includes(sanitizedQuery);
+
+		// true if we're outside a group & the node isn't specifically for sub-graphs
+		const outsideGroupFilter = outsideGroup && itemIsSubGraphOnly==false;
+		
+		// true if we're inside a group & the node is either not an IO, or it is an IO type but it's a subgraph node
+		const insideGroupFilter = insideGroup && (isIOType==false || (isIOType && itemIsSubGraphOnly));
+		
+		// if we match the query, and we're either outside a group & the node isn't specifically for sub-graphs
+		const passesAllFilters = matchesQueryFilter && (outsideGroupFilter || insideGroupFilter);
+
+		return passesAllFilters;
 	});
 
 	// convert the flat array into a nested object
@@ -165,12 +190,14 @@ function _buildMenuHierarchy(flatArray) {
 	}
 
 	for (const { menuPath, class: classRef } of flatArray) {
+
 		const nodeName = classRef.nodeName;
 		const parts = menuPath.split('/').filter(Boolean).map(sanitize);
 
 		let currentLevel = root;
 
 		for (let i = 0; i < parts.length; i++) {
+
 			const part = parts[i];
 
 			if (i === parts.length - 1) {
@@ -181,8 +208,10 @@ function _buildMenuHierarchy(flatArray) {
 				// Walk/create directory
 				currentLevel = getOrCreate(currentLevel, part).items;
 			}
-		}
-	}
+
+		}// next i
+
+	}// next { menuPath, class: classRef}
 
 	return root;
 }

@@ -40,6 +40,9 @@ export default class GroupInputNode extends NWNode {
 		// reset things
 		this.init();
 		
+		// this node should only be allowed in sub-graphs
+		this.isSubGraphOnly = true;
+
 		// This functions as an input-type node
 		this.setNodeType(NODE_TYPE.INPUT);
 
@@ -62,10 +65,7 @@ export default class GroupInputNode extends NWNode {
 	constructor() {
 
 		super();
-
-		// this node should only be allowed in sub-graphs
-		this.isSubGraphOnly = true;
-
+		
 		// this.fieldState.groupName.val = 'Group';
 	}
 
