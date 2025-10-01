@@ -13,6 +13,8 @@ import SuperWaveNode from './SuperWaveNode';
 
 // special nodes
 import GroupNode from './GroupNode';
+import GroupInputNode from './GroupInputNode';
+import GroupOutputNode from './GroupOutputNode';
 
 import ABMathNode from './ABMathNode';
 import ABCompareNode from './ABCompareNode';
@@ -72,6 +74,8 @@ const defaultNodeList = [
 
 	// special nodes
 	{ class: GroupNode, menuPath: '/Special' },
+	{ class: GroupInputNode, menuPath: '/Special/' },
+	{ class: GroupOutputNode, menuPath: '/Special/' },
 	
 	// debug nodes
 	{ class: AllTypesNode, menuPath: '/Debug' },
