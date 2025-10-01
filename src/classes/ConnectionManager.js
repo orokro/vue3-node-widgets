@@ -19,6 +19,9 @@ import { shallowRef, ref } from "vue";
 import { Connection } from "./Connection";
 import NWNode, { SOCKET_TYPE } from "./NWNode";
 
+// get our special type
+import { VGroupAny } from "./Types/VGroupAny";
+
 // main export
 export class ConnectionManager {
 
@@ -327,8 +330,28 @@ export class ConnectionManager {
 			return;
 		}
 
+		// don't allow same type when it's a VGroupAny
+		if(fromType.typeName == VGroupAny.typeName && toType.typeName == VGroupAny.typeName) {
+
+			cursorPopup.show(`Group IO can only be wired to other types`);
+			return;	// don't snap
+
+		// if wiring from a VGroupAny, allow anything
+		}else if(fromType.typeName == VGroupAny.typeName) {
+
+			// get to field
+			const toField = isInputSocket ? field : this.connectionBeingDragged?.outputField;
+			cursorPopup.show(`Add '${toField.title}' as Group Input`);
+
+		// if wiring to a VGroupAny, allow anything
+		}else if(toType.typeName == VGroupAny.typeName) {
+
+			// get from field
+			const fromField = isInputSocket ? this.connectionBeingDragged?.inputField : field;
+			cursorPopup.show(`Add '${fromField.title}' as Group Output`);
+
 		// same type → no conversion
-		if (fromType.typeName === toType.typeName) {
+		}else if (fromType.typeName === toType.typeName) {
 
 			// cursorPopup.show(`${node.slug}_${field.name} (${toType})`);
 			cursorPopup.show(`Same Type: ${fromType.typeName}`);
