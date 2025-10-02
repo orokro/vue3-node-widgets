@@ -48,13 +48,6 @@ export default class GroupInputNode extends NWNode {
 
 		this.addField(FIELD_TYPE.LABEL, { name: 'lbl', text: 'Add Inputs Below', align:'center' });
 
-		// enumeration
-		this.addField(FIELD_TYPE.OUTPUT, { 
-			name: 'addOutput',
-			title: 'Add Output',
-			description: "Wire to add an output",
-			type: VGroupAny,
-		});
 
 	}
 
@@ -65,8 +58,69 @@ export default class GroupInputNode extends NWNode {
 	constructor() {
 
 		super();
-		console.log(this);
+
+		// our any type
+		this.anyField = this.addDynamicField(FIELD_TYPE.OUTPUT, {
+			name: 'addOutput',
+			title: 'Add Output',
+			description: "Wire to add an output",
+			type: VGroupAny,
+		});
+
+
 		// this.fieldState.groupName.val = 'Group';
+	}
+
+
+	static fieldCounter = 0;
+
+	/**
+	 * Called by the connection manager when a field's connection changes.
+	 * 
+	 * @param {Object} field - the field object whose connection changed
+	 * @param {Connection} connection - the connection object that was added or removed
+	 */
+	onFieldConnect(field, connection){
+		
+		// if we're the any field, let's re-wire it to a new dynamic input
+		if(field === this.anyField){
+
+			// get the type of the connected field
+			let targetField = connection.getOtherField(field);
+			let targetType = targetField.valueType;
+			let targetName = targetField.name + (this.constructor.fieldCounter++);
+			let targetTitle = targetField.title || targetField.name || 'Output';
+			let targetDescription = targetField.description;
+
+			// create a new dynamic output field with this type
+			let newField = this.addDynamicField(FIELD_TYPE.OUTPUT, {
+				name: targetName,
+				title: targetTitle,
+				description: targetDescription,
+				type: targetType,
+			});
+
+			// move the any field to the bottom
+			this.moveDynamicFieldToEnd(this.anyField);
+
+			// change the field on the connection to this new field
+			connection.inputField = newField;
+			connection.getNodeWireTickFn()();
+			this.wiresVersion.value++;
+		}
+	}
+
+
+	/**
+	 * Called by the connection manager when a field's connection is removed.
+	 * 
+	 * @param {Object} field - the field object whose connection was removed
+	 * @param {Connection} connection - the connection object that was removed
+	 */
+	onFieldDisconnect(field, connection){
+		
+		this.removeDynamicField(field.id);
+		this.wiresVersion.value++;
 	}
 
 }

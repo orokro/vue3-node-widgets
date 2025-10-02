@@ -187,7 +187,13 @@ export class NWGraph {
 		inputNodes.forEach(node => {
 			node.fieldsList.value.forEach(field => {
 				if (field.fieldType === 'output') {
+					
+					// skip the VGroupAny type, since it's just a placeholder
+					if (field.valueType && field.valueType.typeName === 'Group Any')
+						return;
+
 					const connections = this.connMgr.getConnectionsBySocket(node, field, false);
+
 					newInputsList.push({
 						node: node,
 						field: field,
@@ -202,7 +208,13 @@ export class NWGraph {
 		outputNodes.forEach(node => {
 			node.fieldsList.value.forEach(field => {
 				if (field.fieldType === 'input') {
+
+					// skip the VGroupAny type, since it's just a placeholder
+					if (field.valueType && field.valueType.typeName === 'Group Any')
+						return;
+
 					const connections = this.connMgr.getConnectionsBySocket(node, field);
+					
 					newOutputsList.push({
 						node: node,
 						field: field,

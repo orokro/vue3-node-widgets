@@ -524,7 +524,12 @@ export class ConnectionManager {
 						otherConn.destroy();
 				}
 
+				// tell nodes about the connections made
+				conn.inputNode?.onFieldConnect(conn.inputField, conn);
+				conn.outputNode?.onFieldConnect(conn.outputField, conn);				
 				conn.getNodeWireTickFn()();
+
+				// update the IO if we connected to an IO node
 				if(connectedToIONode)
 					this.graph.updateIO();
 			}

@@ -86,7 +86,9 @@ export default class GroupNode extends NWNode {
 		// build our built-in graph (which is just a default input & output node)
 		this.buildDefaultLayout();
 
-		// wathc 
+		// watch for IO changes in the internal graph & update our dynamic fields
+		this.watchIO();
+
 		// below was debug code for dynamic inputs
 		return;
 		this.addDynamicField(FIELD_TYPE.INPUT, {
@@ -114,6 +116,48 @@ export default class GroupNode extends NWNode {
 			// we'll start fresh by clearing our dynamic fields
 			this.clearDynamicFields();
 
+			// get our actual NWGraph instance for this node
+			const ctx = this.fieldState.graph.val;
+
+			/*
+				The input/output definitions have the shape:
+				
+				{
+					node: theNode,
+					field: theField,
+					type: theType,
+					connected: true if a wire is connected
+				}
+			*/
+
+			// get the inputs definitions
+			const inputs = ctx.inputs.value;
+
+			// iterate over them & add dynamic fields
+			inputs.forEach( def => {
+
+				// add a dynamic input field for this
+				this.addDynamicField(FIELD_TYPE.INPUT, {
+					name: def.field.name,
+					title: def.field.title,
+					type: def.type,
+				});
+			});
+
+			// get the outputs definitions
+			const outputs = ctx.outputs.value;
+
+			// iterate over them & add dynamic fields
+			outputs.forEach( def => {
+
+				// add a dynamic output field for this
+				this.addDynamicField(FIELD_TYPE.OUTPUT, {
+					name: def.field.name,
+					title: def.field.title,
+					type: def.type,
+				});
+			});
+
 		});
 	}
 
@@ -132,6 +176,28 @@ export default class GroupNode extends NWNode {
 
 		// for debug we'll also add a math node to the middle
 		ctx.addNode(ABMathNode, 350, 200);
+	}
+
+
+	/**
+	 * Called by the connection manager when a field's connection changes.
+	 * 
+	 * @param {Object} field - the field object whose connection changed
+	 * @param {Connection} connection - the connection object that was added or removed
+	 */
+	onFieldConnect(field, connection){
+		// console.log(`Field ${field.name} connection changed!`);
+	}
+
+
+	/**
+	 * Called by the connection manager when a field's connection is removed.
+	 * 
+	 * @param {Object} field - the field object whose connection was removed
+	 * @param {Connection} connection - the connection object that was removed
+	 */
+	onFieldDisconnect(field, connection){
+		// console.log(`Field ${field.name} disconnected!`);
 	}
 
 }

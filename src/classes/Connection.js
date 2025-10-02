@@ -151,6 +151,36 @@ export class Connection {
 
 
 	/**
+	 * Helper to get the opposite field of a connection.
+	 * 
+	 * @param {Object} field - the field to get the opposite end of the connection for
+	 * @returns {Object|null} - the opposite field, or null if not found
+	 */
+	getOtherField(field){
+		if(field === this.inputField)
+			return this.outputField;
+		if(field === this.outputField)
+			return this.inputField;
+		return null;
+	}
+
+	
+	/**
+	 * Helper to get the opposite node of a connection.
+	 * 
+	 * @param {NWNode} node - the node to get the opposite end of the connection for
+	 * @returns {NWNode|null} - the opposite node, or null if not found
+	 */
+	getOtherNode(node){
+		if(node === this.inputNode)
+			return this.outputNode;
+		if(node === this.outputNode)
+			return this.inputNode;
+		return null;
+	}
+	
+
+	/**
 	 * Ticks the wire rendering versions of the input and output nodes.
 	 */
 	getNodeWireTickFn(){
@@ -182,6 +212,10 @@ export class Connection {
 
 		// make sure our nodes update their wire versions
 		const tickFn = this.getNodeWireTickFn();
+
+		// tell the nodes we're disconnecting
+		this.inputNode?.onFieldDisconnect(this.inputField, this);
+		this.outputNode?.onFieldDisconnect(this.outputField, this);
 
 		// clear input and output refs
 		this.setInput(null, null);

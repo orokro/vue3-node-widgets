@@ -196,6 +196,7 @@
 // vue
 import { Value } from 'sass';
 import { ref, shallowRef, watchEffect } from 'vue';
+import { Connection } from './Connection';
 
 // the kind of nodes
 export const NODE_TYPE = {
@@ -638,8 +639,10 @@ export default class NWNode {
 	 * 		- title: string, optional, title of the field
 	 * 		- type: Value class, required, type of the field
 	 * 		- description: string, optional, description of the field
+	 * @param {Boolean} inFront - if true, adds the field to the front of the list, otherwise to the end
+	 * @returns {Object} - the field object that was added
 	 */
-	addDynamicField(fieldType, options) {
+	addDynamicField(fieldType, options, inFront=false) {
 		
 		const field = {
 			id: this.static.generateUUID('field'),
@@ -655,7 +658,10 @@ export default class NWNode {
 		};
 
 		// add to our list of dynamic fields
-		this.dynamicFields.push(field);
+		if(!inFront)
+			this.dynamicFields.push(field);
+		else
+			this.dynamicFields.unshift(field);
 
 		// create field state for this field
 		if([FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)) {
@@ -669,6 +675,8 @@ export default class NWNode {
 
 		// update our fields list
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
+
+		return field;
 	}
 
 
@@ -707,6 +715,47 @@ export default class NWNode {
 			}
 		}// field
 
+		// clear the dynamic fields array
+		this.dynamicFields = [];
+
+		// update our fields list
+		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
+	}
+
+
+	/**
+	 * Called by the connection manager when a field's connection changes.
+	 * 
+	 * @param {Object} field - the field object whose connection changed
+	 * @param {Connection} connection - the connection object that was added or removed
+	 */
+	onFieldConnect(field, connection){
+		// console.log(`Field ${field.name} connection changed!`);
+	}
+
+
+	/**
+	 * Called by the connection manager when a field's connection is removed.
+	 * 
+	 * @param {Object} field - the field object whose connection was removed
+	 * @param {Connection} connection - the connection object that was removed
+	 */
+	onFieldDisconnect(field, connection){
+		// console.log(`Field ${field.name} disconnected!`);
+	}
+
+
+	/**
+	 * Helper to get the static properties of the class
+	 *
+	 * @param {Object} field - the field object to move
+	 */
+	moveDynamicFieldToEnd(field) {
+
+		// filter out the field
+		this.dynamicFields = this.dynamicFields.filter(f => f.id !== field.id);
+		this.dynamicFields.push(field);
+		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 	}
 
 }
