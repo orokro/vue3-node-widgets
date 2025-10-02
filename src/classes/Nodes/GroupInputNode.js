@@ -65,7 +65,7 @@ export default class GroupInputNode extends NWNode {
 	constructor() {
 
 		super();
-		
+		console.log(this);
 		// this.fieldState.groupName.val = 'Group';
 	}
 

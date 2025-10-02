@@ -40,6 +40,7 @@ import {
 import GroupInputNode from './GroupInputNode.js';
 import GroupOutputNode from './GroupOutputNode.js';
 import ABMathNode from './ABMathNode.js';
+import { watchEffect } from 'vue';
 
 // main export
 export default class GroupNode extends NWNode {
@@ -85,6 +86,7 @@ export default class GroupNode extends NWNode {
 		// build our built-in graph (which is just a default input & output node)
 		this.buildDefaultLayout();
 
+		// wathc 
 		// below was debug code for dynamic inputs
 		return;
 		this.addDynamicField(FIELD_TYPE.INPUT, {
@@ -97,6 +99,21 @@ export default class GroupNode extends NWNode {
 			name: 'bar',
 			title: 'Bar',
 			type: VVector3,
+		});
+	}
+
+
+	/**
+	 * Set up a watcher to monitor the internal graph's IO changes
+	 */
+	watchIO(){
+
+		// automatically update our dynamic fields with the graph's IO changes
+		this.ioWatcher = watchEffect(() => {
+
+			// we'll start fresh by clearing our dynamic fields
+			this.clearDynamicFields();
+
 		});
 	}
 

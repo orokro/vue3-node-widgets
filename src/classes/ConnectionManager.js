@@ -17,7 +17,7 @@ import { shallowRef, ref } from "vue";
 
 // app
 import { Connection } from "./Connection";
-import NWNode, { SOCKET_TYPE } from "./NWNode";
+import NWNode, { NODE_TYPE, SOCKET_TYPE } from "./NWNode";
 
 // get our special type
 import { VGroupAny } from "./Types/VGroupAny";
@@ -496,10 +496,17 @@ export class ConnectionManager {
 				this.connectionBeingDragged = null;
 				this.isSnappedToSocket.value = false;
 
+				// check if either side of the wire was connected an input or output type node
+				const wireInputIsIONode = [NODE_TYPE.INPUT, NODE_TYPE.OUTPUT].includes(conn.inputNode?.static.nodeType);
+				const wireOutputIsIONode = [NODE_TYPE.INPUT, NODE_TYPE.OUTPUT].includes(conn.outputNode?.static.nodeType);
+				const connectedToIONode = wireInputIsIONode || wireOutputIsIONode;
+
 				// if the wire doesn't have both an input and output, we need to destroy it
 				if (!conn.inputNode || !conn.outputNode) {
 					conn.destroy();
 					conn.getNodeWireTickFn()();
+					if(connectedToIONode)
+						this.graph.updateIO();
 					return;
 				}
 
@@ -518,7 +525,8 @@ export class ConnectionManager {
 				}
 
 				conn.getNodeWireTickFn()();
-
+				if(connectedToIONode)
+					this.graph.updateIO();
 			}
 		);
 	}

@@ -245,15 +245,18 @@ export default class NWNode {
 	
 	// true when this node is only available in sub-graphs
 	static isSubGraphOnly = false;
-	
+
 	// just a helpful shorthand
 	static = this.constructor;
 
 	// the id field of the node
 	id = '';
 
-	// the live list of fields for template
-	fieldsList = shallowRef(this.static.fields);
+	// dynamic fields added at runtime
+	dynamicFields = [];
+
+	// this will be a reactive list of both the static & dynamic fields as they're added/removed
+	fieldsList = shallowRef([...this.static.fields, ...this.dynamicFields]);
 
 	// version tick for reactive dependents (Node.vue, etc)
 	// whenever a connection is plugged or unplugged from this node,
@@ -626,8 +629,18 @@ export default class NWNode {
 	}
 
 
+	/**
+	 * Adds a dynamic field that isn't defined on the node type itself
+	 * 
+	 * @param {string} fieldType - either FIELD_TYPE.INPUT or FIELD_TYPE.OUTPUT
+	 * @param {Object} options - options for the field:
+	 * 		- name: string, required, name of the field
+	 * 		- title: string, optional, title of the field
+	 * 		- type: Value class, required, type of the field
+	 * 		- description: string, optional, description of the field
+	 */
 	addDynamicField(fieldType, options) {
-
+		
 		const field = {
 			id: this.static.generateUUID('field'),
 			fieldType: fieldType,
@@ -641,8 +654,10 @@ export default class NWNode {
 			lintFn: (value) => value,
 		};
 
-		this.fieldsList.value = [...this.fieldsList.value, field];
+		// add to our list of dynamic fields
+		this.dynamicFields.push(field);
 
+		// create field state for this field
 		if([FIELD_TYPE.INPUT, FIELD_TYPE.OUTPUT, FIELD_TYPE.PROP].includes(field.fieldType)) {
 				
 			this.fieldState[field.name] = this.wrapFieldValue(
@@ -651,5 +666,47 @@ export default class NWNode {
 				new field.valueType()
 			);
 		}
+
+		// update our fields list
+		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 	}
+
+
+	/**
+	 * Removes a dynamic field that was added at runtime.
+	 * 
+	 * @param {String} fieldID - the id of the field to remove
+	 */
+	removeDynamicField(fieldID) {
+
+		// get the field definition for this ID
+		const field = this.dynamicFields.find(f => f.id === fieldID);
+
+		// filter out the field with the given id
+		this.dynamicFields = this.dynamicFields.filter(f => f.id !== fieldID);
+
+		// delete the field state that matches this field name
+		if (field && field.name in this.fieldState) {
+			delete this.fieldState[field.name];
+		}
+
+		// update our fields list
+		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
+	}
+
+
+	/**
+	 * Clear all our dynamic fields
+	 */
+	clearDynamicFields(){
+
+		// delete the field state for _just_ the dynamic fields
+		for(const field of this.dynamicFields){
+			if(field.name in this.fieldState){
+				delete this.fieldState[field.name];
+			}
+		}// field
+
+	}
+
 }
