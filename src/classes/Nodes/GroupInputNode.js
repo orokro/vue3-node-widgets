@@ -79,17 +79,15 @@ export default class GroupInputNode extends NWNode {
 	 */
 	onFieldConnect(field, connection){
 		
+		// get the type of the connected field
+		let targetField = connection.getOtherField(field);
+		let targetType = targetField.valueType;
+		let targetName = targetField.name + (this.constructor.fieldCounter++);
+		let targetTitle = targetField.title || targetField.name || 'Output';
+		let targetDescription = targetField.description;
+
 		// if we're the any field, let's re-wire it to a new dynamic input
 		if(field === this.anyField){
-
-			window.ccc = connection.mgr;
-
-			// get the type of the connected field
-			let targetField = connection.getOtherField(field);
-			let targetType = targetField.valueType;
-			let targetName = targetField.name + (this.constructor.fieldCounter++);
-			let targetTitle = targetField.title || targetField.name || 'Output';
-			let targetDescription = targetField.description;
 
 			// create a new dynamic output field with this type
 			let newField = this._addDynamicField(FIELD_TYPE.OUTPUT, {
@@ -107,6 +105,23 @@ export default class GroupInputNode extends NWNode {
 			connection.getNodeWireTickFn()();
 			this.wiresVersion.value++;
 		}
+
+		// otherwise, if it's a connection involving one of our other fields, we need to ensure
+		// that the group node has a matching input
+		else {
+
+			// update the field to match the connected type
+			field.title = targetTitle;
+			field.description = targetDescription;
+			this._changeFieldType(field.id, targetType);
+
+			// move the any field to the bottom
+			this._moveDynamicFieldToEnd(this.anyField);
+
+			connection.getNodeWireTickFn()();
+			this.wiresVersion.value++;
+		}
+
 	}
 
 

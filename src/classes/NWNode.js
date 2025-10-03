@@ -197,6 +197,7 @@
 import { Value } from 'sass';
 import { ref, shallowRef, watchEffect } from 'vue';
 import { Connection } from './Connection';
+import VType from './VType';
 
 // the kind of nodes
 export const NODE_TYPE = {
@@ -677,6 +678,33 @@ export default class NWNode {
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 
 		return field;
+	}
+
+
+	/**
+	 * Sets the type of a dynamic field that was added at runtime.
+	 * 
+	 * @param {string} fieldID - the id of the field to change
+	 * @param {VType} newType - the new type class to set for the field
+	 */
+	_changeFieldType(fieldID, newType) {
+
+		// get the field definition for this ID
+		const field = this.dynamicFields.find(f => f.id === fieldID);
+
+		// if the field exists, change it's type
+		if (field) {
+			field.valueType = newType;
+
+			// update the field state to use the new type
+			if (field.name in this.fieldState) {
+				this.fieldState[field.name] = this.wrapFieldValue(
+					field.name,
+					field.id,
+					new field.valueType()
+				);
+			}
+		}
 	}
 
 

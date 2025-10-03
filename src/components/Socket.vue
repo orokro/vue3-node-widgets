@@ -39,7 +39,7 @@
 <script setup>
 
 // vue imports
-import { ref, onMounted, computed, shallowRef, watch, inject } from 'vue';
+import { ref, onMounted, onUnmounted, computed, shallowRef, watch, inject, watchEffect } from 'vue';
 
 import { FIELD_TYPE, NODE_TYPE, SOCKET_TYPE } from '@/classes/NWNode';
 
@@ -113,10 +113,18 @@ const eventCtx = computed(()=>{
 });
 
 // when we mount we should figure out how to render this socket
+let we = null;
 onMounted(() => {
 
 	// configure our socket style
-	buildSocketStyle();
+	watchEffect(() => {
+		buildSocketStyle();
+	});
+});
+
+// clean up on unmount
+onUnmounted(() => {
+	if (we) we();
 });
 
 
