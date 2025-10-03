@@ -724,13 +724,8 @@ export default class NWNode {
 	 * Removes a dynamic field that was added at runtime.
 	 * 
 	 * @param {String} fieldID - the id of the field to remove
-	 * @param {ConnectionManager} connMgr - the connection manager to remove connections from
 	 */
-	_removeDynamicField(fieldID, connMgr) {
-
-		// throw error if connMgr not provided
-		if (!connMgr) 
-			throw new Error('Connection manager is required to remove dynamic fields');
+	_removeDynamicField(fieldID) {
 
 		// get the field definition for this ID
 		const field = this.dynamicFields.find(f => f.id === fieldID);
@@ -750,7 +745,7 @@ export default class NWNode {
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 
 		// break any connections to this field
-		connMgr.breakConnectionsByField(field);
+		this.graph.connMgr.breakConnectionsByField(field);
 	}
 
 

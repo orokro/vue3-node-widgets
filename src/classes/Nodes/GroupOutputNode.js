@@ -151,7 +151,7 @@ export default class GroupOutputNode extends NWNode {
 		nextTick(() => {
 
 			// do the remove
-			this._removeDynamicField(field.id, this.graph.connMgr);
+			this._removeDynamicField(field.id);
 			
 			// do all our update stuff
 			connection.getNodeWireTickFn()();

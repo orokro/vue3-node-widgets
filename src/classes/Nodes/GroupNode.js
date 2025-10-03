@@ -125,7 +125,7 @@ export default class GroupNode extends NWNode {
 				// check if we have any input definitions that match this field id
 				const matchingInput = inputs.find(i => i.field.id === f.for);
 				if(matchingInput == undefined)
-					this._removeDynamicField(f.id, this.graph.connMgr);
+					this._removeDynamicField(f.id);
 			});
 
 			// now add or update fields for each input
@@ -164,7 +164,7 @@ export default class GroupNode extends NWNode {
 				// check if we have any output definitions that match this field id
 				const matchingOutput = outputs.find(o => o.field.id === f.for);
 				if(matchingOutput == undefined)
-					this._removeDynamicField(f.id, this.graph.connMgr);
+					this._removeDynamicField(f.id);
 			});
 
 			// now add or update fields for each output
