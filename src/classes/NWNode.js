@@ -656,6 +656,9 @@ export default class NWNode {
 			valuePassThrough: false,
 			validateFn: (value) => true,
 			lintFn: (value) => value,
+
+			// optional, to check if this field is for a group input/output
+			for: options.for || null,
 		};
 
 		// add to our list of dynamic fields
@@ -712,11 +715,22 @@ export default class NWNode {
 	 * Removes a dynamic field that was added at runtime.
 	 * 
 	 * @param {String} fieldID - the id of the field to remove
+	 * @param {ConnectionManager} connMgr - the connection manager to remove connections from
 	 */
-	_removeDynamicField(fieldID) {
+	_removeDynamicField(fieldID, connMgr) {
+
+		// throw error if connMgr not provided
+		if (!connMgr) 
+			throw new Error('Connection manager is required to remove dynamic fields');
 
 		// get the field definition for this ID
 		const field = this.dynamicFields.find(f => f.id === fieldID);
+
+		if(!field)
+			return;
+
+		// break any connections to this field
+		// connMgr.breakConnectionsByField(field);
 
 		// filter out the field with the given id
 		this.dynamicFields = this.dynamicFields.filter(f => f.id !== fieldID);
@@ -728,6 +742,8 @@ export default class NWNode {
 
 		// update our fields list
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
+
+		
 	}
 
 

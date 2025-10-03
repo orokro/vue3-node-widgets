@@ -148,8 +148,12 @@ export default class GroupOutputNode extends NWNode {
 		if(fieldConnections.includes(field))
 			return;
 
-		this._removeDynamicField(field.id);
+		// doo the remove
+		this._removeDynamicField(field.id, connection.mgr);
+
+		// do all our update stuff
 		connection.getNodeWireTickFn()();
+		connection.mgr.graph.updateIO();
 		this.wiresVersion.value++;		
 	}
 

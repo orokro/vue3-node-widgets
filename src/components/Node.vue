@@ -94,7 +94,7 @@
 							</div>	
 
 							<!-- area to spawn sockets below -->
-							<div :ref="el => setSocketRef(field.name, el)" class="socket-ref-el"/>
+							<div :ref="el => setSocketRef(field.id, el)" class="socket-ref-el"/>
 
 							<!-- otherwise, if we're processing node we'll mount it's component-->
 							<component
@@ -264,10 +264,10 @@ const connectedInputsKeySet = computed(()=>{
 
 
 // helper to set a socket ref for a given field name
-function setSocketRef(fieldName, el){
+function setSocketRef(fieldID, el){
 
 	// otherwise create a new entry
-	fieldRowData.set(fieldName, el);
+	fieldRowData.set(fieldID, el);
 }
 
 
@@ -421,7 +421,7 @@ function measureFieldPositions(){
 
 		// get the row element for this field
 		// const rowEl = props.node.fieldState[field.name]?.data.rowEl?.value[0];
-		const rowEl = fieldRowData.get(field.name);
+		const rowEl = fieldRowData.get(field.id);
 
 		if (!rowEl) {
 			console.warn(`No row element found for field ${field.name}`);

@@ -138,6 +138,33 @@ export class ConnectionManager {
 
 
 	/**
+	 * Breaks all connections that involve a specific field on a node.
+	 * 
+	 * @param {Object} field - the field on the node to break connections for.
+	 * @returns null
+	 */
+	breakConnectionsByField(field) {
+
+		// gtfo if the field is not defined
+		if (!field || !field.name)
+			return;
+
+		// filter the wires for connections that match the node and field
+		const toBreak = this.wires.value.filter(conn => {
+
+			if(conn.id==this.connectionBeingDragged?.id)
+				return false;
+
+			return (conn.inputField?.id === field.id || conn.outputField?.id === field.id);
+		});
+
+		// destroy the connections
+		for (const conn of toBreak)
+			conn.destroy();
+	}
+
+
+	/**
 	 * Starts dragging a wire from a node's socket.
 	 * 
 	 * @param {Object} ctx - context about the component (if needed).

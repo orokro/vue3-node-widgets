@@ -40,7 +40,7 @@ import {
 import GroupInputNode from './GroupInputNode.js';
 import GroupOutputNode from './GroupOutputNode.js';
 import ABMathNode from './ABMathNode.js';
-import { watchEffect } from 'vue';
+import { nextTick, watch, watchEffect } from 'vue';
 import ColorBlendNode from './ColorBlendNode.js';
 import ColorMixNode from './ColorMixNode.js';
 
@@ -90,20 +90,6 @@ export default class GroupNode extends NWNode {
 
 		// watch for IO changes in the internal graph & update our dynamic fields
 		this.watchIO();
-
-		// below was debug code for dynamic inputs
-		return;
-		this._addDynamicField(FIELD_TYPE.INPUT, {
-			name: 'foo',
-			title: 'Foo',
-			type: VInteger,
-		});
-
-		this._addDynamicField(FIELD_TYPE.OUTPUT, {
-			name: 'bar',
-			title: 'Bar',
-			type: VVector3,
-		});
 	}
 
 
@@ -112,14 +98,11 @@ export default class GroupNode extends NWNode {
 	 */
 	watchIO(){
 
+		// get our actual NWGraph instance for this node
+		const ctx = this.fieldState.graph.val;
+
 		// automatically update our dynamic fields with the graph's IO changes
-		this.ioWatcher = watchEffect(() => {
-
-			// we'll start fresh by clearing our dynamic fields
-			this._clearDynamicFields();
-
-			// get our actual NWGraph instance for this node
-			const ctx = this.fieldState.graph.val;
+		this.ioWatcher = watch([ctx.inputs, ctx.outputs], ([newInputs, newOutputs], [oldInputs, oldOutputs]) => {
 
 			/*
 				The input/output definitions have the shape:
@@ -135,31 +118,88 @@ export default class GroupNode extends NWNode {
 			// get the inputs definitions
 			const inputs = ctx.inputs.value;
 
-			// iterate over them & add dynamic fields
-			inputs.forEach( def => {
+			// first, remove any existing input fields that are no longer in the graph
+			const dynamicInputFields = this.dynamicFields.filter(f => f.fieldType === FIELD_TYPE.INPUT);
+			dynamicInputFields.forEach(f => {
 
-				// add a dynamic input field for this
-				this._addDynamicField(FIELD_TYPE.INPUT, {
-					name: def.field.name,
-					title: def.field.title,
-					type: def.type,
-				});
+				// check if we have any input definitions that match this field id
+				const matchingInput = inputs.find(i => i.field.id === f.for);
+				if(matchingInput == undefined)
+					this._removeDynamicField(f.id, ctx.connMgr);
+				
+			});
+
+			// now add or update fields for each input
+			inputs.forEach(i => {
+
+				let existingField = this.dynamicFields.find(f => f.fieldType === FIELD_TYPE.INPUT && f.name === i.field.name);
+				
+				if(existingField){
+					// update the type if it changed
+					if(existingField.valueType.typeName !== i.type.typeName){
+						existingField.title = i.field.title || i.field.name;
+						existingField.description = i.field.description;
+						this._changeFieldType(existingField.id, i.type);
+					}
+				}
+
+				else {
+					// add a new field
+					this._addDynamicField(FIELD_TYPE.INPUT, {
+						name: i.field.name,
+						title: i.field.title || i.field.name,
+						description: i.field.description,
+						type: i.type,
+						for: i.field.id,
+					});
+				}
 			});
 
 			// get the outputs definitions
 			const outputs = ctx.outputs.value;
 
-			// iterate over them & add dynamic fields
-			outputs.forEach( def => {
+			// first, remove any existing output fields that are no longer in the graph
+			const dynamicOutputFields = this.dynamicFields.filter(f => f.fieldType === FIELD_TYPE.OUTPUT);
+			dynamicOutputFields.forEach(f => {
 
-				// add a dynamic output field for this
-				this._addDynamicField(FIELD_TYPE.OUTPUT, {
-					name: def.field.name,
-					title: def.field.title,
-					type: def.type,
-				});
+				// check if we have any output definitions that match this field id
+				const matchingOutput = outputs.find(o => o.field.id === f.for);
+				if(matchingOutput == undefined)
+					this._removeDynamicField(f.id, ctx.connMgr);				
 			});
 
+			// now add or update fields for each output
+			outputs.forEach(o => {
+				
+				let existingField = this.dynamicFields.find(f => f.fieldType === FIELD_TYPE.OUTPUT && f.name === o.field.name);
+				
+				if(existingField){
+					// update the type if it changed
+					if(existingField.valueType.typeName !== o.type.typeName){
+						existingField.title = o.field.title || o.field.name;
+						existingField.description = o.field.description;
+						this._changeFieldType(existingField.id, o.type);
+					}
+				}
+				else {
+
+					// add a new field
+					this._addDynamicField(FIELD_TYPE.OUTPUT, {
+						name: o.field.name,
+						title: o.field.title || o.field.name,
+						description: o.field.description,
+						type: o.type,
+						for: o.field.id,
+					});
+				}
+			});
+			
+			// update our list & triggers
+			this.fieldsList.value = [
+				...this.static.fields,
+				...this.dynamicFields
+			];
+			this.wiresVersion.value++;			
 		});
 	}
 
