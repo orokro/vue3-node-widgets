@@ -263,15 +263,14 @@ export class ConnectionManager {
 		return this.wires.value.filter(conn => {
 
 			if (isInputSocket) {
-				return conn.outputNode === node && conn.outputField.name === field.name;
+				return conn.outputNode === node && conn.outputField.id === field.id;
 			} else {
-				return conn.inputNode === node && conn.inputField.name === field.name;
+				return conn.inputNode === node && conn.inputField.id === field.id;
 			}
 		});
 	}
 
-
-
+	
 	/**
 	 * When the user hovers over a socket, we might wanna snap to it if we're in the middle of dragging a wire.
 	 * 

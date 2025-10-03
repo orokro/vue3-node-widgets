@@ -82,6 +82,8 @@ export default class GroupInputNode extends NWNode {
 		// if we're the any field, let's re-wire it to a new dynamic input
 		if(field === this.anyField){
 
+			window.ccc = connection.mgr;
+
 			// get the type of the connected field
 			let targetField = connection.getOtherField(field);
 			let targetType = targetField.valueType;
@@ -119,9 +121,16 @@ export default class GroupInputNode extends NWNode {
 		// only remove the field if it's not the any field
 		if(field === this.anyField)
 			return;
+		
+		// if there are still connections to this field, don't remove it
+		const fieldConnections = connection.mgr.getConnectionsBySocket(this, field, false);
+		
+		// if there's more than one, don't remove it
+		if(fieldConnections.length > 1)
+			return;
 
-		// if we still have connections, don't remove it
-		if(connection.mgr.getConnectionsBySocket(this, field).length > 0)
+		// if the connection remaining is not the one being removed, don't remove it
+		if(fieldConnections.includes(field))
 			return;
 
 		this._removeDynamicField(field.id);
