@@ -63,8 +63,8 @@ export default class RandomV2Node extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.v2Min.val = {x: 0, y: 0};
 		this.fieldState.v2Max.val = {x: 1, y: 1};

@@ -84,8 +84,8 @@ export default class MapRangeNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.fromMin.val = 0;
 		this.fieldState.fromMax.val = 1;

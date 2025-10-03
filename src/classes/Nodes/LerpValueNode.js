@@ -70,8 +70,8 @@ export default class LerpValueNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.bValue.val = 1;
 	}

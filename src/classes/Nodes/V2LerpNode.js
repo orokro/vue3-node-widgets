@@ -70,8 +70,8 @@ export default class V2LerpNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 	}
 
 }

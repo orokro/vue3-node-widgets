@@ -72,8 +72,8 @@ export default class CombineHSVNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 	}
 
 }

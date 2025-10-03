@@ -71,8 +71,8 @@ export default class V3CombineXYZNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 	}
 
 }

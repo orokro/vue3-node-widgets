@@ -63,8 +63,8 @@ export default class V3ScaleNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 	}
 
 }

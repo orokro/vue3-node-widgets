@@ -112,8 +112,8 @@ export default class SuperWaveNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.degrees.val = true;
 		this.fieldState.amplitude.val = 1;

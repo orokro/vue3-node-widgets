@@ -63,8 +63,8 @@ export default class V2DotNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 	}
 
 }

@@ -8,6 +8,7 @@
 	the group node to have matching inputs.
 */
 
+import { nextTick } from 'vue';
 import NWNode from '../NWNode.js';
 import { NODE_TYPE, FIELD_TYPE } from '../NWNode.js';
 import { 
@@ -57,9 +58,8 @@ export default class GroupInputNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-
-		super();
+	constructor(...args) {
+		super(...args);
 
 		// this one is dynamic so we can re-order to the bottom as we add things
 		this.anyField = this._addDynamicField(FIELD_TYPE.OUTPUT, {
@@ -148,13 +148,16 @@ export default class GroupInputNode extends NWNode {
 		if(fieldConnections.includes(field))
 			return;
 
-		// doo the remove
-		this._removeDynamicField(field.id, connection.mgr);
-
-		// do all our update stuff
-		connection.getNodeWireTickFn()();
-		connection.mgr.graph.updateIO();
-		this.wiresVersion.value++;		
+		nextTick(() => {
+		
+			// do the remove
+			this._removeDynamicField(field.id, this.graph.connMgr);
+			
+			// do all our update stuff
+			connection.getNodeWireTickFn()();
+			connection.mgr.graph.updateIO();
+			this.wiresVersion.value++;		
+		});
 	}
 
 }

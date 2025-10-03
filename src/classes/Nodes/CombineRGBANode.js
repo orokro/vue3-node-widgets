@@ -78,8 +78,8 @@ export default class CombineRGBANode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.a.val = 1;
 	}

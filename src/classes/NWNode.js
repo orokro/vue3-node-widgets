@@ -254,6 +254,10 @@ export default class NWNode {
 	// the id field of the node
 	id = '';
 
+	// store the graph this node was added to when added
+	// (or when moved to a new graph)
+	graph = null;
+
 	// dynamic fields added at runtime
 	dynamicFields = [];
 
@@ -527,11 +531,16 @@ export default class NWNode {
 
 	/**
 	 * Constructor
+	 * 
+	 * @param {NWGraph} graph - the graph this node is being added to
 	 */
-	constructor() {
+	constructor(graph) {
 
 		// unique id for this node
 		this.id = this.constructor.generateUUID();
+
+		// save our graph
+		this.graph = graph || null;
 
 		// position of the node in the graph
 		this.x = ref(0);
@@ -729,9 +738,6 @@ export default class NWNode {
 		if(!field)
 			return;
 
-		// break any connections to this field
-		// connMgr.breakConnectionsByField(field);
-
 		// filter out the field with the given id
 		this.dynamicFields = this.dynamicFields.filter(f => f.id !== fieldID);
 
@@ -743,7 +749,8 @@ export default class NWNode {
 		// update our fields list
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 
-		
+		// break any connections to this field
+		connMgr.breakConnectionsByField(field);
 	}
 
 

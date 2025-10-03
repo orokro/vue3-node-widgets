@@ -163,9 +163,9 @@ export default class AllTypesOutNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
-
+	constructor(...args) {
+		super(...args);
+	
 		this.fieldState.rangeInput.val = 10;
 	}
 

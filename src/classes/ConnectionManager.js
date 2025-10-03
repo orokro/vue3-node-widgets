@@ -152,9 +152,11 @@ export class ConnectionManager {
 		// filter the wires for connections that match the node and field
 		const toBreak = this.wires.value.filter(conn => {
 
+			// don't destroy the one that's currently being dragged
 			if(conn.id==this.connectionBeingDragged?.id)
 				return false;
 
+			// only break matches
 			return (conn.inputField?.id === field.id || conn.outputField?.id === field.id);
 		});
 
@@ -267,6 +269,21 @@ export class ConnectionManager {
 		this.attachWireDrag(ctx, conn, startFromOutput, startX, startY, event);
 
 		return conn;
+	}
+
+
+	/**
+	 * Gets all connections that involve a specific node.
+	 * 
+	 * @param {NWNode} node - the node to check for loops.
+	 * @returns {Connection[]} - an array of connections involving the node.
+	 */
+	getConnectionsByNode(node){
+
+		if (!(node instanceof NWNode))
+			return [];
+
+		return this.wires.value.filter(conn => conn.inputNode === node || conn.outputNode === node);
 	}
 
 

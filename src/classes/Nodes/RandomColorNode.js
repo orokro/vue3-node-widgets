@@ -70,8 +70,8 @@ export default class RandomColorNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.rMinMax.val = {x: 0, y: 1};
 		this.fieldState.gMinMax.val = {x: 0, y: 1};

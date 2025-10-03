@@ -71,8 +71,8 @@ export default class RoundNode extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.places.val = 1;
 	}

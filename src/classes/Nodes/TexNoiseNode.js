@@ -109,8 +109,8 @@ export default class TexNoise extends NWNode {
 	/**
 	 * Constructor
 	 */
-	constructor() {
-		super();
+	constructor(...args) {
+		super(...args);
 
 		this.fieldState.scale.val = 50.0;
 		this.fieldState.octaves.val = 4;

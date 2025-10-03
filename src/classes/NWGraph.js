@@ -69,12 +69,12 @@ export class NWGraph {
 
 		// if we were passed in a class, instantiate it
 		if (t.isClass(nodeClass)) {
-			newNode = new nodeClass();
+			newNode = new nodeClass(this);
 		}
 
 		// if we were passed in an object, instantiate the class from the object
 		else if (t.isObject(nodeClass) && t.isDefined(nodeClass.class)) {
-			newNode = new nodeClass.class();
+			newNode = new nodeClass.class(this);
 		}
 
 		// set the position of the node
@@ -214,7 +214,7 @@ export class NWGraph {
 						return;
 
 					const connections = this.connMgr.getConnectionsBySocket(node, field);
-					
+
 					newOutputsList.push({
 						node: node,
 						field: field,
