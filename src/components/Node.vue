@@ -56,14 +56,14 @@
 						class="node-field-row"
 						:data-type="field.fieldType"
 						v-for="(field, index) in node.fieldsList.value"
-						:key="index"			
+						:key="field.id"			
 					><!-- :setYPos="setYPos(node.fieldState[field.name]?.data.rowEl, field)" -->
 
 
 						<!-- all node kinds can have labels -->
 						<NLabel 
 							v-if="field.fieldType == FIELD_TYPE.LABEL"
-							:key="index"
+							:key="field.id"
 							:text="field.text"
 							:align="field.align"/>
 
@@ -100,7 +100,7 @@
 							<component
 								v-if="showWidgetFor(field)"
 								:is="getFieldComponent(field)"
-								:key="index"								
+								:key="field.id"								
 								:node="node"
 								:field="field"
 								:read-only="field.fieldType == FIELD_TYPE.OUTPUT"
@@ -408,6 +408,9 @@ function measureFieldPositions(){
 	if(props.node.constructor.customComponent!==null)
 		return;
 
+	// console.log(props.node.constructor.nodeName,  props.node.fieldsList.value);
+	// console.log(props.node.constructor.nodeName,  fieldRowData);
+
 	// loop through all the fields in the node
 	for (const field of props.node.fieldsList.value) {
 
@@ -435,10 +438,10 @@ function measureFieldPositions(){
 }
 
 
-const viewport = inject('viewport');
-watch(()=>viewport.zoomScale.value, (newZoom)=>{
-	measureFieldPositions();
-});
+// const viewport = inject('viewport');
+// watch(()=>viewport.zoomScale.value, (newZoom)=>{
+// 	// measureFieldPositions();
+// });
 
 
 // resize observer to remeasure field positions when the content element resizes

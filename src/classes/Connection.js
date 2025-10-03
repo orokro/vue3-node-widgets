@@ -100,6 +100,10 @@ export class Connection {
 	 */
 	setInput(node, field){
 
+		// tell the node before we kill stuffs
+		if(node==null || field==null)
+			this.inputNode?.onFieldDisconnect(this.inputField, this);
+
 		// null defaults
 		node = node || null;
 		field = field || null;
@@ -128,6 +132,10 @@ export class Connection {
 	 * @param {Object} field - the field on the node that is the output for this connection.
 	 */
 	setOutput(node, field){
+
+		// tell the node before we kill stuffs
+		if(node==null || field==null)
+			this.outputNode?.onFieldDisconnect(this.outputField, this);
 
 		// null defaults
 		node = node || null;
@@ -164,7 +172,7 @@ export class Connection {
 		return null;
 	}
 
-	
+
 	/**
 	 * Helper to get the opposite node of a connection.
 	 * 
@@ -212,10 +220,6 @@ export class Connection {
 
 		// make sure our nodes update their wire versions
 		const tickFn = this.getNodeWireTickFn();
-
-		// tell the nodes we're disconnecting
-		this.inputNode?.onFieldDisconnect(this.inputField, this);
-		this.outputNode?.onFieldDisconnect(this.outputField, this);
 
 		// clear input and output refs
 		this.setInput(null, null);

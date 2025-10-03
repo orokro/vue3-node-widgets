@@ -41,6 +41,8 @@ import GroupInputNode from './GroupInputNode.js';
 import GroupOutputNode from './GroupOutputNode.js';
 import ABMathNode from './ABMathNode.js';
 import { watchEffect } from 'vue';
+import ColorBlendNode from './ColorBlendNode.js';
+import ColorMixNode from './ColorMixNode.js';
 
 // main export
 export default class GroupNode extends NWNode {
@@ -91,13 +93,13 @@ export default class GroupNode extends NWNode {
 
 		// below was debug code for dynamic inputs
 		return;
-		this.addDynamicField(FIELD_TYPE.INPUT, {
+		this._addDynamicField(FIELD_TYPE.INPUT, {
 			name: 'foo',
 			title: 'Foo',
 			type: VInteger,
 		});
 
-		this.addDynamicField(FIELD_TYPE.OUTPUT, {
+		this._addDynamicField(FIELD_TYPE.OUTPUT, {
 			name: 'bar',
 			title: 'Bar',
 			type: VVector3,
@@ -114,7 +116,7 @@ export default class GroupNode extends NWNode {
 		this.ioWatcher = watchEffect(() => {
 
 			// we'll start fresh by clearing our dynamic fields
-			this.clearDynamicFields();
+			this._clearDynamicFields();
 
 			// get our actual NWGraph instance for this node
 			const ctx = this.fieldState.graph.val;
@@ -137,7 +139,7 @@ export default class GroupNode extends NWNode {
 			inputs.forEach( def => {
 
 				// add a dynamic input field for this
-				this.addDynamicField(FIELD_TYPE.INPUT, {
+				this._addDynamicField(FIELD_TYPE.INPUT, {
 					name: def.field.name,
 					title: def.field.title,
 					type: def.type,
@@ -151,7 +153,7 @@ export default class GroupNode extends NWNode {
 			outputs.forEach( def => {
 
 				// add a dynamic output field for this
-				this.addDynamicField(FIELD_TYPE.OUTPUT, {
+				this._addDynamicField(FIELD_TYPE.OUTPUT, {
 					name: def.field.name,
 					title: def.field.title,
 					type: def.type,
@@ -175,7 +177,8 @@ export default class GroupNode extends NWNode {
 		ctx.addNode(GroupOutputNode, 680, 200);
 
 		// for debug we'll also add a math node to the middle
-		ctx.addNode(ABMathNode, 350, 200);
+		ctx.addNode(ABMathNode, 360, 200);
+		ctx.addNode(ColorMixNode, 360, 460);
 	}
 
 

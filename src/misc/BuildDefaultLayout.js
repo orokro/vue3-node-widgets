@@ -7,6 +7,11 @@
 
 // import all our nodes
 import { 
+
+	GroupNode,
+	GroupInputNode,
+	GroupOutputNode,
+
 	ABMathNode,
 	ABCompareNode,
 	ClampValueNode,
@@ -146,6 +151,7 @@ function buildNaturalLayout01(g) {
 
 	// some random stuff in the middle
 	g.addNode(TexChecker, 320, 20, 'checker');
+	g.addNode(GroupNode, 320, 400, 'group1');
 
 	nextTick(() => {
 	

@@ -35,6 +35,9 @@ export default class GroupInputNode extends NWNode {
 	static nodeName = 'Group Input';
 	static icon = 'group';
 
+	// so we can give unique names to fields
+	static fieldCounter = 0;
+
 	static {
 
 		// reset things
@@ -46,9 +49,8 @@ export default class GroupInputNode extends NWNode {
 		// This functions as an input-type node
 		this.setNodeType(NODE_TYPE.INPUT);
 
+		// label instructions
 		this.addField(FIELD_TYPE.LABEL, { name: 'lbl', text: 'Add Inputs Below', align:'center' });
-
-
 	}
 
 	
@@ -59,20 +61,15 @@ export default class GroupInputNode extends NWNode {
 
 		super();
 
-		// our any type
-		this.anyField = this.addDynamicField(FIELD_TYPE.OUTPUT, {
+		// this one is dynamic so we can re-order to the bottom as we add things
+		this.anyField = this._addDynamicField(FIELD_TYPE.OUTPUT, {
 			name: 'addOutput',
 			title: 'Add Output',
 			description: "Wire to add an output",
 			type: VGroupAny,
 		});
-
-
-		// this.fieldState.groupName.val = 'Group';
 	}
 
-
-	static fieldCounter = 0;
 
 	/**
 	 * Called by the connection manager when a field's connection changes.
@@ -93,7 +90,7 @@ export default class GroupInputNode extends NWNode {
 			let targetDescription = targetField.description;
 
 			// create a new dynamic output field with this type
-			let newField = this.addDynamicField(FIELD_TYPE.OUTPUT, {
+			let newField = this._addDynamicField(FIELD_TYPE.OUTPUT, {
 				name: targetName,
 				title: targetTitle,
 				description: targetDescription,
@@ -101,7 +98,7 @@ export default class GroupInputNode extends NWNode {
 			});
 
 			// move the any field to the bottom
-			this.moveDynamicFieldToEnd(this.anyField);
+			this._moveDynamicFieldToEnd(this.anyField);
 
 			// change the field on the connection to this new field
 			connection.inputField = newField;
@@ -119,8 +116,17 @@ export default class GroupInputNode extends NWNode {
 	 */
 	onFieldDisconnect(field, connection){
 		
-		this.removeDynamicField(field.id);
-		this.wiresVersion.value++;
+		// only remove the field if it's not the any field
+		if(field === this.anyField)
+			return;
+
+		// if we still have connections, don't remove it
+		if(connection.mgr.getConnectionsBySocket(this, field).length > 0)
+			return;
+
+		this._removeDynamicField(field.id);
+		connection.getNodeWireTickFn()();
+		this.wiresVersion.value++;		
 	}
 
 }

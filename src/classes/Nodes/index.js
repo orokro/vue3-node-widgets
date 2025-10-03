@@ -201,4 +201,8 @@ export {
 	TexNoise,
 	TexImage,
 	TexLayer,
+
+	GroupNode,
+	GroupInputNode,
+	GroupOutputNode,
 };

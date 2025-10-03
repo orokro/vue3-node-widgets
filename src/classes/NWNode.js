@@ -642,7 +642,7 @@ export default class NWNode {
 	 * @param {Boolean} inFront - if true, adds the field to the front of the list, otherwise to the end
 	 * @returns {Object} - the field object that was added
 	 */
-	addDynamicField(fieldType, options, inFront=false) {
+	_addDynamicField(fieldType, options, inFront=false) {
 		
 		const field = {
 			id: this.static.generateUUID('field'),
@@ -685,7 +685,7 @@ export default class NWNode {
 	 * 
 	 * @param {String} fieldID - the id of the field to remove
 	 */
-	removeDynamicField(fieldID) {
+	_removeDynamicField(fieldID) {
 
 		// get the field definition for this ID
 		const field = this.dynamicFields.find(f => f.id === fieldID);
@@ -706,7 +706,7 @@ export default class NWNode {
 	/**
 	 * Clear all our dynamic fields
 	 */
-	clearDynamicFields(){
+	_clearDynamicFields(){
 
 		// delete the field state for _just_ the dynamic fields
 		for(const field of this.dynamicFields){
@@ -750,7 +750,7 @@ export default class NWNode {
 	 *
 	 * @param {Object} field - the field object to move
 	 */
-	moveDynamicFieldToEnd(field) {
+	_moveDynamicFieldToEnd(field) {
 
 		// filter out the field
 		this.dynamicFields = this.dynamicFields.filter(f => f.id !== field.id);
