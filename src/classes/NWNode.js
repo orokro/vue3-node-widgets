@@ -571,7 +571,6 @@ export default class NWNode {
 
 		// re-do wires when we change collapsed state
 		this.collapsedWatcher = watch(()=>this.collapsed.value, () => {
-			console.log('collapsed changed, updating wiresVersion');
 			this.wiresVersion.value++;
 		});
 	}

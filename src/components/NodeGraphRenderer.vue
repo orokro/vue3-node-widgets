@@ -17,8 +17,7 @@
 		ref="containerEl"
 		class="editor-container fill-parent" 
 		tabindex="0"
-		@click.self="graph.selMgr.selectNone"
-		@mousedown.prevent="startPanDrag"		
+		@mousedown.self.prevent="startDragOperation"		
 		@mouseup="checkAddMenu"		
 		@keydown="handleKeyDown"
 		@wheel="handleWheelZoom"		
@@ -40,11 +39,20 @@
 			
 			<!-- loop through all the nodes and render them -->
 			<Node 
-				v-for="(node, index) in graph.nodes.value" 
+				v-for="(node, index) in graph.nodes.value"
+				class="node-instance"
 				:key="node.id" 
+				:data-node-id="node.id"
 				:graph="graph"
 				:node="node"
 			/>
+
+			<!-- box to show rectangle when box selecting -->
+			<SelectBox 
+				v-if="graph.selMgr.isBoxSelecting.value"
+				:selMgr="graph.selMgr"
+			/>
+
 		</div>
 
 	</div>
@@ -53,14 +61,12 @@
 <script setup>
 
 // vue
-import { ref, onMounted, provide, inject, reactive, computed } from 'vue';
+import { ref, onMounted, provide, inject, reactive } from 'vue';
 
 // components
-import DevErrors from '@Components/DevErrors.vue';
-import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import Node from '@Components/Node.vue';
 import WireRenderer from '@Components/WireRenderer.vue';
-import CursorPopup from './CursorPopup.vue';
+import SelectBox from './SelectBox.vue';
 
 // props
 const props = defineProps({
@@ -157,6 +163,42 @@ const MIN_ZOOM = 0.1;
 	// Adjust pan so the content under the cursor stays in place
 	panX.value = mouseX - offsetX * newZoom;
 	panY.value = mouseY - offsetY * newZoom;
+}
+
+
+/**
+ * If it's left click, we start a box-drag operation to select nodes
+ * If it's right click, we start a pan operation
+ * 
+ * @param {MouseEvent} e - the mouse event
+ */
+function startDragOperation(e){
+
+	// if shift is not pressed, de-select everything first
+	if (!e.shiftKey) {
+		props.graph.selMgr.selectNone();
+	}
+
+	// left click = box select
+	if (e.button === 0) {
+		startSelectDrag(e);
+	}
+	// right click = pan
+	else if (e.button === 2) {
+		startPanDrag(e);
+	}
+}
+
+
+/**
+ * Starts a box-drag selection operation
+ * 
+ * @param {MouseEvent} e - the mouse event
+ */
+function startSelectDrag(e){
+
+	// tell our selection manager to start a drag-select operation
+	props.graph.selMgr.startDragSelect(e, viewport, dh);
 }
 
 

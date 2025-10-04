@@ -131,6 +131,29 @@ export class NWGraph {
 
 
 	/**
+	 * Gets nodes by their ID(s).
+	 * 
+	 * @param {string|string[]} nodeID - The node ID or array of node IDs to get.
+	 * @returns {NWNode|NWNode[]|null} - The node(s) with the specified ID(s), or null if not found.
+	 */
+	getNodesById(nodeID) {
+
+		// if we were passed in a single ID, return the node with that ID
+		if (t.isDefined(nodeID) && t.isString(nodeID)) {
+			return this.nodes.value.find(n => n.id === nodeID) || null;
+		}
+
+		// if we were passed in an array of IDs, return the nodes with those IDs
+		else if (t.isDefined(nodeID) && Array.isArray(nodeID)) {
+			return this.nodes.value.filter(n => nodeID.includes(n.id));
+		}
+
+		// if we weren't passed in anything, return null
+		return null;
+	}
+	
+
+	/**
 	 * Helper to get all nodes of a specific kind.
 	 * 
 	 * @param {string} kind - one of the NODE_TYPE values

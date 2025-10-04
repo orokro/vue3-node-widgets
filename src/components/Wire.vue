@@ -233,7 +233,8 @@ const SVGDetails = computed(()=>{
 
 		// for debug
 		/* border: 1px solid cyan; */
-
+		pointer-events: none;
+		
 		// fixed positioning
 		position: absolute;
 
