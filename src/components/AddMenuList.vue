@@ -50,6 +50,8 @@
 
 import { ref, onMounted } from 'vue';
 
+import { useAddMenu } from '@Composables/useAddMenu.js';
+
 // external libs/misc
 import t from 'typical';
 
@@ -74,6 +76,8 @@ const props = defineProps({
 	}
 });
 
+const { closeMenu } = useAddMenu(props.nwSystem);
+
 
 /**
  * Adds a node to the graph (if its an item and not a menu)
@@ -88,12 +92,12 @@ function addNode(event, item){
 	}
 
 	const graph = props.graphCtx.graph;
-	const pos = props.graphCtx.pos;
+	const pos = props.graphCtx.spawn;
 	const ctx = props.graphCtx.ctx;
 
 	// add the item & close the menu
 	graph.addNode(item.item, pos.x, pos.y);
-	ctx.showMenu.value = false;
+	closeMenu();
 }
 
 </script>

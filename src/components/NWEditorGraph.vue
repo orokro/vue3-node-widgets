@@ -24,7 +24,7 @@
 				:editor="ctxRef"
 				:graph="ctxRef.rootGraphRef.value"
 				:backgroundScale="backgroundScale"
-				@showAddMenu="showAddMenu"
+				@showAddMenu="handleShowAddMenu"
 			/>
 		</div>
 
@@ -42,27 +42,25 @@
 				v-if="ctxRef != null && showDevErrors" 
 				:nwSystem="ctxRef"
 			/>
-
-			<!-- this is both a menu that pops up, but also and entire layer
-				that overlaps everything. Mostly invisible. -->
-			<AddNodeMenu
-				v-if="ctxRef != null"
-				:nwSystem="ctxRef"
-				:graphCtx="menuGraphCtx"
-			/>
-
+			
 		</div>
 
 		<!-- tool tip for errors when wiring up sockets -->
 		<CursorPopup 
 			ref="cursorPopupEl"
 		/>
+
+		<!-- Auto-mount AddNodeMenu globally if no user-mounted instance exists -->
+		<Teleport v-if="isCurrentHost(hostId)" :to="menuMountEl">
+			<AddNodeMenu :internalMount="true" />
+		</Teleport>
+
 	</div>
 </template>
 <script setup>
 
 // vue
-import { ref, shallowRef, onMounted, provide, watch } from 'vue';
+import { ref, shallowRef, onMounted, provide, watch, computed, onUnmounted } from 'vue';
 
 // components
 import NodeGraphRenderer from '@Components/NodeGraphRenderer.vue';
@@ -76,6 +74,9 @@ import NWEditor from '@src/classes/NWEditor.js';
 
 // lib/misc
 import DragHelper from 'gdraghelper';
+
+// composable
+import { useAddMenu } from '@Composables/useAddMenu.js';
 
 // define some props
 const props = defineProps({
@@ -98,17 +99,18 @@ const props = defineProps({
 		default: 20
 	},
 
+	// optional - element to teleport our menu to
+	menuMountEl: {
+		type: [Object, String],
+		default: 'body'
+	},
+
 });
 
 
 // els
 const cursorPopupEl = ref(null);
 provide('cursorPopupEl', cursorPopupEl);
-
-// when we show a menu, we'll save the contextual graph for which to add nodes
-const menuGraphCtx = shallowRef({
-	graph: props.graph
-});
 
 // our context will either be passed in via the props, or one we made locally
 let ctx = null;
@@ -119,6 +121,18 @@ provide('ctx', ctxRef);
 const dh = new DragHelper();
 provide('dh', dh);
 
+// composable for menu control
+const {
+	menuIsMounted,
+	registerHost,
+	unregisterHost,
+	claimMenuHost,
+	showAddMenu,
+	isCurrentHost,
+} = useAddMenu();
+
+const hostId = registerHost();
+
 // on mounted, initialize the component and optionally, state
 onMounted(() => {
 
@@ -126,9 +140,19 @@ onMounted(() => {
 	ctx = new NWEditor();
 	ctxRef.value = ctx;
 
+	if (claimMenuHost(hostId)) {
+		// this instance becomes the menu host
+		// console.log("NWEditorGraph: claimed menu host", hostId);
+	}
+
+
 	// if we have a graph prop, set it as the root graph
 	if (props.graph)
 		ctxRef.value.setRootGraph(props.graph);
+});
+
+onUnmounted(() => {
+	unregisterHost(hostId);
 });
 
 // update root graph if the prop changes
@@ -160,43 +184,40 @@ defineExpose({
 
 
 /**
- * Shows the add node menu at the mouse position
- * 
- * @param context - the context of the event, including event, graph, viewport, etc
+ * Called by NodeGraphRenderer when user triggers "add node" action.
+ * Instead of directly showing menu in ctx, delegate to global composable.
  */
-function showAddMenu(context){
+function handleShowAddMenu(context) {
 
-	// destructure the context
 	const { event, graph, viewport } = context;
 
-	// get client x/y
-	const x = event.clientX;
-	const y = event.clientY;
-
-	// get viewport bounding box
 	const rect = viewport.el.getBoundingClientRect();
 
-	// compute the mouse position in graph space
-	const menuX = x - rect.left;
-	const menuY = y - rect.top;
+	const x = event.clientX;
+	const y = event.clientY;
+	const spawnX = (event.clientX - rect.left - viewport.panX.value) / viewport.zoomScale.value;
+	const spawnY = (event.clientY - rect.top - viewport.panY.value) / viewport.zoomScale.value;
 
-	// save graph for the menu to add nodes to
-	menuGraphCtx.value = {
-		...context,
-		ctx,
-		pos: {
-			x: menuX,
-			y: menuY
-		}
+	// prepare graph context
+	const gCtx = { 
+		...context, 
+		ctx, 
+		pos: { x, y },
+		spawn: { x: spawnX, y: spawnY },		
 	};
 
-	// show the add node menu
-	ctx.showAddNodeMenu(menuX, menuY);
+	// 🔸 use composable
+	showAddMenu({
+		x,
+		y,
+		graphCtx: gCtx,
+		nwSystem: ctx,
+		availableNodes: ctx.availableNodes.value,
+	});
+	
 }
 
-
 </script>
-
 <style lang="scss" scoped>
 
 	// main outer wrapper for the entire node-graph system

@@ -18,7 +18,7 @@
 		class="editor-container fill-parent" 
 		tabindex="0"
 		@mousedown.self.prevent="startDragOperation"		
-		@mouseup="checkAddMenu"		
+		@click.right="checkAddMenu"		
 		@keydown="handleKeyDown"
 		@wheel="handleWheelZoom"		
 		:style="{
@@ -54,7 +54,6 @@
 			/>
 
 		</div>
-
 	</div>
 
 </template>

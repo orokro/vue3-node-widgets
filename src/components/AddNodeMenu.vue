@@ -9,18 +9,20 @@
 
 	<!-- outer most wrapper, fill parent div -->
 	<div 
-		v-show="nwSystem.showMenu.value"
+		v-show="menuIsOpen"
+		ref="menuEl"
 		class="add-node-menu-layer"
-		@click="closeMenu"
-		@click.right="nwSystem.showMenu.value && closeMenu" 
+		@click="closeAndReset"
+		@click.right="menuIsOpen && closeAndReset" 
 		@mouseup.stop
+		@contextmenu="$event.preventDefault()"
 	>
 		<div 
 			class="menu-container" 
 			@click.stop 
 			:style="{
-				left: `${nwSystem.menuX.value}px`,
-				top: `${nwSystem.menuY.value}px`,
+				left: `${menuX}px`,
+				top: `${menuY}px`,
 			}"
 		>
 			<!-- search box -->
@@ -43,6 +45,7 @@
 
 			<!-- this will spawn the list of menu items and sub-menu items -->
 			<AddMenuList
+				v-if="graphCtx != null && nwSystem != null"
 				:nwSystem="nwSystem"
 				:graphCtx="graphCtx"
 				:listItems="rootMenuItems"
@@ -54,27 +57,34 @@
 <script setup>
 
 // vue
-import { ref, shallowRef, watch, computed } from 'vue';
+import { ref, shallowRef, watch, computed, onMounted, onUnmounted } from 'vue';
 
 // components
 import AddMenuList from '@Components/AddMenuList.vue';
 import { NODE_TYPE } from '@/classes/NWNode';
 
-// define some props
+// our app / composables
+import { useAddMenu } from '@/composables/useAddMenu';
+
+// define props
 const props = defineProps({
 
-	// reference to the NWEditor instance
-	nwSystem: {
-		type: Object,
-		required: true
-	},
-
-	// the current graph context for the menu
-	graphCtx: {
-		type: Object,
-		required: true
+	// if true, this instance is being mounted internally by the app
+	internalMount: {
+		type: Boolean,
+		default: false
 	}
+
 });
+
+// import our global menu manager
+const {
+	setMountedMenu,
+	clearMountedMenu,
+	closeMenu,
+	menuIsOpen,
+	menuOptions,
+} = useAddMenu();
 
 // store the hierarchy of the menu
 const menuHierarchy = shallowRef([]);
@@ -82,19 +92,34 @@ const menuHierarchy = shallowRef([]);
 // search query
 const searchQuery = ref('');
 
-// reference to our search box
+// reference to various elements
+const menuEl = ref(null);
 const searchBoxEl = ref(null);
 
 // compute either the results of a search query, or the full menu hierarchy
 const rootMenuItems = computed(() => {
 
-	// if the search query is empty, return the full menu hierarchy
-	// if (searchQuery.value.trim() === '') {
-	// 	return menuHierarchy.value;
-	// }
-
 	// otherwise, filter the menu hierarchy based on the search query
-	return filterMenuItems(props.nwSystem.availableNodes.value, searchQuery.value);
+	return filterMenuItems(menuOptions.value.availableNodes, searchQuery.value);
+});
+
+// When the composable signals that the menu is open,
+// use the menuOptions to get the position info dynamically.
+const menuX = computed(() => menuOptions.value?.x ?? 0);
+const menuY = computed(() => menuOptions.value?.y ?? 0);
+const nwSystem = computed(() => menuOptions.value?.nwSystem ?? null);
+const graphCtx = computed(() => menuOptions.value?.graphCtx ?? null);
+
+// Lifecycle hooks
+onMounted(() => {
+	setMountedMenu({ el: menuEl.value });
+
+	// for debug
+	// console.log("AddNodeMenu mounted, isInternalMount:", props.internalMount);
+});
+
+onUnmounted(() => {
+	clearMountedMenu();
 });
 
 
@@ -107,14 +132,18 @@ const rootMenuItems = computed(() => {
  */
 function filterMenuItems(items, query) {
 
+	if(menuOptions.value==null || graphCtx.value==null) {
+		return [];
+	}
+
 	// prepare some info about the query & graph context
 	const sanitizedQuery = query.trim().toLowerCase();
 	const queryIsEmpty = sanitizedQuery.length===0;
-	const outsideGroup = props.graphCtx.graph.subGraph==false;
-	const insideGroup = props.graphCtx.graph.subGraph==true;
+	const outsideGroup = graphCtx.value.graph.subGraph==false;
+	const insideGroup = graphCtx.value.graph.subGraph==true;
 
 	/*
-		props.nwSystem.availableNodes.value
+		nwSystem.availableNodes.value
 		will be an array of objects with the following structure:
 		{
 			menuPath: 'Path/To/Node',
@@ -153,7 +182,7 @@ function filterMenuItems(items, query) {
 
 
 // watch when the menu becomes visible & focus the search box
-watch(() => props.nwSystem.showMenu.value, (newVal) => {
+watch(() => menuIsOpen, (newVal) => {
 	
 	// if the menu is shown, focus the search box
 	if (newVal && searchBoxEl.value) {
@@ -223,7 +252,6 @@ function _buildMenuHierarchy(flatArray) {
  * @param availableNodes - The list of available nodes to build the menu from
  */
 function buildMenuHierarchy(availableNodes) {
-
 	menuHierarchy.value = _buildMenuHierarchy(availableNodes);
 };
 
@@ -232,19 +260,20 @@ function buildMenuHierarchy(availableNodes) {
 // while they probably wont change live at runtime, we still want to
 // build the menu hierarchy when the component is mounted
 // and when the available nodes change
-watch(() => props.nwSystem.availableNodes.value, (newVal) => {
+watch(() => menuOptions, (newVal) => {
 
 	// build the menu hierarchy
-	buildMenuHierarchy(newVal);
+	buildMenuHierarchy(menuOptions.value.availableNodes);
 
 }, { immediate: true });
 
 
 /**
- * Closes the menu
+ * Closes the menu and resets the search query
  */
-function closeMenu() {
-	props.nwSystem.showMenu.value = false;
+function closeAndReset() {
+	searchQuery.value = '';
+	closeMenu();
 }
 
 </script>
@@ -256,18 +285,19 @@ function closeMenu() {
 	.add-node-menu-layer {
 
 		// fill parent
-		position: absolute;
+		position: fixed;
 		inset: 0px 0px 0px 0px;
+		z-index: 9001;
 
 		// for debug
-		// background: rgba(0,0, 0, 0.5);
+		/* background: rgba(0,0, 0, 0.5); */
 		font-size: 1px;
 
 		// search box on top
 		.search-box {
 
 			position: relative;
-			background: rgba(0, 0, 0, 0.5);
+			background: rgba(0, 0, 0, 0.85);
 			padding: 8em;
 			border-radius: 8em;
 			height: 30em;
