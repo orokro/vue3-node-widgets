@@ -26,6 +26,7 @@
 		<!-- title -->
 		<div 
 			class="title-bar"
+			:class="{ collapsed: node.collapsed.value }"
 			@mousedown.stop="startDrag"
 		>
 
@@ -396,7 +397,7 @@ function getOffsetInEm(rowEl) {
 	const emSize = parseFloat(getComputedStyle(parentEl).fontSize) || 1;
 	return {
 			top: pixelOffset / emSize + 9, 
-			right: parentRect.width / emSize
+			right: parentRect.width / emSize+4
 	};
 }
 
@@ -410,9 +411,6 @@ function measureFieldPositions(){
 	// because it will specify it's own socket positions
 	if(props.node.constructor.customComponent!==null)
 		return;
-
-	// console.log(props.node.constructor.nodeName,  props.node.fieldsList.value);
-	// console.log(props.node.constructor.nodeName,  fieldRowData);
 
 	// loop through all the fields in the node
 	for (const field of props.node.fieldsList.value) {
@@ -530,6 +528,10 @@ onUnmounted(()=>{
 				font-weight: bold;
 			}
 
+			&.collapsed {
+				border-radius: 7em;
+			}
+
 			// arrow to collapse the node
 			.collapse-arrow {
 
@@ -635,7 +637,7 @@ onUnmounted(()=>{
 
 					// slide up over the title bar
 					position: relative;
-					top: -20em;
+					top: -21em;
 
 					// scaleY to 0 to collapse
 					transform-origin: top left !important;
