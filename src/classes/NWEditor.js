@@ -149,24 +149,21 @@ export default class NWEditor {
 		// set it
 		this.rootGraph = newGraph;
 		this.rootGraphRef.value = newGraph;
-		this.graphName.value = 'Root Graph';
 	}
 
 
 	/**
 	 * Opens a sub-graph in the editor.
 	 * 
-	 * @param {String} graphName - the name of the sub-graph to open
 	 * @param {NWGraph} newSubGraph - the sub-graph to open
 	 */
-	openSubGraph(graphName, newSubGraph){
+	openSubGraph(newSubGraph){
 
 		// add the current graph to the parent editors stack
 		this.parentGraphs.value = [
 			...this.parentGraphs.value, 
 			{
 				id: this.constructor.generateUUID('parent'),
-				name: this.graphName.value,
 				graph: this.rootGraph,
 			}
 		];
@@ -174,9 +171,6 @@ export default class NWEditor {
 		// set our graph but don't clear parents bc we're going deeper
 		this.rootGraph = newSubGraph;
 		this.rootGraphRef.value = newSubGraph;
-
-		// save our name
-		this.graphName.value = graphName;
 	}
 
 
@@ -199,9 +193,6 @@ export default class NWEditor {
 		// set our graph but don't clear parents bc we're going deeper
 		this.rootGraph = selected.graph;
 		this.rootGraphRef.value = selected.graph;
-
-		// save our name
-		this.graphName.value = selected.name;
 
 		// set the new parents array
 		this.parentGraphs.value = newParents;

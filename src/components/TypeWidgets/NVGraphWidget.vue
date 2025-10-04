@@ -77,7 +77,7 @@ function openGraph() {
 
 	// open the sub graph editor
 	const ctx = ctxRef.value;
-	ctx.openSubGraph(graphName, graph);
+	ctx.openSubGraph(graph);
 }
 
 // debug mount test

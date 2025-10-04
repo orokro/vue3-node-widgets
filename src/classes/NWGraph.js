@@ -39,6 +39,9 @@ export class NWGraph {
 		// save whether this is a subgraph
 		this.subGraph = subGraph;
 		
+		// our dynamic name
+		this.name = ref('Root Graph');
+
 		// our list of instantiated nodes and connections
 		this.nodes = shallowRef([]);
 		this.wires = shallowRef([]);

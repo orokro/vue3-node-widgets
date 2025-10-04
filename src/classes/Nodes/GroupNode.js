@@ -90,6 +90,24 @@ export default class GroupNode extends NWNode {
 
 		// watch for IO changes in the internal graph & update our dynamic fields
 		this.watchIO();
+
+		// watch for our name to change to update the graph internally
+		this.watchName();
+	}
+
+
+	/**
+	 * Clean up
+	 */
+	destroy(){
+
+		super.destroy();
+
+		// stop our watchers
+		if(this.ioWatcher)
+			this.ioWatcher();
+		if(this.nameWatcher)
+			this.nameWatcher();
 	}
 
 
@@ -199,6 +217,21 @@ export default class GroupNode extends NWNode {
 				...this.dynamicFields
 			];
 			this.wiresVersion.value++;
+		});
+	}
+
+
+	/**
+	 * Watch for changes to our name field and update the internal graph name
+	 */
+	watchName(){
+
+		this.nameWatcher = watchEffect(() => {
+			
+			// get our actual NWGraph instance for this node
+			const ctx = this.fieldState.graph.val;
+			const newName = this.fieldState.groupName.valueRef.value;
+			ctx.name.value = newName || 'Group';
 		});
 	}
 

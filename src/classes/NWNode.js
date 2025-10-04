@@ -564,6 +564,21 @@ export default class NWNode {
 			}
 		}
 	}
+	
+
+	/**
+	 * Cleans up any watchers or other resources used by this node.
+	 */
+	destroy() {
+
+		// stop all the watchers on our field state
+		for (const key in this.fieldState) {
+			if (this.fieldState[key].watch) {
+				this.fieldState[key].watch();
+			}
+		}
+		this.fieldState = {};
+	}
 
 
 	/**

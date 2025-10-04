@@ -21,7 +21,7 @@
 				:key="graph.id"
 				@click="e=>clickCrumb(idx, e)"
 			>
-				<span>{{ graph.name }}<span class="arrow"> ➤</span></span>
+				<span>{{ graph.nameRef.value }}<span class="arrow"> ➤</span></span>
 				<div 
 					class="close-button"
 					@click="e=>clickCrumb(idx-1, e)"
@@ -53,10 +53,15 @@ const props = defineProps({
 const crumbs = computed( () => {
 
 	return [
-		...props.editor.parentGraphs.value,
+		...props.editor.parentGraphs.value.map(i=>{
+			return {
+				...i,
+				nameRef: i.graph.name
+			}
+		}),
 		{
 			id: 'current',
-			name: props.editor.graphName.value,
+			nameRef: props.editor.rootGraphRef.value.name,
 			graph: props.editor.rootGraphRef.value,
 		}
 	];
