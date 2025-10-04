@@ -30,7 +30,7 @@
 		<div 
 			class="title-bar"
 			:class="{ collapsed: node.collapsed.value }"
-			@mousedown="startDrag"
+			@mousedown.stop="startDrag"
 		>
 
 			<!-- collapse arrow -->
@@ -204,7 +204,6 @@ import { ref, onMounted, onUnmounted, nextTick, inject, watch, readonly, compute
 
 // our app
 import { FIELD_TYPE, NODE_TYPE, SOCKET_TYPE } from '@/classes/NWNode';
-import { VGraph } from '@/classes/Types';
 
 // components
 
@@ -335,25 +334,6 @@ watch(()=>props.graph.wires.value, ()=>{
 });
 
 
-function setYPos(rowEl, field) {
-
-	nextTick(()=>{
-		console.log(rowEl);
-		rowEl = rowEl?.value?.[0];
-
-		// if the row element is not defined, return
-		if (!rowEl) return;
-
-		// get the offset of the row element in ems relative to its parent
-		const offsetInEm = getOffsetInEm(rowEl) + 26;
-
-		// set the input and output Y positions based on the offset
-		props.node.fieldState[field.name].data.inputYPos.value = offsetInEm;
-		props.node.fieldState[field.name].data.outputYPos.value = offsetInEm;
-	});
-}
-
-
 /**
  * Handles the start of dragging the node
  * 
@@ -361,18 +341,35 @@ function setYPos(rowEl, field) {
  */
 function startDrag(e) {
 
-	// save our nodes initial position
-	const initialX = props.node.x.value;
-	const initialY = props.node.y.value;
+	// don't deselect if we're already selected
+	props.graph.selMgr.conditionallySelectNode(e, props.node);
+
+	// check if there's others selected, if so we'll move them all
+	const selectedNodes = props.graph.selMgr.moreSelectedThanJust(props.node);
+
+	// add ourself to the selected nodes if not already
+	if(!selectedNodes.includes(props.node))
+		selectedNodes.push(props.node);
+
+	// build map of initial positions for all selected nodes
+	const initialPositions = new Map();
+	for(const n of selectedNodes)
+		initialPositions.set(n, { x: n.x.value, y: n.y.value });
 
 	dh.dragStart(
 
 		(dx, dy) => {
 
-			props.node.setPosition(
-				initialX - dx / zoomScale.value,
-				initialY - dy / zoomScale.value
-			);
+			// move all selected nodes
+			for(const n of selectedNodes){
+				const initialPos = initialPositions.get(n);
+				if(initialPos){
+					n.setPosition(
+						initialPos.x - dx / zoomScale.value,
+						initialPos.y - dy / zoomScale.value
+					);
+				}
+			}
 
 			measureFieldPositions();
 		},
@@ -380,7 +377,6 @@ function startDrag(e) {
 
 		},
 	);
-
 }
 
 
@@ -445,12 +441,6 @@ function measureFieldPositions(){
 		socketPositions.set(`${key}`, offsetInEm);
 	}
 }
-
-
-// const viewport = inject('viewport');
-// watch(()=>viewport.zoomScale.value, (newZoom)=>{
-// 	// measureFieldPositions();
-// });
 
 
 // resize observer to remeasure field positions when the content element resizes

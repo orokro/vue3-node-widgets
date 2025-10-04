@@ -10,6 +10,7 @@
 // vue
 import DragHelper from 'gdraghelper';
 import { ref, shallowRef } from 'vue';
+import NWNode from './NWNode';
 
 // main export
 export class SelectionManager {
@@ -62,6 +63,39 @@ export class SelectionManager {
 			// single select, just set it
 			this.selectedNodes.value = [node];
 		}
+	}
+
+
+	/**
+	 * Conditionally selects a node if it is not already selected.
+	 * 
+	 * @param {MouseEvent} event - the mouse event that triggered the selection
+	 * @param {NWNode} node - the node to conditionally select
+	 * @returns 
+	 */
+	conditionallySelectNode(event, node){
+
+		// if already selected, do nothing
+		if(this.selectedNodes.value.includes(node))
+			return;
+		
+
+		// otherwise select it
+		this.selectNode(event, node);
+	}
+
+
+	/**
+	 * Helper to determine if there are more nodes selected than just the given one.
+	 * 
+	 * @param {NWNode} node - the node to check
+	 * @returns 
+	 */
+	moreSelectedThanJust(node){
+
+		// filter out the node & see if anything's left
+		const others = this.selectedNodes.value.filter(n => n !== node);
+		return others.length > 0 ? others : [];
 	}
 
 
@@ -144,7 +178,6 @@ export class SelectionManager {
 				this.isBoxSelecting.value = false;
 			}
 		);
-
 	}
 
 
