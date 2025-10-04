@@ -148,9 +148,13 @@ export class NWGraph {
 			// delete the node
 			this.nodes.value = this.nodes.value.filter(n => n !== node);
 
+			// tell it to clean up
+			node.destroy();
+
 			// break any connections this node may have & update io
 			this.connMgr.breakConnectionsByNode(node);
 			this.updateIO();
+			
 			return true;
 		}
 

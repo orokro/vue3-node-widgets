@@ -122,6 +122,7 @@ function selectItem(index) {
 					position: relative;
 					border-radius: 10em;
 					padding: 0em;
+					padding-bottom: 3em;
 
 					// drop down element (previously was a select box)
 					.dropdown {

@@ -55,6 +55,9 @@ export default class GroupNode extends NWNode {
 
 		// reset things
 		this.init();
+
+		// this IS a two-column node
+		this.isTwoColumn = true;
 		
 		// special group type
 		this.setNodeType(NODE_TYPE.GROUP);

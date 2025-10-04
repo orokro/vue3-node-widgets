@@ -248,6 +248,9 @@ export default class NWNode {
 	// true when this node is only available in sub-graphs
 	static isSubGraphOnly = false;
 
+	// true if this is a two-column style node
+	static isTwoColumn = false;
+	
 	// just a helpful shorthand
 	static = this.constructor;
 
