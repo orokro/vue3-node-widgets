@@ -28,6 +28,18 @@
 			class="title-bar"
 			@mousedown.stop="startDrag"
 		>
+
+			<!-- collapse arrow -->
+			<div 
+				class="collapse-arrow"
+				:class="{ collapsed: node.collapsed.value }"
+				@click="node.collapsed.value = !node.collapsed.value"
+			>
+				<span>
+					<i class="material-icons">keyboard_arrow_down</i>
+				</span>
+			</div>
+
 			<span>
 				{{ node.constructor.nodeName }}
 			</span>
@@ -42,85 +54,91 @@
 		</div>
 
 		<!-- node content -->
-		<div ref="contentEl" class="content">
+		<div 
+			ref="contentEl" 
+			class="content"
+			:class="{ collapsed: node.collapsed.value }"
+		>
 
-			<!-- only render this if we don't provide a custom component -->
-			<template v-if="node.constructor.customComponent==null">
-				<span v-if="node.fieldsList.value.length === 0">
-					NODE CONTENT.
-				</span>
-				<div v-else>
+			<!-- helper wrapper to squish content when node is collapsed -->
+			<div class="collapsed-shift-wrapper">
+				<!-- only render this if we don't provide a custom component -->
+				<template v-if="node.constructor.customComponent==null">
+					<span v-if="node.fieldsList.value.length === 0">
+						NODE CONTENT.
+					</span>
+					<div v-else>
 
-					<!-- single column mode -->
-					<template v-if="node.constructor.isTwoColumn==false">
-						<NodeFieldColumn
-							:node="node"
-							:fieldsList="node.fieldsList.value"
-							:fieldHasInput="fieldHasInput"
-							:showWidgetFor="showWidgetFor"
-							:getFieldComponent="getFieldComponent"
-							:setSocketRef="setSocketRef"
-						/>
-					</template>
+						<!-- single column mode -->
+						<template v-if="node.constructor.isTwoColumn==false">
+							<NodeFieldColumn
+								:node="node"
+								:fieldsList="node.fieldsList.value"
+								:fieldHasInput="fieldHasInput"
+								:showWidgetFor="showWidgetFor"
+								:getFieldComponent="getFieldComponent"
+								:setSocketRef="setSocketRef"
+							/>
+						</template>
 
-					<!-- two column mode -->
-					<template v-else>
+						<!-- two column mode -->
+						<template v-else>
 
-						<!-- just the prop and labels in a single column -->
-						<NodeFieldColumn
-							:node="node"
-							:fieldsList="node.fieldsList.value.filter(f=>[FIELD_TYPE.PROP, FIELD_TYPE.LABEL].includes(f.fieldType))"
-							:fieldHasInput="fieldHasInput"
-							:showWidgetFor="showWidgetFor"
-							:getFieldComponent="getFieldComponent"
-							:setSocketRef="setSocketRef"
-						/>
+							<!-- just the prop and labels in a single column -->
+							<NodeFieldColumn
+								:node="node"
+								:fieldsList="node.fieldsList.value.filter(f=>[FIELD_TYPE.PROP, FIELD_TYPE.LABEL].includes(f.fieldType))"
+								:fieldHasInput="fieldHasInput"
+								:showWidgetFor="showWidgetFor"
+								:getFieldComponent="getFieldComponent"
+								:setSocketRef="setSocketRef"
+							/>
 
-						<div class="two-column-box">
+							<div class="two-column-box">
 
-							<!-- left column for INPUT/PROP fields -->
-							<div class="col col-a">
-								<NodeFieldColumn
-									:node="node"
-									:fieldsList="node.fieldsList.value.filter(f=>[FIELD_TYPE.INPUT].includes(f.fieldType))"
-									:fieldHasInput="fieldHasInput"
-									:showWidgetFor="showWidgetFor"
-									:getFieldComponent="getFieldComponent"
-									:setSocketRef="setSocketRef"
-								/>
+								<!-- left column for INPUT/PROP fields -->
+								<div class="col col-a">
+									<NodeFieldColumn
+										:node="node"
+										:fieldsList="node.fieldsList.value.filter(f=>[FIELD_TYPE.INPUT].includes(f.fieldType))"
+										:fieldHasInput="fieldHasInput"
+										:showWidgetFor="showWidgetFor"
+										:getFieldComponent="getFieldComponent"
+										:setSocketRef="setSocketRef"
+									/>
+								</div>
+
+								<!-- right column for OUTPUT fields -->
+								<div class="col col-b">
+									<NodeFieldColumn
+										:node="node"
+										:fieldsList="node.fieldsList.value.filter(f=>f.fieldType==FIELD_TYPE.OUTPUT)"
+										:fieldHasInput="fieldHasInput"
+										:showWidgetFor="showWidgetFor"
+										:getFieldComponent="getFieldComponent"
+										:setSocketRef="setSocketRef"
+									/>
+								</div>
+
 							</div>
 
-							<!-- right column for OUTPUT fields -->
-							<div class="col col-b">
-								<NodeFieldColumn
-									:node="node"
-									:fieldsList="node.fieldsList.value.filter(f=>f.fieldType==FIELD_TYPE.OUTPUT)"
-									:fieldHasInput="fieldHasInput"
-									:showWidgetFor="showWidgetFor"
-									:getFieldComponent="getFieldComponent"
-									:setSocketRef="setSocketRef"
-								/>
-							</div>
+						</template>
 
-						</div>
+					</div>
+				</template>
 
-					</template>
+				<!-- if we have a custom component, we can just mount it here -->
+				<template v-else>
+					<component
+						:is="node.constructor.customComponent"
+						:node="node"
+						:graph="graph"
+					/>
+				</template>
 
-				</div>
-			</template>
-
-			<!-- if we have a custom component, we can just mount it here -->
-			<template v-else>
-				<component
-					:is="node.constructor.customComponent"
-					:node="node"
-					:graph="graph"
-				/>
-			</template>
-
-			<!-- regardless of weather we used the autogenerated UI or a custom component
-			 	 we need to spawn the sockets for the inputs and outputs separately -->
-			<template v-if="node.fieldsList.value.length !== 0">
+				<!-- regardless of weather we used the autogenerated UI or a custom component
+					we need to spawn the sockets for the inputs and outputs separately -->
+				<template v-if="node.fieldsList.value.length !== 0">
 				<div class="sockets sockets-inputs">
 
 					<template
@@ -170,8 +188,8 @@
 						/>
 					</template>
 				</div>
-			</template>
-
+				</template>
+			</div>
 		</div>
 	</div>
 </template>
@@ -500,7 +518,7 @@ onUnmounted(()=>{
 			// look draggable
 			cursor: move;
 
-			padding: 3em 20em 0em 7em;
+			padding: 3em 20em 0em 27em;
 			text-align: left;
 			text-wrap: nowrap;
 			text-overflow: ellipsis;
@@ -511,6 +529,51 @@ onUnmounted(()=>{
 				color: white;
 				font-weight: bold;
 			}
+
+			// arrow to collapse the node
+			.collapse-arrow {
+
+				// red round circle
+				background	: rgba(0, 0, 0, 0.55);
+				border-radius: 50%;
+				width: 16em;
+				height: 16em;
+				transform-origin: center;
+				// light up on hover
+				&:hover {
+					background: rgba(255, 145, 0, 0.55);
+				}
+
+				// position the close button
+				position: absolute;
+				inset: 3em auto 4em 4em;
+
+				// make it look like a button
+				cursor: pointer;
+				color: white;
+
+				// rotate when collapsed
+				&.collapsed {
+					transform: rotate(-90deg);
+
+					&:hover {
+						background:rgba(60, 255, 0, 0.55);
+					}
+				}
+
+				// force center arrow
+				span {
+					position: absolute;
+					top: 60%;
+					left: 50%;
+					transform: translate(-50%, -50%);
+
+					i{
+						font-size: 1.7em;
+					}
+				}
+
+			}// .collapse-arrow
 
 			// the delete button
 			.delete-button {
@@ -556,8 +619,31 @@ onUnmounted(()=>{
 			width: 100%;
 			height: 100%;
 
-			// padding for the content
-			/* padding: 30em; */
+			// true when node is collapsed
+			&.collapsed {
+
+				// compress content to 0 height so node is just the title bar
+				display: hidden;
+				height: 0px !important;
+				overflow: clip !important;
+				
+				// helper wrapper so we can collapse & shift the content up
+				// note: this is a huge lazy hack so I didn't to we-write the wire/socket position update
+				// code, so if we just collapse the sockets with scaleY(0) they stay in the same place,
+				// and then we can shift them up so they overlap the title bar. lol.
+				.collapsed-shift-wrapper {
+
+					// slide up over the title bar
+					position: relative;
+					top: -20em;
+
+					// scaleY to 0 to collapse
+					transform-origin: top left !important;
+					transform: scaleY(0) !important;
+
+				}// .collapsed-shift-wrapper
+
+			}// .collapsed
 
 			// background color
 			background: rgba(255, 255, 255, 0.8);

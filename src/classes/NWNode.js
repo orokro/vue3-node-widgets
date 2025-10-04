@@ -194,8 +194,7 @@
 */
 
 // vue
-import { Value } from 'sass';
-import { ref, shallowRef, watchEffect } from 'vue';
+import { ref, shallowRef, watchEffect, watch} from 'vue';
 import { Connection } from './Connection';
 import VType from './VType';
 
@@ -250,7 +249,7 @@ export default class NWNode {
 
 	// true if this is a two-column style node
 	static isTwoColumn = false;
-	
+
 	// just a helpful shorthand
 	static = this.constructor;
 
@@ -271,6 +270,9 @@ export default class NWNode {
 	// whenever a connection is plugged or unplugged from this node,
 	// we'll increment this version to force updates of dependents
 	wiresVersion = ref(0);
+
+	// true when user collapses the node
+	collapsed = ref(false);
 
 	// resets the static properties of the class for subclasses
 	static init(){
@@ -566,6 +568,12 @@ export default class NWNode {
 				);
 			}
 		}
+
+		// re-do wires when we change collapsed state
+		this.collapsedWatcher = watch(()=>this.collapsed.value, () => {
+			console.log('collapsed changed, updating wiresVersion');
+			this.wiresVersion.value++;
+		});
 	}
 	
 
