@@ -6,7 +6,7 @@
 	in our connection manager.
 */
 
-import { reactive, ref, shallowReactive } from "vue";
+import { nextTick, reactive, ref, shallowReactive } from "vue";
 import { ConnectionManager } from "./ConnectionManager";
 import NWNode, { SOCKET_TYPE } from "./NWNode";
 

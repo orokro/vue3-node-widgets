@@ -238,24 +238,21 @@ const fieldRowData = new Map();
 // ref to the element where we spawn content
 const contentEl = ref(null);
 
-// wires list lives on the editor graph; shallowRef so changes are reactive
-const wiresRef = props.graph.wires;
-
-
 // cache of connected INPUT endpoints, keyed by "nodeId::fieldName"
 const connectedInputsKeySet = computed(()=>{
 
 	// force recalc when wires change
 	const _ver = props.node.wiresVersion.value;
+	const wires = props.graph.wires.value;
 
 	// build a set of all connected INPUT endpoints
 	const set = new Set();
-	for(const c of wiresRef.value){
+	for(const c of wires){
 
 		// NOTE: a field gets its value when it is the OUTPUT end of a connection
 		// (connection.outputNode/outputField is the consumer/input socket)
 		if(c?.outputNode && c?.outputField)
-			set.add(`${c.outputNode.id}::${c.outputField.name}`);
+			set.add(`${c.outputNode.id}::${c.outputField.id}`);
 		
 	}// next c
 
@@ -274,7 +271,7 @@ function setSocketRef(fieldID, el){
 // true iff THIS node's given field has an INPUT wire
 function fieldHasInput(field){
 
-	return connectedInputsKeySet.value.has(`${props.node.id}::${field.name}`);
+	return connectedInputsKeySet.value.has(`${props.node.id}::${field.id}`);
 }
 
 
@@ -318,7 +315,7 @@ function getFieldComponent(field){
 
 
 // when wires change, widgets can appear/disappear → row heights change → remeasure
-watch(()=>wiresRef.value, ()=>{
+watch(()=>props.graph.wires.value, ()=>{
 	nextTick(()=>{ measureFieldPositions(); });
 });
 

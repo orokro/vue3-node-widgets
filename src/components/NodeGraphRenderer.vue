@@ -41,7 +41,7 @@
 			<!-- loop through all the nodes and render them -->
 			<Node 
 				v-for="(node, index) in graph.nodes.value" 
-				:key="index" 
+				:key="node.id" 
 				:graph="graph"
 				:node="node"
 			/>
