@@ -21,10 +21,11 @@ import { ref, shallowRef, reactive } from 'vue';
 
 // our app
 import { ConnectionManager } from './ConnectionManager';
+import { SelectionManager } from './SelectionManager';
 
 // external libs/misc
 import t from 'typical';
-import { NODE_TYPE } from './NWNode';
+import NWNode, { NODE_TYPE } from './NWNode';
 
 // main export
 export class NWGraph {
@@ -54,6 +55,19 @@ export class NWGraph {
 		// make new manager for our connections in this graph specifically
 		// (previously we had a global one in NWEditor, but this makes more sense for node groups)
 		this.connMgr = new ConnectionManager(this);
+
+		// make new selection manager for this graph specifically
+		this.selMgr = new SelectionManager(this);		
+	}
+
+
+	/**
+	 * Selects a node in the graph.
+	 * 
+	 * @param {NWNode} node - The node to select.
+	 */
+	selectNode(node){
+		console.log('selectNode not implemented yet', node);
 	}
 
 

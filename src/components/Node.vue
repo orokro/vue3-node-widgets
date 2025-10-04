@@ -18,16 +18,19 @@
 	<!-- main outer wrapper -->
 	<div 
 		class="node-box"
+		:class="{ selected: isSelected }"
 		:style="{
 			left: `${node.x?.value}em`,
 			top: `${node.y?.value}em`,
-		}">
+		}"
+		@mousedown.stop="e=>graph.selMgr.selectNode(e, node)"
+	>
 
 		<!-- title -->
 		<div 
 			class="title-bar"
 			:class="{ collapsed: node.collapsed.value }"
-			@mousedown.stop="startDrag"
+			@mousedown="startDrag"
 		>
 
 			<!-- collapse arrow -->
@@ -237,6 +240,11 @@ const {
 	panY,
 	zoomScale,
 } = inject('viewport');
+
+// true when we're selected
+const isSelected = computed(()=>{
+	return props.graph.selMgr.selectedNodes.value.includes(props.node);
+});
 
 // a map of the socket row refs for this component
 // (instead of storing them on state like we used to)
@@ -495,6 +503,10 @@ onUnmounted(()=>{
 
 		// padding on top for the title bar
 		padding-top: 22em;
+
+		&.selected {
+			border-color: #00ABAE;
+		}
 
 		// the title bar for the node that has the close button
 		//  & can drag the node around

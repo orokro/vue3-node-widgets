@@ -10,7 +10,7 @@
 		class="n-graph-widget" 
 		:style="{
 			'text-align': align,
-		}"
+		}"		
 	>
 		<!-- the outer most wrapper -->
 		<div class="input-wrapper">

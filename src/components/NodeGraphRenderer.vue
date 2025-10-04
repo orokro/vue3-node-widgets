@@ -17,6 +17,7 @@
 		ref="containerEl"
 		class="editor-container fill-parent" 
 		tabindex="0"
+		@click.self="graph.selMgr.selectNone"
 		@mousedown.prevent="startPanDrag"		
 		@mouseup="checkAddMenu"		
 		@keydown="handleKeyDown"
@@ -27,7 +28,6 @@
 			backgroundPosition: `${panX}px ${panY}px`,
 		}"
 	>
-
 		<!-- this container will host all the moveable elements, it will move with the pan -->
 		<div 
 			class="pan-container" 
