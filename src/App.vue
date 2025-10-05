@@ -8,6 +8,8 @@
 	<main @contextmenu="disableContextMenu">
 		<div class="positioning-box">
 
+			<!-- <AddNodeMenu /> -->
+
 			<WindowManager
 				ref="winMgrEl"
 				:availableWindows="availableWindows"
@@ -16,6 +18,7 @@
 				:topBarComponent="HeaderBar"
 				:showTopBar="true"
 			/>
+			
 			
 		</div>
 
@@ -30,6 +33,7 @@ import WindowManager from 'vue-win-mgr';
 import GraphWindow from './dev_src/GraphWindow.vue';
 import HeaderBar from './dev_src/HeaderBar.vue';
 import { DevApp } from './dev_src/DevApp.js';
+import AddNodeMenu from './components/AddNodeMenu.vue';
 
 // styles
 import 'vue-win-mgr/dist/style.css';

@@ -115,7 +115,7 @@ onMounted(() => {
 	setMountedMenu({ el: menuEl.value });
 
 	// for debug
-	// console.log("AddNodeMenu mounted, isInternalMount:", props.internalMount);
+	console.log("AddNodeMenu mounted, isInternalMount:", props.internalMount);
 });
 
 onUnmounted(() => {
