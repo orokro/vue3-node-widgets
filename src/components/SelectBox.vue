@@ -44,7 +44,7 @@ const props = defineProps({
 
 		// box settings
 		border: 1px dashed #aaa;
-		background-color: rgba(100, 100, 255, 0.2);
+		background-color: rgba(100, 100, 100, 0.2);
 		
 		// don't interact with mouse events
 		pointer-events: none;
