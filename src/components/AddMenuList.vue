@@ -17,7 +17,11 @@
 			<!-- loop over the list items and display them -->
 			<template v-for="(item, index) in listItems" :key="index">
 
-				<div class="list-item" @click.stop="e=>addNode(e, item)">
+				<div 
+					class="list-item"
+					:class="{ 'selected': item.id === selectedItemId }"
+					@click.stop="e=>addNode(e, item)"
+				>
 
 					<!-- the icon box -->
 					<div class="icon-box">
@@ -85,8 +89,13 @@ const props = defineProps({
 	rightAligned: {
 		type: Boolean,
 		default: false
-	}
+	},
 
+	// string of the currently selected item (if any)
+	selectedItemId: {
+		type: String,
+		default: null
+	}
 });
 
 const { closeMenu } = useAddMenu(props.nwSystem);
@@ -138,6 +147,11 @@ function addNode(event, item){
 				border-radius: 8em;
 			}
 
+			&.selected {
+				background-color: #c0c0c0ff;
+				color: black;
+			}
+
 			// so we can position children abso-lutely
 			position: relative;
 
@@ -184,12 +198,13 @@ function addNode(event, item){
 
 			// fix submenu on the right
 			.sub-menu {
-				backdrop-filter: blur(5px);
+				
 				// hidden by default
 				display: none;
 
 				position: absolute;
 				right: 0em;
+
 				top: 0em;
 				// width: 200px; // fixed width for sub-menus
 				width: max-content;
@@ -197,7 +212,8 @@ function addNode(event, item){
 
 			}// .sub-menu
 
-			&:hover {
+			&:hover, &.selected {
+
 				background-color: #f0f0f0FF;
 				color: black;
 				backdrop-filter: blur(5px) !important;

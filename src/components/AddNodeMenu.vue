@@ -13,6 +13,7 @@
 		ref="menuEl"
 		class="add-node-menu-layer"
 		:class="{ 'right-aligned': isRightAligned }"
+		@keydown="handleKeyDown"
 		@click="closeAndReset"
 		@click.right="repositionMenu" 
 		@mouseup.stop
@@ -53,6 +54,7 @@
 				:listItems="rootMenuItems"
 				:containerEl="menuEl"
 				:right-aligned="isRightAligned"
+				:selectedItemId="selectedItemId"
 			/>
 			
 		</div>
@@ -99,6 +101,9 @@ const menuHierarchy = shallowRef([]);
 // search query
 const searchQuery = ref('');
 
+// selected item ID for keyboard nav
+const selectedItemId = ref(null);
+
 // reference to various elements
 const menuEl = ref(null);
 const containerPopupEl = ref(null);	
@@ -111,8 +116,18 @@ const isRightAligned = ref(false);
 const rootMenuItems = computed(() => {
 
 	// otherwise, filter the menu hierarchy based on the search query
-	return filterMenuItems(menuOptions.value.availableNodes, searchQuery.value);
+	const items = filterMenuItems(menuOptions.value.availableNodes, searchQuery.value);
+
+	// if we have a search query, select the first items ID, otherwise, clear it
+	if(searchQuery.value.length > 0 && items.length > 0) {
+		selectedItemId.value = items[0].id;
+	} else {
+		selectedItemId.value = null;
+	}
+
+	return items;
 });
+
 
 // When the composable signals that the menu is open,
 // use the menuOptions to get the position info dynamically.
@@ -392,6 +407,185 @@ watch(() => menuOptions, (newVal) => {
 function closeAndReset() {
 	searchQuery.value = '';
 	closeMenu();
+}
+
+
+
+/**
+ * Helps find an item by its ID in the root menu items
+ * 
+ * @param id - The ID of the item to find
+ */
+function getItemByID(id){
+
+	if(id == null || rootMenuItems.value == null)
+		return null;
+
+	// search the root menu items recursively
+	function search(items){
+		for(const item of items){
+			if(item.id === id){
+				return item;
+			}
+			if(item.items){
+				const found = search(item.items);
+				if(found) return found;
+			}
+		}
+		return null;
+	}
+
+	return search(rootMenuItems.value);
+}
+
+
+/**
+ * Get's the sibling items of an item.
+ * 
+ * It will find the item in the hierarchy and get the sibling before (above) & after (below) it.
+ * If it's the first item in the list, it will not have a previous sibling.
+ * If it's the last item in the list, it will not have a next sibling.
+ * If the item is a group, it will also have a 'right' sibling which is the first item in the group.
+ * If the item itself is inside a group, it will also have a 'left' sibling which is the parent group.
+ * @param {string|object} item - the id string or the item object itself
+ * @returns {object} - An object with the sibling items: { above, below, left, right }
+ */
+function getItemSiblings(item){
+
+	if(item == null || rootMenuItems.value == null)
+		return {};
+
+	// if we were given an ID, find the item first
+	if(typeof item === 'string'){
+		item = getItemByID(item);
+		if(item == null)
+			return {};
+	}
+
+	let parent = null;
+	let index = -1;
+
+	// search the root menu items recursively to find the parent & index
+	function search(items, parentItem){
+		for(let i = 0; i < items.length; i++){
+			const currentItem = items[i];
+			if(currentItem.id === item.id){
+				parent = parentItem;
+				index = i;
+				return true;
+			}
+			if(currentItem.items){
+				if(search(currentItem.items, currentItem)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	search(rootMenuItems.value, null);
+
+	if(index === -1)
+		return {};
+
+	const siblings = {};
+
+	// get above sibling
+	if(index > 0){
+		siblings.above = parent ? parent.items[index - 1] : rootMenuItems.value[index - 1];
+	}
+
+	// get below sibling
+	if(parent){
+		if(index < parent.items.length - 1){
+			siblings.below = parent.items[index + 1];
+		}
+	} else {
+		if(index < rootMenuItems.value.length - 1){
+			siblings.below = rootMenuItems.value[index + 1];
+		}
+	}
+
+	// get left sibling (parent group)
+	if(parent){
+		siblings.left = parent;
+	}
+
+	// get right sibling (first item in group)
+	if(item.items && item.items.length > 0){
+		siblings.right = item.items[0];
+	}
+
+	return siblings;
+}
+
+
+/**
+ * Handles key down events for the menu
+ * 
+ * @param {KeyboardEvent} event - The keyboard event
+ */
+function handleKeyDown(event) {
+
+	// close if the user hits escape
+	if(event.key === 'Escape') {
+		closeAndReset();
+		return;
+	}
+
+	// if the user hits enter, and we have a selected item, add it to the graph
+	if(event.key === 'Enter' && selectedItemId.value != null) {
+
+		const item = getItemByID(selectedItemId.value);
+		if(item != null && item.item != null && graphCtx.value != null) {
+
+			// add the node to the graph
+			graphCtx.value.graph.addNode(item.item, graphCtx.value.spawn.x, graphCtx.value.spawn.y);
+
+			// close the menu
+			closeAndReset();
+		}
+
+		return;
+	}
+
+	// if the user hits up/down/left/right, navigate the menu
+	if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+
+		if(selectedItemId.value == null) {
+			return;
+		}
+
+		const currentItem = getItemByID(selectedItemId.value);
+		if(currentItem == null) return;
+
+		const siblings = getItemSiblings(currentItem);
+
+		switch(event.key) {
+			case 'ArrowUp':
+				if(siblings.above) {
+					selectedItemId.value = siblings.above.id;
+				}
+				break;
+			case 'ArrowDown':
+				if(siblings.below) {
+					selectedItemId.value = siblings.below.id;
+				}
+				break;
+			case 'ArrowLeft':
+				if(siblings.left) {
+					selectedItemId.value = siblings.left.id;
+				}
+				break;
+			case 'ArrowRight':
+				if(siblings.right) {
+					selectedItemId.value = siblings.right.id;
+				}
+				break;
+		}
+
+		event.preventDefault();
+	}
 }
 
 </script>
