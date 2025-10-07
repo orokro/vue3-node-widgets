@@ -72,6 +72,9 @@ import TexLayer from './TexLayerNode';
 // make a reusable list of default nodes
 const defaultNodeList = [
 
+	// test
+	{ class: GroupNode, menuPath: '/' },
+
 	// special nodes
 	{ class: GroupNode, menuPath: '/Special' },
 	{ class: GroupInputNode, menuPath: '/Special/' },
@@ -82,6 +85,14 @@ const defaultNodeList = [
 	{ class: AllTypesOutNode, menuPath: '/Debug/' },
 	{ class: ABMathKnobNode, menuPath: '/Debug/' },
 	{ class: SuperWaveNode, menuPath: '/Debug/' },
+
+	// special nodes
+	{ class: V2ScaleNode, menuPath: '/Debug/Special/' },
+	{ class: GroupInputNode, menuPath: '/Debug/Special/' },
+	{ class: GroupOutputNode, menuPath: '/Debug/Special/' },
+
+	// also broken
+	{ class: GroupNode, menuPath: '/Debug/Other' },
 
 	// mathematical nodes
 	{ class: ABMathNode, menuPath: '/Math (Scalar)' },

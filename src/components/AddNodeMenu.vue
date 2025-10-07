@@ -317,29 +317,23 @@ watch(() => menuIsOpen.value, async (newVal) => {
 });
 
 
-/**
- * Makes a unique ID based on a prefix and name
- * 
- * @param {string} prefix - The prefix for the ID
- * @param {string} name - The name to base the ID 
- */
-function makeID(prefix, name) {
-
-	// prefer deterministic IDs from name if possible
-	let base = `${prefix}:${name}`;
+// Generate a stable unique ID based on type + path + name
+function makeID(type, fullPath) {
+	let base = `${type}:${fullPath}`;
 	let hash = 0;
 	for (let i = 0; i < base.length; i++) {
 		hash = (hash << 5) - hash + base.charCodeAt(i);
 		hash |= 0;
 	}
-	return `${prefix}-${Math.abs(hash)}`;
+	return `${type}-${Math.abs(hash)}`;
 }
 
 
 /**
- * Builds a hierarchical menu structure from a flat array of menu items.
- * 
- * @param flatArray - The flat array of menu items to convert into a hierarchy
+ * Builds a nested menu hierarchy that supports:
+ * - Root-level items (menuPath = "/")
+ * - Unique group and item IDs based on full path
+ * - Duplicate items allowed in different paths
  */
 function _buildMenuHierarchy(flatArray) {
 	const root = [];
@@ -352,11 +346,11 @@ function _buildMenuHierarchy(flatArray) {
 			.replace(/(^\w|\s\w)/g, c => c.toUpperCase());
 	}
 
-	// Utility to find or create a node at current level
-	function getOrCreate(items, name) {
-		let existing = items.find(i => i.name === name && i.items);
+	// Find or create a group node at a given path
+	function getOrCreate(items, name, fullPath) {
+		let existing = items.find(i => i.name === name && i.path === fullPath);
 		if (!existing) {
-			existing = { id: makeID('group', name), name, items: [] };
+			existing = { id: makeID('group', fullPath), name, path: fullPath, items: [] };
 			items.push(existing);
 		}
 		return existing;
@@ -364,22 +358,41 @@ function _buildMenuHierarchy(flatArray) {
 
 	for (const { menuPath, class: classRef } of flatArray) {
 		const nodeName = classRef.nodeName;
-		const parts = menuPath.split('/').filter(Boolean).map(sanitize);
+		const sanitizedPath = (menuPath || '/').trim();
+
+		// Handle root-level items (menuPath === "/" or empty)
+		if (sanitizedPath === '/' || sanitizedPath === '') {
+			root.push({
+				id: makeID('item', `/${nodeName}`),
+				name: nodeName,
+				item: classRef,
+				path: '/',
+			});
+			continue;
+		}
+
+		// Break down into segments and sanitize
+		const parts = sanitizedPath.split('/').filter(Boolean).map(sanitize);
+
 		let currentLevel = root;
+		let currentPath = '';
 
 		for (let i = 0; i < parts.length; i++) {
 			const part = parts[i];
+			currentPath += `/${part}`;
 
 			if (i === parts.length - 1) {
-				// Last segment — insert the leaf node
-				const container = getOrCreate(currentLevel, part);
+				// This segment is the group under which we add the item
+				const container = getOrCreate(currentLevel, part, currentPath);
+				const itemFullPath = `${currentPath}/${nodeName}`;
 				container.items.push({
-					id: makeID('item', nodeName),
+					id: makeID('item', itemFullPath),
 					name: nodeName,
 					item: classRef,
+					path: itemFullPath,
 				});
 			} else {
-				currentLevel = getOrCreate(currentLevel, part).items;
+				currentLevel = getOrCreate(currentLevel, part, currentPath).items;
 			}
 		}
 	}
