@@ -136,8 +136,6 @@ onMounted(() => {
 		// we've manually mounted
 		manuallyMounted.value = true;
 	}
-
-
 });
 
 
@@ -277,10 +275,37 @@ watch(() => menuIsOpen.value, async (newVal) => {
 			fitMenu();
 		});
 	}
+
+	if(newVal) {
+		console.log(rootMenuItems.value);
+	}
 });
 
 
-// loop over a flat array of items and build a nested object
+/**
+ * Makes a unique ID based on a prefix and name
+ * 
+ * @param {string} prefix - The prefix for the ID
+ * @param {string} name - The name to base the ID 
+ */
+function makeID(prefix, name) {
+
+	// prefer deterministic IDs from name if possible
+	let base = `${prefix}:${name}`;
+	let hash = 0;
+	for (let i = 0; i < base.length; i++) {
+		hash = (hash << 5) - hash + base.charCodeAt(i);
+		hash |= 0;
+	}
+	return `${prefix}-${Math.abs(hash)}`;
+}
+
+
+/**
+ * Builds a hierarchical menu structure from a flat array of menu items.
+ * 
+ * @param flatArray - The flat array of menu items to convert into a hierarchy
+ */
 function _buildMenuHierarchy(flatArray) {
 	const root = [];
 
@@ -296,35 +321,33 @@ function _buildMenuHierarchy(flatArray) {
 	function getOrCreate(items, name) {
 		let existing = items.find(i => i.name === name && i.items);
 		if (!existing) {
-			existing = { name, items: [] };
+			existing = { id: makeID('group', name), name, items: [] };
 			items.push(existing);
 		}
 		return existing;
 	}
 
 	for (const { menuPath, class: classRef } of flatArray) {
-
 		const nodeName = classRef.nodeName;
 		const parts = menuPath.split('/').filter(Boolean).map(sanitize);
-
 		let currentLevel = root;
 
 		for (let i = 0; i < parts.length; i++) {
-
 			const part = parts[i];
 
 			if (i === parts.length - 1) {
-				// Last segment — we insert the leaf node (class here)
+				// Last segment — insert the leaf node
 				const container = getOrCreate(currentLevel, part);
-				container.items.push({ name: nodeName, item: classRef });
+				container.items.push({
+					id: makeID('item', nodeName),
+					name: nodeName,
+					item: classRef,
+				});
 			} else {
-				// Walk/create directory
 				currentLevel = getOrCreate(currentLevel, part).items;
 			}
-
-		}// next i
-
-	}// next { menuPath, class: classRef}
+		}
+	}
 
 	return root;
 }
