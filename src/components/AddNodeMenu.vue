@@ -13,7 +13,7 @@
 		ref="menuEl"
 		class="add-node-menu-layer"
 		@click="closeAndReset"
-		@click.right="menuIsOpen && closeAndReset" 
+		@click.right="repositionMenu" 
 		@mouseup.stop
 		@contextmenu="$event.preventDefault()"
 	>
@@ -74,7 +74,6 @@ const props = defineProps({
 		type: Boolean,
 		default: false
 	}
-
 });
 
 // import our global menu manager
@@ -85,6 +84,7 @@ const {
 	menuIsOpen,
 	menuOptions,
 	manuallyMounted,
+	showAddMenu,
 } = useAddMenu();
 
 // store the hierarchy of the menu
@@ -131,6 +131,43 @@ onUnmounted(() => {
 	clearMountedMenu();
 	manuallyMounted.value = false;
 });
+
+
+/**
+ * Repositions the menu to the new mouse position
+ * 
+ * @param {MouseEvent} event - The mouse event that triggered the reposition
+ */
+function repositionMenu(event){
+
+	/*
+		NOTE:
+		If the user right-clicks over a different instance of NWEditorGraph,
+		then the will reposition in the original context it was opened in.
+
+		This might be misleading, but it's a rare use-case.
+
+		Probably should come up with a strategy for this someday, but for now,
+		it's not a big deal.
+	*/
+
+	// save old options
+	const options = menuOptions.value;
+
+	// close currently open menu
+	closeMenu();
+
+	// get new position
+	const rect = menuEl.value.getBoundingClientRect();
+	const spawnX = (event.clientX - rect.left);
+	const spawnY = (event.clientY - rect.top);
+
+	// update just the x/y - menu is already open so we don't need to do anything else
+	options.x = spawnX;
+	options.y = spawnY;
+	console.log(options);
+	showAddMenu(options);
+}
 
 
 /**
