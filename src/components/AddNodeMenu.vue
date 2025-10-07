@@ -207,55 +207,66 @@ function repositionMenu(event){
  * @param {string} query - The search query
  * @returns {Array} - The filtered menu items
  */
-function filterMenuItems(items, query) {
-
-	if(menuOptions.value==null || graphCtx.value==null) {
+ function filterMenuItems(items, query) {
+	if (menuOptions.value == null || graphCtx.value == null) {
 		return [];
 	}
 
-	// prepare some info about the query & graph context
 	const sanitizedQuery = query.trim().toLowerCase();
-	const queryIsEmpty = sanitizedQuery.length===0;
-	const outsideGroup = graphCtx.value.graph.subGraph==false;
-	const insideGroup = graphCtx.value.graph.subGraph==true;
+	const queryIsEmpty = sanitizedQuery.length === 0;
+	const outsideGroup = graphCtx.value.graph.subGraph === false;
+	const insideGroup = graphCtx.value.graph.subGraph === true;
 
-	/*
-		nwSystem.availableNodes.value
-		will be an array of objects with the following structure:
-		{
-			menuPath: 'Path/To/Node',
-			class: NodeClassReference
-		}
-
-		filter this array into a new array,
-		where we do a match based on it's class.nodeName
-	*/	
+	// step 1: apply your same filtering rules
 	let filteredItems = items.filter(item => {
-		
-		// get some info about the item		
-		const isInputType = item.class.nodeType===NODE_TYPE.INPUT;
-		const isOutputType = item.class.nodeType===NODE_TYPE.OUTPUT;
-		const isIOType = isInputType || isOutputType;		
-		const itemIsSubGraphOnly = item.class.isSubGraphOnly===true;
+		const isInputType = item.class.nodeType === NODE_TYPE.INPUT;
+		const isOutputType = item.class.nodeType === NODE_TYPE.OUTPUT;
+		const isIOType = isInputType || isOutputType;
+		const itemIsSubGraphOnly = item.class.isSubGraphOnly === true;
 
-		// true if we match the query
-		const matchesQueryFilter = queryIsEmpty || item.class.nodeName.toLowerCase().includes(sanitizedQuery);
+		const matchesQueryFilter =
+			queryIsEmpty || item.class.nodeName.toLowerCase().includes(sanitizedQuery);
 
-		// true if we're outside a group & the node isn't specifically for sub-graphs
-		const outsideGroupFilter = outsideGroup && itemIsSubGraphOnly==false;
-		
-		// true if we're inside a group & the node is either not an IO, or it is an IO type but it's a subgraph node
-		const insideGroupFilter = insideGroup && (isIOType==false || (isIOType && itemIsSubGraphOnly));
-		
-		// if we match the query, and we're either outside a group & the node isn't specifically for sub-graphs
-		const passesAllFilters = matchesQueryFilter && (outsideGroupFilter || insideGroupFilter);
+		const outsideGroupFilter = outsideGroup && itemIsSubGraphOnly == false;
+		const insideGroupFilter =
+			insideGroup && (isIOType == false || (isIOType && itemIsSubGraphOnly));
 
-		return passesAllFilters;
+		return matchesQueryFilter && (outsideGroupFilter || insideGroupFilter);
 	});
 
-	// convert the flat array into a nested object
-	return _buildMenuHierarchy(filteredItems);
+	// step 2: convert into hierarchy
+	const hierarchy = _buildMenuHierarchy(filteredItems);
+
+	// step 3: if no query, return hierarchy as usual
+	if (queryIsEmpty) return hierarchy;
+
+	// step 4: flatten all leaf nodes and compute match scores
+	const flat = [];
+	function collectLeaves(arr) {
+		for (const entry of arr) {
+			if (entry.items && entry.items.length) {
+				collectLeaves(entry.items);
+			} else if (entry.item) {
+				const name = entry.name.toLowerCase();
+				const matchIndex = name.indexOf(sanitizedQuery);
+				const score = matchIndex === -1 ? 0 : 1 / (matchIndex + 1); // earlier match = higher score
+				flat.push({
+					id: entry.id,
+					name: entry.name,
+					item: entry.item,
+					score,
+				});
+			}
+		}
+	}
+	collectLeaves(hierarchy);
+
+	// step 5: sort by score and alphabetically
+	flat.sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
+
+	return flat;
 }
+
 
 
 // watch when the menu becomes visible & focus the search box
