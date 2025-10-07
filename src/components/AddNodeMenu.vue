@@ -55,6 +55,7 @@
 				:containerEl="menuEl"
 				:right-aligned="isRightAligned"
 				:selectedItemId="selectedItemId"
+				:openedSubMenus="openedSubMenus"
 			/>
 			
 		</div>
@@ -104,6 +105,9 @@ const searchQuery = ref('');
 // selected item ID for keyboard nav
 const selectedItemId = ref(null);
 
+// list of submenus that were opened via keyboard
+const openedSubMenus = ref([]);
+
 // reference to various elements
 const menuEl = ref(null);
 const containerPopupEl = ref(null);	
@@ -143,7 +147,7 @@ onMounted(() => {
 	setMountedMenu({ el: menuEl.value });
 
 	// for debug
-	console.log("AddNodeMenu mounted, isInternalMount:", props.internalMount);
+	// console.log("AddNodeMenu mounted, isInternalMount:", props.internalMount);
 
 	// if we weren't mounted internally by the app
 	if( props.internalMount === false ) {
@@ -168,6 +172,22 @@ async function fitMenu(){
 	
 	const fitResults = await ensureFit(containerPopupEl, menuEl, 8);
 	isRightAligned.value = fitResults.x < 0;	
+}
+
+
+/**
+ * Resets the search box, selected item, opened submenus,
+ */
+function resetAndFit(){
+
+	// delay focus to allow the menu to render
+	nextTick(() => {
+		searchBoxEl.value.focus();
+		searchQuery.value = '';
+		selectedItemId.value = null;
+		openedSubMenus.value = [];
+		fitMenu();
+	});
 }
 
 
@@ -206,12 +226,7 @@ function repositionMenu(event){
 	showAddMenu(options);
 
 	// delay focus to allow the menu to render
-	nextTick(() => {
-		searchBoxEl.value.focus();
-		searchQuery.value = '';
-
-		fitMenu();
-	});
+	resetAndFit();
 }
 
 
@@ -223,6 +238,7 @@ function repositionMenu(event){
  * @returns {Array} - The filtered menu items
  */
  function filterMenuItems(items, query) {
+
 	if (menuOptions.value == null || graphCtx.value == null) {
 		return [];
 	}
@@ -258,9 +274,12 @@ function repositionMenu(event){
 	// step 4: flatten all leaf nodes and compute match scores
 	const flat = [];
 	function collectLeaves(arr) {
+
 		for (const entry of arr) {
+
 			if (entry.items && entry.items.length) {
 				collectLeaves(entry.items);
+
 			} else if (entry.item) {
 				const name = entry.name.toLowerCase();
 				const matchIndex = name.indexOf(sanitizedQuery);
@@ -272,7 +291,8 @@ function repositionMenu(event){
 					score,
 				});
 			}
-		}
+
+		}// next entry
 	}
 	collectLeaves(hierarchy);
 
@@ -283,7 +303,6 @@ function repositionMenu(event){
 }
 
 
-
 // watch when the menu becomes visible & focus the search box
 watch(() => menuIsOpen.value, async (newVal) => {
 	
@@ -291,20 +310,9 @@ watch(() => menuIsOpen.value, async (newVal) => {
 	searchQuery.value = '';
 
 	// if the menu is shown, focus the search box
-	if (newVal && searchBoxEl.value) {
-
-		// delay focus to allow the menu to render
-		nextTick(() => {
-			searchBoxEl.value.focus();
-			searchQuery.value = '';
-
-			fitMenu();
-		});
-	}
-
-	if(newVal) {
-		console.log(rootMenuItems.value);
-	}
+	if (newVal && searchBoxEl.value)
+		resetAndFit();	
+	
 });
 
 
@@ -521,6 +529,58 @@ function getItemSiblings(item){
 
 
 /**
+ * When the user does keyboard navigation, sometimes they can go into / out of submenus.
+ * When they do, we need to find the currently selected item & then compute it's parents chain.
+ * The will be set to the array openedSubMenus ref so the template can open those submenus.
+ * 
+ * @param {string|object} item - the id string or the item object itself
+ */
+function openParentMenus(item){
+
+	if(item == null || rootMenuItems.value == null)
+		return;
+
+	// if we were given an ID, find the item first
+	if(typeof item === 'string'){
+		item = getItemByID(item);
+		if(item == null)
+			return;
+	}
+
+	const parents = [];
+
+	// search the root menu items recursively to find the parent chain
+	function search(items, parentItem){
+		for(const currentItem of items){
+			if(currentItem.id === item.id){
+				if(parentItem){
+					parents.push(parentItem);
+				}
+				return true;
+			}
+			if(currentItem.items){
+				if(search(currentItem.items, currentItem)){
+					if(parentItem){
+						parents.push(parentItem);
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	search(rootMenuItems.value, null);
+
+	// reverse the parents array so it's in order from root to leaf
+	parents.reverse();
+
+	// set the opened submenus to the parents chain
+	openedSubMenus.value = parents.map(p => p.id);
+}
+
+
+/**
  * Handles key down events for the menu
  * 
  * @param {KeyboardEvent} event - The keyboard event
@@ -552,8 +612,24 @@ function handleKeyDown(event) {
 	// if the user hits up/down/left/right, navigate the menu
 	if(['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
 
+		let key = event.key;
+
+		// if we're right-aligned, swap left/right
+		if(isRightAligned.value) {
+			if(key === 'ArrowLeft')
+				key = 'ArrowRight';
+			else if(key === 'ArrowRight')
+				key = 'ArrowLeft';
+		}
+
 		if(selectedItemId.value == null) {
-			return;
+			
+			// select first item & gtfo
+			if(rootMenuItems.value.length > 0) {
+				selectedItemId.value = rootMenuItems.value[0].id;
+				openParentMenus(selectedItemId.value);
+				return;
+			}
 		}
 
 		const currentItem = getItemByID(selectedItemId.value);
@@ -561,7 +637,7 @@ function handleKeyDown(event) {
 
 		const siblings = getItemSiblings(currentItem);
 
-		switch(event.key) {
+		switch(key) {
 			case 'ArrowUp':
 				if(siblings.above) {
 					selectedItemId.value = siblings.above.id;
@@ -583,6 +659,8 @@ function handleKeyDown(event) {
 				}
 				break;
 		}
+
+		openParentMenus(selectedItemId.value);
 
 		event.preventDefault();
 	}

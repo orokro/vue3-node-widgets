@@ -19,7 +19,10 @@
 
 				<div 
 					class="list-item"
-					:class="{ 'selected': item.id === selectedItemId }"
+					:class="{ 
+						'selected': item.id === selectedItemId,
+						'opened': isOpenedMenu(item.id)
+					}"
 					@click.stop="e=>addNode(e, item)"
 				>
 
@@ -43,6 +46,8 @@
 							:nwSystem="nwSystem"
 							:graphCtx="graphCtx"
 							:listItems="item.items"
+							:selectedItemId="selectedItemId"
+							:openedSubMenus="openedSubMenus"
 						/>
 					</div>
 				</div>
@@ -56,7 +61,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 
 // our app composables / utils
 import { useAddMenu } from '@Composables/useAddMenu.js';
@@ -95,6 +100,12 @@ const props = defineProps({
 	selectedItemId: {
 		type: String,
 		default: null
+	},
+
+	// array of opened menu ids
+	openedSubMenus: {
+		type: Array,
+		default: () => []
 	}
 });
 
@@ -121,6 +132,11 @@ function addNode(event, item){
 	closeMenu();
 }
 
+// helpers / computed
+const isOpenedMenu = (itemID) => {
+	return props.openedSubMenus.includes(itemID);
+};
+
 
 </script>
 <style lang="scss" scoped>
@@ -145,11 +161,6 @@ function addNode(event, item){
 			}
 			&:only-child {
 				border-radius: 8em;
-			}
-
-			&.selected {
-				background-color: #c0c0c0ff;
-				color: black;
 			}
 
 			// so we can position children abso-lutely
@@ -212,7 +223,7 @@ function addNode(event, item){
 
 			}// .sub-menu
 
-			&:hover, &.selected {
+			&:hover, &.opened, &.selected {
 
 				background-color: #f0f0f0FF;
 				color: black;
@@ -221,6 +232,11 @@ function addNode(event, item){
 				&>.sub-menu {
 					display: block;
 				}
+			}
+
+			&.opened {
+				background-color: #c0c0c0ff;
+				/* color: red; */
 			}
 
 			&:active {
