@@ -329,7 +329,7 @@ function getFieldComponent(field){
 
 
 // when wires change, widgets can appear/disappear → row heights change → remeasure
-watch(()=>props.graph.wires.value, ()=>{
+watch([connectedInputsKeySet], ()=>{
 	nextTick(()=>{ measureFieldPositions(); });
 });
 
