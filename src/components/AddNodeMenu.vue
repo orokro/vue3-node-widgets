@@ -369,7 +369,6 @@ function closeAndReset() {
 		// the box where we'll spawn our menu list components.
 		// this is the box that is offset with the x/y coordinates
 		.menu-container {
-
 			position: absolute;
 
 			// for debug

@@ -173,8 +173,8 @@ const MIN_ZOOM = 0.1;
  */
 function startDragOperation(e){
 
-	// if shift is not pressed, de-select everything first
-	if (!e.shiftKey) {
+	// if left-click && shift is not pressed, de-select everything first
+	if (e.button===0 &&  !e.shiftKey) {
 		props.graph.selMgr.selectNone();
 	}
 
