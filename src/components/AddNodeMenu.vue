@@ -12,19 +12,21 @@
 		v-show="menuIsOpen"
 		ref="menuEl"
 		class="add-node-menu-layer"
+		:class="{ 'right-aligned': isRightAligned }"
 		@click="closeAndReset"
 		@click.right="repositionMenu" 
 		@mouseup.stop
 		@contextmenu="$event.preventDefault()"
 	>
 		<div 
+			ref="containerPopupEl"
 			class="menu-container" 
 			@click.stop 
 			:style="{
 				left: `${menuX}px`,
 				top: `${menuY}px`,
 			}"
-		>
+		>	
 			<!-- search box -->
 			<div class="search-box">
 
@@ -49,7 +51,10 @@
 				:nwSystem="nwSystem"
 				:graphCtx="graphCtx"
 				:listItems="rootMenuItems"
+				:containerEl="menuEl"
+				:right-aligned="isRightAligned"
 			/>
+			
 		</div>
 	</div>
 
@@ -57,7 +62,7 @@
 <script setup>
 
 // vue
-import { ref, shallowRef, watch, computed, onMounted, onUnmounted } from 'vue';
+import { ref, shallowRef, watch, computed, onMounted, onUnmounted, nextTick } from 'vue';
 
 // components
 import AddMenuList from '@Components/AddMenuList.vue';
@@ -65,6 +70,7 @@ import { NODE_TYPE } from '@/classes/NWNode';
 
 // our app / composables
 import { useAddMenu } from '@/composables/useAddMenu';
+import { ensureFit } from '@/misc/ensureFit';
 
 // define props
 const props = defineProps({
@@ -95,7 +101,11 @@ const searchQuery = ref('');
 
 // reference to various elements
 const menuEl = ref(null);
+const containerPopupEl = ref(null);	
 const searchBoxEl = ref(null);
+
+// true if we are right-aligned
+const isRightAligned = ref(false);
 
 // compute either the results of a search query, or the full menu hierarchy
 const rootMenuItems = computed(() => {
@@ -113,6 +123,8 @@ const graphCtx = computed(() => menuOptions.value?.graphCtx ?? null);
 
 // Lifecycle hooks
 onMounted(() => {
+
+	// register this instance as the active menu
 	setMountedMenu({ el: menuEl.value });
 
 	// for debug
@@ -124,6 +136,8 @@ onMounted(() => {
 		// we've manually mounted
 		manuallyMounted.value = true;
 	}
+
+
 });
 
 
@@ -131,6 +145,17 @@ onUnmounted(() => {
 	clearMountedMenu();
 	manuallyMounted.value = false;
 });
+
+
+/**
+ * Ensures the menu fits within the viewport
+ * and updates the isRightAligned ref accordingly
+ */
+async function fitMenu(){
+	
+	const fitResults = await ensureFit(containerPopupEl, menuEl, 8);
+	isRightAligned.value = fitResults.x < 0;	
+}
 
 
 /**
@@ -165,8 +190,15 @@ function repositionMenu(event){
 	// update just the x/y - menu is already open so we don't need to do anything else
 	options.x = spawnX;
 	options.y = spawnY;
-	console.log(options);
 	showAddMenu(options);
+
+	// delay focus to allow the menu to render
+	nextTick(() => {
+		searchBoxEl.value.focus();
+		searchQuery.value = '';
+
+		fitMenu();
+	});
 }
 
 
@@ -229,7 +261,7 @@ function filterMenuItems(items, query) {
 
 
 // watch when the menu becomes visible & focus the search box
-watch(() => menuIsOpen.value, (newVal) => {
+watch(() => menuIsOpen.value, async (newVal) => {
 	
 	// clear the search query
 	searchQuery.value = '';
@@ -238,10 +270,12 @@ watch(() => menuIsOpen.value, (newVal) => {
 	if (newVal && searchBoxEl.value) {
 
 		// delay focus to allow the menu to render
-		setTimeout(() => {
+		nextTick(() => {
 			searchBoxEl.value.focus();
 			searchQuery.value = '';
-		}, 100);
+
+			fitMenu();
+		});
 	}
 });
 
@@ -406,12 +440,12 @@ function closeAndReset() {
 		// the box where we'll spawn our menu list components.
 		// this is the box that is offset with the x/y coordinates
 		.menu-container {
+
 			position: absolute;
 
 			// for debug
-			min-width: 300em;
+			min-width: 210em;
 			min-height: 10em;
-			// border: 1px solid red;
 
 		}// .menu-container
 

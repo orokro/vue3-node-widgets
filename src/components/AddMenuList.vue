@@ -7,7 +7,10 @@
 -->
 <template>
 
-	<div class="list-container">
+	<div
+		class="list-container"
+		:class="{ 'right-aligned': rightAligned }"
+	>
 
 		<div class="list-items">
 
@@ -48,9 +51,12 @@
 </template>
 <script setup>
 
+// vue
 import { ref, onMounted } from 'vue';
 
+// our app composables / utils
 import { useAddMenu } from '@Composables/useAddMenu.js';
+import { ensureFit } from '@/misc/ensureFit';
 
 // external libs/misc
 import t from 'typical';
@@ -73,11 +79,17 @@ const props = defineProps({
 	graphCtx: {
 		type: Object,
 		required: true
+	},
+
+	// true if this menu is right-aligned
+	rightAligned: {
+		type: Boolean,
+		default: false
 	}
+
 });
 
 const { closeMenu } = useAddMenu(props.nwSystem);
-
 
 /**
  * Adds a node to the graph (if its an item and not a menu)
@@ -99,6 +111,7 @@ function addNode(event, item){
 	graph.addNode(item.item, pos.x, pos.y);
 	closeMenu();
 }
+
 
 </script>
 <style lang="scss" scoped>
@@ -129,10 +142,7 @@ function addNode(event, item){
 			position: relative;
 
 			// nice bg styles
-			background: rgba(0, 0, 0, 0.5);
-			&:nth-child(odd) {
-				background: rgba(0, 0, 0, 0.65);
-			}
+			background: rgba(0, 0, 0, 0.85);
 
 			.item-name {
 				font-size: 14em;
@@ -143,7 +153,7 @@ function addNode(event, item){
 			color: white;
 			font-weight: bolder;
 
-			padding: 5em 45em 5em 45em;
+			padding: 5em 45em 5em 40em;
 			cursor: pointer;
 
 			// icon box fixed on left, before text
@@ -172,9 +182,9 @@ function addNode(event, item){
 
 			}// .menu-arrow
 
-			// fix submneu on the right
+			// fix submenu on the right
 			.sub-menu {
-
+				backdrop-filter: blur(5px);
 				// hidden by default
 				display: none;
 
@@ -188,8 +198,9 @@ function addNode(event, item){
 			}// .sub-menu
 
 			&:hover {
-				background-color: #f0f0f057;
+				background-color: #f0f0f0FF;
 				color: black;
+				backdrop-filter: blur(5px) !important;
 
 				&>.sub-menu {
 					display: block;
@@ -198,10 +209,44 @@ function addNode(event, item){
 
 			&:active {
 				background-color: #d0d0d0af;
+				backdrop-filter: blur(5px);
 				color: black;
 			}
 
 		}// .list-item
 
+		// if we're right-aligned, we need to adjust some styles
+		&.right-aligned {
+
+			.list-item {
+
+				padding: 5em 45em 5em 60em;
+
+				.icon-box {	
+					left: 30em;
+
+				}// .icon-box
+
+				.menu-arrow {
+
+					left: 5em;
+					right: auto;
+
+					transform: scaleX(-1) translateY(-50%);
+				}// .menu-arrow
+
+				.sub-menu {
+
+					right: auto;
+					left: 0em;
+					transform: translateX(-100%);
+
+				}// .sub-menu 
+
+			}// .list-item
+
+		}// &.right-aligned
+
 	}// .list-container
+
 </style>
