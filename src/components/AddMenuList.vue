@@ -24,6 +24,7 @@
 						'opened': isOpenedMenu(item.id)
 					}"
 					@click.stop="e=>addNode(e, item)"
+					@mouseover="$emit('item-hover', item)"
 				>
 
 					<!-- the icon box -->
@@ -48,6 +49,7 @@
 							:listItems="item.items"
 							:selectedItemId="selectedItemId"
 							:openedSubMenus="openedSubMenus"
+							@item-hover="$emit('item-hover', $event)"
 						/>
 					</div>
 				</div>
@@ -108,6 +110,10 @@ const props = defineProps({
 		default: () => []
 	}
 });
+
+
+// add emit for when the mouse moves over an item
+const emits = defineEmits(['item-hover']);
 
 const { closeMenu } = useAddMenu(props.nwSystem);
 

@@ -56,6 +56,7 @@
 				:right-aligned="isRightAligned"
 				:selectedItemId="selectedItemId"
 				:openedSubMenus="openedSubMenus"
+				@item-hover="handleItemHover"
 			/>
 			
 		</div>
@@ -664,6 +665,21 @@ function handleKeyDown(event) {
 
 		event.preventDefault();
 	}
+}
+
+
+/**
+ * When the user hovers over an item with the mouse,
+ * we want to clear the keyboard selection & opened submenus
+ * since the mouse is now active.
+ * 
+ * @param {object} item - The item that was hovered over
+ */
+function handleItemHover(item){
+
+	// clear keyboard select since mouse is active
+	selectedItemId.value = null;
+	openedSubMenus.value = [];
 }
 
 </script>
