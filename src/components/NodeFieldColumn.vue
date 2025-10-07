@@ -144,15 +144,12 @@ const props = defineProps({
 
 	.node-field-column {
 
+		/* background: red; */
 		// the rows where we spawn the individual fields
 		.node-field-row {
 
 			padding: 6em 8em 0em 6em;
 
-			background: rgba(0, 0, 0, 0.1);
-			&:nth-child(odd) {
-				background: rgba(0, 0, 0, 0.15);
-			}
 
 			&:last-child {
 				padding-bottom: 6em;

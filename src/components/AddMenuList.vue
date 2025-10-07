@@ -150,6 +150,9 @@ const isOpenedMenu = (itemID) => {
 	// container for this list of menu items...
 	.list-container {
 
+		// no text selection!
+		user-select: none;
+
 		// for debug
 		// border: 2px solid black;
 
@@ -242,11 +245,10 @@ const isOpenedMenu = (itemID) => {
 
 			&.opened {
 				background-color: #c0c0c0ff;
-				/* color: red; */
 			}
 
 			&:active {
-				background-color: #d0d0d0af;
+				background-color: #d0d0d0ff;
 				backdrop-filter: blur(5px);
 				color: black;
 			}

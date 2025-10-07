@@ -509,7 +509,7 @@ onUnmounted(()=>{
 			box-sizing: border-box;
 
 			// background color
-			background: rgba(0, 0, 0, 0.5);
+			background: #1E1E1E;
 
 			// same rounded corners at the top
 			border-top-left-radius: 7em;
@@ -650,9 +650,11 @@ onUnmounted(()=>{
 			}// .collapsed
 
 			// background color
-			background: rgba(255, 255, 255, 0.8);
+			background: rgb(175, 175, 175);
 
+			// ground out the bottom corners & allow nothing to escape
 			border-radius: 0em 0em 7em 7em;
+			overflow: clip;
 
 			span {
 				display: block;
