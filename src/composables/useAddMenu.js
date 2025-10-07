@@ -6,6 +6,7 @@
 
 import { ref, shallowRef, nextTick } from 'vue';
 
+
 // ------------------------------------------------------------
 // 🔸 Reactive shared state
 // ------------------------------------------------------------
@@ -14,6 +15,7 @@ const menuIsOpen = ref(false);         // visibility (shown/hidden)
   // data passed to showAddMenu()
 const mountedMenuEl = shallowRef(null);// actual component ref or el
 const activeHostId = ref(null);        // ID of the NWEditorGraph that currently owns the menu
+const manuallyMounted = ref(false);   // if true, menu was mounted manually outside of NWEditorGraph
 const menuOptions = shallowRef(
 	{
 		x: 0,
@@ -42,6 +44,7 @@ const activeHosts = new Set();
 // 🔸 Lifecycle: claiming and releasing host responsibility
 // ------------------------------------------------------------
 
+
 /**
  * Called by NWEditorGraph when it mounts.
  * Returns a unique host ID that it should retain.
@@ -51,6 +54,7 @@ function registerHost() {
 	activeHosts.add(id);
 	return id;
 }
+
 
 /**
  * Called by NWEditorGraph when it unmounts.
@@ -66,6 +70,7 @@ function unregisterHost(id) {
 	}
 }
 
+
 /**
  * Attempts to claim ownership of the global AddNodeMenu.
  * Returns true if successful, false otherwise.
@@ -79,12 +84,20 @@ function claimMenuHost(id) {
 	return activeHostId.value === id; // already host
 }
 
+
 /**
  * Returns whether the given host currently owns the menu.
  */
 function isCurrentHost(id) {
+
+	// always return false if the add menu was manually mounted
+	if (manuallyMounted.value)
+		return false;
+
+	// otherwise return true if the given id matches the active host
 	return activeHostId.value === id;
 }
+
 
 // ------------------------------------------------------------
 // 🔸 AddNodeMenu component lifecycle
@@ -98,6 +111,7 @@ function setMountedMenu(el) {
 	menuIsMounted.value = true;
 }
 
+
 /**
  * Called by AddNodeMenu.vue when it unmounts.
  */
@@ -105,6 +119,7 @@ function clearMountedMenu() {
 	mountedMenuEl.value = null;
 	menuIsMounted.value = false;
 }
+
 
 // ------------------------------------------------------------
 // 🔸 Menu visibility control
@@ -120,11 +135,13 @@ function closeMenu() {
 	menuOptions.value = null;
 }
 
+
 // ------------------------------------------------------------
 // 🔸 Public composable API
 // ------------------------------------------------------------
 
 export function useAddMenu() {
+
 	return {
 		// reactive state
 		menuIsMounted,
@@ -132,6 +149,7 @@ export function useAddMenu() {
 		menuOptions,
 		mountedMenuEl,
 		activeHostId,
+		manuallyMounted,
 
 		// component lifecycle
 		setMountedMenu,

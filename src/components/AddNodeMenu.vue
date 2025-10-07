@@ -84,6 +84,7 @@ const {
 	closeMenu,
 	menuIsOpen,
 	menuOptions,
+	manuallyMounted,
 } = useAddMenu();
 
 // store the hierarchy of the menu
@@ -116,10 +117,19 @@ onMounted(() => {
 
 	// for debug
 	console.log("AddNodeMenu mounted, isInternalMount:", props.internalMount);
+
+	// if we weren't mounted internally by the app
+	if( props.internalMount === false ) {
+		
+		// we've manually mounted
+		manuallyMounted.value = true;
+	}
 });
+
 
 onUnmounted(() => {
 	clearMountedMenu();
+	manuallyMounted.value = false;
 });
 
 
@@ -182,8 +192,11 @@ function filterMenuItems(items, query) {
 
 
 // watch when the menu becomes visible & focus the search box
-watch(() => menuIsOpen, (newVal) => {
+watch(() => menuIsOpen.value, (newVal) => {
 	
+	// clear the search query
+	searchQuery.value = '';
+
 	// if the menu is shown, focus the search box
 	if (newVal && searchBoxEl.value) {
 

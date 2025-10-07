@@ -8,6 +8,7 @@
 	<main @contextmenu="disableContextMenu">
 		<div class="positioning-box">
 
+			<!-- This will be automatically mounted if commented out below -->
 			<!-- <AddNodeMenu /> -->
 
 			<WindowManager
