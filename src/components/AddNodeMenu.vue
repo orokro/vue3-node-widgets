@@ -190,45 +190,6 @@ function resetAndFit(){
 
 
 /**
- * Repositions the menu to the new mouse position
- * 
- * @param {MouseEvent} event - The mouse event that triggered the reposition
- */
-function repositionMenu(event){
-
-	/*
-		NOTE:
-		If the user right-clicks over a different instance of NWEditorGraph,
-		then the will reposition in the original context it was opened in.
-
-		This might be misleading, but it's a rare use-case.
-
-		Probably should come up with a strategy for this someday, but for now,
-		it's not a big deal.
-	*/
-
-	// save old options
-	const options = menuOptions.value;
-
-	// close currently open menu
-	closeMenu();
-
-	// get new position
-	const rect = menuEl.value.getBoundingClientRect();
-	const spawnX = (event.clientX - rect.left);
-	const spawnY = (event.clientY - rect.top);
-
-	// update just the x/y - menu is already open so we don't need to do anything else
-	options.x = spawnX;
-	options.y = spawnY;
-	showAddMenu(options);
-
-	// delay focus to allow the menu to render
-	resetAndFit();
-}
-
-
-/**
  * Filters the menu items based on the search query
  * 
  * @param {Array} items - The menu items to filter
