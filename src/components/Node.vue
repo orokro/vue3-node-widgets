@@ -181,6 +181,8 @@
 									|| 
 									(field.fieldType == FIELD_TYPE.INPUT && field.valuePassThrough)
 								)
+								&&
+								field.isArray === false
 							"
 							:y="socketPositions.get(`${node.id}::${field.id}`).top"
 							:node="node"
@@ -205,9 +207,7 @@ import { ref, onMounted, onUnmounted, nextTick, inject, watch, readonly, compute
 import { FIELD_TYPE, NODE_TYPE, SOCKET_TYPE } from '@/classes/NWNode';
 
 // components
-
 import Socket from './Socket.vue';
-
 import NodeFieldColumn from './NodeFieldColumn.vue';
 
 // props

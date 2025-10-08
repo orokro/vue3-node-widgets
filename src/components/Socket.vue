@@ -30,7 +30,7 @@
 			:style="cornerStyle"
 		/>		
 		<div
-			v-else="socketFormat === 'svg'"
+			v-else-if="socketFormat === 'svg'"
 		>
 		</div>
 	</div>
@@ -79,7 +79,7 @@ const props = defineProps({
 	// the string that stores the style of the socket
 	socketStyle: {
 		type: String,
-		default: 'R,R,R,R,0'
+		default: '10,10,10,10'
 	},
 });
 
@@ -145,7 +145,7 @@ function buildSocketStyle(){
 		
 		// generate the corner style
 		const themeColor = (props.field.valueType.themeColor);
-		cornerStyle.value = generateCornerStyle(props.socketStyle, themeColor);
+		cornerStyle.value = generateCornerStyle(props.socketStyle, themeColor, props.field.isArray);
 
 	} else if (socketFormat.value === 'svg') {
 		if (!validateSvgPath(props.socketStyle)) {
@@ -158,14 +158,14 @@ function buildSocketStyle(){
 
 
 /**
- * Checks if a style string (from the prop) is in the C,C,C,C,Degrees format
+ * Checks if a style string (from the prop) is in the 0–10 corner format
  * 
  * @param input - the input string to check
  * @returns {boolean} - true if the input is in corner format, false otherwise
  */
 function isCornerFormat(input) {
-	// Corner format: 5 segments, 4 of R/S, last is number
-	return /^[RS](?:,[RS]){3},-?\d+(\.\d+)?$/.test(input.trim());
+	// Corner format: 4 numbers 0–10
+	return /^([0-9]|10)(,([0-9]|10)){3}$/.test(input.trim());
 }
 
 
@@ -196,30 +196,22 @@ function detectStyleFormat(input) {
 
 
 /**
- * Validates the style string based on its detected format
+ * Validates the corner style string (0–10 system)
  * 
  * @param input - the input string to validate
  * @returns {boolean} - true if valid, false otherwise
  */
 function validateCornerFormat(input) {
 
-	// we can give it benefit of the doubt and make it uppercase
-	input = input.toUpperCase();
-
-	// split on commas and check length
 	const parts = input.trim().split(',');
-	if (parts.length !== 5)
+	if (parts.length !== 4)
 		return false;
 
-	// break out the parts
-	const [tl, tr, br, bl, deg] = parts;
-	const corners = [tl, tr, br, bl];
-
-	// Corners must be 'R' or 'S'
-	if (!corners.every(c => c === 'R' || c === 'S')) return false;
-
-	// Degrees must be a valid number
-	return !isNaN(parseFloat(deg));
+	// Ensure each part is a number between 0 and 10
+	return parts.every(p => {
+		const num = parseFloat(p);
+		return !isNaN(num) && num >= 0 && num <= 10;
+	});
 }
 
 
@@ -244,8 +236,8 @@ function validateSvgPath(path) {
 	const curveCommands = trimmed.match(/C\s*([-\d\.]+\s+){5}[-\d\.]+/gi);
 	if (curveCommands) {
 		for (const cmd of curveCommands) {
-		const nums = cmd.match(/[-\d\.]+/g);
-		if (!nums || nums.length !== 6) return false;
+			const nums = cmd.match(/[-\d\.]+/g);
+			if (!nums || nums.length !== 6) return false;
 		}
 	}
 
@@ -257,27 +249,31 @@ function validateSvgPath(path) {
 /**
  * Generates the style object for a corner socket based on the input string
  * 
- * @param input - the input string in C,C,C,C,Degrees format
+ * @param input - the input string in N,N,N,N format (0–10)
  * @param themeColor - optional theme color for the background
- * @returns {Object} - style object with background color, border radius, and rotation
+ * @param isArray - whether the field is an array (to adjust size)
+ * @returns {Object} - style object with background color, border radius, etc.
  */
-function generateCornerStyle(input, themeColor = '#000') {
+function generateCornerStyle(input, themeColor = '#000', isArray) {
 	
 	const parts = input.trim().split(',');
-	if (parts.length !== 5) return {};
+	if (parts.length !== 4) return {};
 
-	const [tl, tr, br, bl, deg] = parts;
-	const degrees = parseFloat(deg) || 0;
+	const [tl, tr, br, bl] = parts.map(v => Math.min(Math.max(parseFloat(v) || 0, 0), 10));
 
-	// Convert "R" or "S" to CSS border-radius values
-	const cornerMap = (corner) => (corner === 'R' ? '50%' : '20%');
+	// Map 0–10 -> 0em–7em
+	const toRadius = (v) => `${(v / 10) * 7}em`;
 
-	const borderRadius = `${cornerMap(tl)} ${cornerMap(tr)} ${cornerMap(br)} ${cornerMap(bl)}`;
+	const borderRadius = `${toRadius(tl)} ${toRadius(tr)} ${toRadius(br)} ${toRadius(bl)}`;
+	const baseWidth = '14em';
+	const baseHeight = isArray ? '28em' : '14em';
 
 	return {
 		background: themeColor,
 		borderRadius: borderRadius,
-		transform: `translate(-50%, -50%) rotate(${degrees}deg)`,
+		width: baseWidth,
+		height: baseHeight,
+		transform: `translate(-50%, -50%)`,
 	};
 }
 
@@ -349,10 +345,10 @@ function onMouseLeave(event) {
 		position: absolute;
 		cursor: move;
 
-		// the simple socket style that just specifies corners & rotation
+		// the simple socket style that just specifies corners
 		.corner-socket {
 
-			transform: translate(-50%, -50%) rotate(0deg);
+			transform: translate(-50%, -50%);
 
 			display: inline-block;
 			width: 14em;

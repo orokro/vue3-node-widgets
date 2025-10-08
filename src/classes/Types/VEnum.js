@@ -27,7 +27,7 @@ export class VEnum extends VType {
 	static nodeWidgetComponent = NVEnumComboWidget;
 	
 	/** @type {string} Socket style */
-	static socketStyle = 'S,S,S,S,0';
+	static socketStyle = '10,10,10,10';
 
 	/** @type {*} Default value (index 0) */
 	static defaultValue = 0;

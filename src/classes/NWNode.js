@@ -692,7 +692,8 @@ export default class NWNode {
 			valuePassThrough: false,
 			validateFn: (value) => true,
 			lintFn: (value) => value,
-
+			isArray: options.isArray || false,
+			
 			// optional, to check if this field is for a group input/output
 			for: options.for || null,
 		};

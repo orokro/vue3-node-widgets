@@ -30,8 +30,8 @@ export default class VType {
 	/** @type {string} Hex color for visual representation */
 	static themeColor = '#000000';
 
-	/** @type {string} Socket style identifier (e.g., 'circle', 'square') */
-	static socketStyle = 'circle';
+	/** @type {string} string with nomalized border-radius between 0-10 */
+	static socketStyle = '10,10,10,10';
 
 	/** @type {Map<Function, Function>} From other types TO this type */
 	static fromCoalescers = new Map();

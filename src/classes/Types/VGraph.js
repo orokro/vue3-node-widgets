@@ -30,7 +30,7 @@ export class VGraph extends VType {
 	static nodeWidgetComponent = NVGraphWidget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'R,R,R,R,0';
+	static socketStyle = '10,10,10,10';
 
 	/** @type {*} Default value */
 	static defaultValue = 0;

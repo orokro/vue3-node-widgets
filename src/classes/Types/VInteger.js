@@ -27,7 +27,7 @@ export class VInteger extends VType {
 	static nodeWidgetComponent = NVIntegerWidget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'R,R,R,R,0';
+	static socketStyle = '10,10,10,10';
 
 	/** @type {*} Default value */
 	static defaultValue = 0;

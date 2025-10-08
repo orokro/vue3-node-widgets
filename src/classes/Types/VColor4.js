@@ -36,7 +36,7 @@ export class VColor4 extends VType {
 	static nodeWidgetComponent = NVColor4Widget;
 
 	/** @type {string} Socket style */
-	static socketStyle = 'R,S,R,S,45';
+	static socketStyle = '10,10,10,10';
 
 	/** @type {*} Default value */
 	static defaultValue = { r: 0, g: 0, b: 0, a: 1 };
