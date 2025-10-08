@@ -25,12 +25,11 @@
 		}"
 		@mousedown.stop="e=>graph.selMgr.selectNode(e, node)"
 	>
-
 		<!-- title -->
 		<div 
 			class="title-bar"
 			:class="{ collapsed: node.collapsed.value }"
-			@mousedown.stop="startDrag"
+			@mousedown.left.stop="startDrag"
 		>
 
 			<!-- collapse arrow -->
@@ -654,7 +653,6 @@ onUnmounted(()=>{
 
 			// ground out the bottom corners & allow nothing to escape
 			border-radius: 0em 0em 7em 7em;
-			overflow: clip;
 
 			span {
 				display: block;

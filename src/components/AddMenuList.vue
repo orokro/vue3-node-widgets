@@ -23,7 +23,7 @@
 						'selected': item.id === selectedItemId,
 						'opened': isOpenedMenu(item.id)
 					}"
-					@click.stop="e=>addNode(e, item)"
+					@mousedown.stop="e=>addNode(e, item)"
 					@mouseover="$emit('item-hover', item)"
 				>
 

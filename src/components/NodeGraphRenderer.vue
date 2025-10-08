@@ -16,11 +16,13 @@
 	<div 
 		ref="containerEl"
 		class="editor-container fill-parent" 
-		tabindex="0"
-		@mousedown.self.prevent="startDragOperation"		
-		@click.right="checkAddMenu"		
-		@keydown="handleKeyDown"
-		@wheel="handleWheelZoom"		
+		:tabindex="0"
+		:tabstop="0"
+		@mousedown.self="startDragOperation"		
+		@click.right.self="checkAddMenu"		
+		@keyup="handleKeyDown"
+		@wheel="handleWheelZoom"
+		@mousemove.self="handleMouseMove"	
 		:style="{
 			fontSize: `${zoomScale}px`,
 			backgroundSize: `${zoomScale * backgroundScale}px ${zoomScale * backgroundScale}px`,
@@ -62,6 +64,9 @@
 // vue
 import { ref, onMounted, provide, inject, reactive } from 'vue';
 
+// utils
+import { useAddMenu } from '@/composables/useAddMenu';
+
 // components
 import Node from '@Components/Node.vue';
 import WireRenderer from '@Components/WireRenderer.vue';
@@ -90,6 +95,11 @@ const props = defineProps({
 
 });
 
+const {
+	menuIsOpen
+} = useAddMenu();
+
+
 // events
 const emits = defineEmits(['showAddMenu']);
 
@@ -100,6 +110,9 @@ const dh = inject('dh');
 const panX = ref(0);
 const panY = ref(0);
 const zoomScale = ref(1);
+
+// we'll save the last mouse move even for keyboard shortcuts, etc
+let lastMouseEvent = null;
 
 // we'll keep a global map of socket positions
 const socketPositions = reactive(new Map());
@@ -127,6 +140,7 @@ onMounted(()=>{
 const didPan = ref(false);
 const MAX_ZOOM = 5.0;
 const MIN_ZOOM = 0.1;
+
 
 /**
  * Handles zooming in and out of the editor container
@@ -283,13 +297,36 @@ function startPanDrag(e){
  */
 function handleKeyDown(event) {
 
+	// reset zoom and pan on "home" key
 	if(event.key === 'Home') {
 		zoomScale.value = 1;
 		panX.value = 0;
 		panY.value = 0;
 	}
+
+	// shift + A = show add node menu
+	if(event.key.toLowerCase() === 'a' && event.shiftKey) {
+		emits('showAddMenu', {
+			event: lastMouseEvent, 
+			graph: props.graph,
+			viewport
+		});	
+	}
+
 }
 
+
+/**
+ * Focus self on mouse move
+ * 
+ * @param event - the mouse event
+ */
+function handleMouseMove(event) {
+	lastMouseEvent = event;
+
+	if(menuIsOpen.value==false)
+		containerEl.value.focus();
+}
 
 </script>
 <style lang="scss" scoped>

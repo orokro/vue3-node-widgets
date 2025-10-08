@@ -380,6 +380,7 @@ export default class NWNode {
 			validateFn: (value) => true, // default validation function always returns true
 			lintFn: (value) => value, // default lint function always returns null (no errors)
 			valuePassThrough: true, // shows socket on right for inputs
+			isArray: false,
 			...options,
 		};
 
@@ -390,6 +391,7 @@ export default class NWNode {
 			fieldType,
 			name: options.name,
 			component: options.component,
+			isArray: options.isArray,
 		};
 
 		// add specific props for each type

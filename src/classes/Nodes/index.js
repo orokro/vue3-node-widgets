@@ -23,6 +23,7 @@ import MapRangeNode from './MapRangeNode';
 import LerpValueNode from './LerpValueNode';
 import RoundNode from './RoundNode';
 import TrigNode from './TrigNode';
+import AverageNode from './AverageNode';
 
 import ColorMixNode from './ColorMixNode';
 import ColorBlendNode from './ColorBlendNode';
@@ -98,6 +99,7 @@ const defaultNodeList = [
 	{ class: ABMathNode, menuPath: '/Math (Scalar)' },
 	{ class: ABCompareNode, menuPath: '/Math (Scalar)' },
 	{ class: RoundNode, menuPath: '/Math (Scalar)' },
+	{ class: AverageNode, menuPath: '/Math (Scalar)' },
 	{ class: ClampValueNode, menuPath: '/Math (Scalar)' },
 	{ class: LerpValueNode, menuPath: '/Math (Scalar)' },
 	{ class: MapRangeNode, menuPath: '/Math (Scalar)' },	

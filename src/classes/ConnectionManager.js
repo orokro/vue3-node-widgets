@@ -562,9 +562,13 @@ export class ConnectionManager {
 					// filter out this new one online
 					const otherConnections = existingConnections.filter(c => c.id !== conn.id);
 
-					// destroy other connections
-					for (const otherConn of otherConnections)
-						otherConn.destroy();
+					// if not an array type field, destroy other connections
+					if (!conn.outputField?.isArray){
+
+						// destroy other connections
+						for (const otherConn of otherConnections)
+							otherConn.destroy();
+					}
 				}
 
 				// tell nodes about the connections made

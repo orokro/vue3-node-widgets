@@ -14,10 +14,6 @@
 		class="add-node-menu-layer"
 		:class="{ 'right-aligned': isRightAligned }"
 		@keydown="handleKeyDown"
-		@click="closeAndReset"
-		@click.right="repositionMenu" 
-		@mouseup.stop
-		@contextmenu="$event.preventDefault()"
 	>
 		<div 
 			ref="containerPopupEl"
@@ -41,6 +37,7 @@
 						type="text"
 						placeholder="Search for a node..."
 						v-model="searchQuery"
+						@blur="closeAndReset"
 					/>
 				</div>
 
@@ -427,10 +424,12 @@ watch(() => menuOptions, (newVal) => {
  * Closes the menu and resets the search query
  */
 function closeAndReset() {
-	searchQuery.value = '';
-	closeMenu();
-}
 
+	nextTick(()=>{
+		searchQuery.value = '';
+		closeMenu();
+	});
+}
 
 
 /**
@@ -708,69 +707,11 @@ function handleItemHover(item){
 		inset: 0px 0px 0px 0px;
 		z-index: 9001;
 
+		pointer-events: none;
+
 		// for debug
 		/* background: rgba(0,0, 0, 0.5); */
 		font-size: 1px;
-
-		// search box on top
-		.search-box {
-
-			position: relative;
-			background: rgba(0, 0, 0, 0.85);
-			padding: 8em;
-			border-radius: 8em;
-			height: 30em;
-
-			margin-bottom: 8em;
-
-			// search icon
-			.icon-box {
-
-				position: absolute;
-				inset: 0em auto 0em 0em;
-				width: 45em;
-				color: white;
-				
-				i {
-					position: absolute;
-					top: 50%;
-					left: 50%;
-					transform: translate(-50%, -50%);
-					font-size: 28em;
-				}// i
-
-			}// .icon-box
-
-			// wrapper so we can use em for the box, but keep its
-			// font size larger/intact
-			.search-input-wrapper {
-
-				// fixed area
-				position: absolute;
-				inset: 5em 5em 5em 45em;
-				
-				// camp corners of box
-				padding: 4em;
-				border-radius: 4em;
-				overflow: hidden;
-
-				border: 1em solid #ccc;
-
-				// the input box	
-				input {
-					position: absolute;
-					inset: 0px 0px 0px 0px;
-
-					outline: none;
-					border: 0px none;
-					background: rgba(255, 255, 255, 0.8);
-
-					font-size: 15em;
-				}// input
-
-			}// .search-input-wrapper
-
-		}// .search-box
 
 		// the box where we'll spawn our menu list components.
 		// this is the box that is offset with the x/y coordinates
@@ -781,6 +722,68 @@ function handleItemHover(item){
 			// for debug
 			min-width: 210em;
 			min-height: 10em;
+
+			pointer-events: initial;
+
+			// search box on top
+			.search-box {
+
+				position: relative;
+				background: rgba(0, 0, 0, 0.85);
+				padding: 8em;
+				border-radius: 8em;
+				height: 30em;
+
+				margin-bottom: 8em;
+
+				// search icon
+				.icon-box {
+
+					position: absolute;
+					inset: 0em auto 0em 0em;
+					width: 45em;
+					color: white;
+					
+					i {
+						position: absolute;
+						top: 50%;
+						left: 50%;
+						transform: translate(-50%, -50%);
+						font-size: 28em;
+					}// i
+
+				}// .icon-box
+
+				// wrapper so we can use em for the box, but keep its
+				// font size larger/intact
+				.search-input-wrapper {
+
+					// fixed area
+					position: absolute;
+					inset: 5em 5em 5em 45em;
+					
+					// camp corners of box
+					padding: 4em;
+					border-radius: 4em;
+					overflow: hidden;
+
+					border: 1em solid #ccc;
+
+					// the input box	
+					input {
+						position: absolute;
+						inset: 0px 0px 0px 0px;
+
+						outline: none;
+						border: 0px none;
+						background: rgba(255, 255, 255, 0.8);
+
+						font-size: 15em;
+					}// input
+
+				}// .search-input-wrapper
+
+			}// .search-box
 
 		}// .menu-container
 
