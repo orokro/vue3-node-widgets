@@ -250,6 +250,14 @@ export default class NWNode {
 	// true if this is a two-column style node
 	static isTwoColumn = false;
 
+	// allow nodes to enable resizing
+	static resizableX = false;
+	static resizableY = false;
+
+	// store size if resizable
+	width = ref(null);
+	height = ref(null);
+
 	// just a helpful shorthand
 	static = this.constructor;
 
@@ -273,6 +281,7 @@ export default class NWNode {
 
 	// true when user collapses the node
 	collapsed = ref(false);
+
 
 	// resets the static properties of the class for subclasses
 	static init(){
@@ -668,6 +677,21 @@ export default class NWNode {
 
 
 	/**
+	 * Sets the size of the node, if resizable
+	 * 
+	 * @param {Number} width - new width of the node
+	 * @param {Number} height - new height of the node
+	 * @returns {void}
+	 */
+	setSize(width, height) {
+		if(this.static.resizableX)
+			this.width.value = Math.max(50, width);
+		if(this.static.resizableY)
+			this.height.value = Math.max(50, height);
+	}
+
+
+	/**
 	 * Adds a dynamic field that isn't defined on the node type itself
 	 * 
 	 * @param {string} fieldType - either FIELD_TYPE.INPUT or FIELD_TYPE.OUTPUT
@@ -693,7 +717,7 @@ export default class NWNode {
 			validateFn: (value) => true,
 			lintFn: (value) => value,
 			isArray: options.isArray || false,
-			
+
 			// optional, to check if this field is for a group input/output
 			for: options.for || null,
 		};

@@ -39,7 +39,11 @@ export default class SuperWaveNode extends NWNode {
 
 		// reset things
 		this.init();
-		
+
+		// enable resizing on both axes for debug testing resizing
+		// this.resizableX = true;
+		// this.resizableY = true;
+
 		// set this before adding fields
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
