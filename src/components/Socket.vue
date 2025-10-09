@@ -112,6 +112,7 @@ const eventCtx = computed(()=>{
 	};
 });
 
+
 // when we mount we should figure out how to render this socket
 let we = null;
 onMounted(() => {
@@ -122,9 +123,11 @@ onMounted(() => {
 	});
 });
 
+
 // clean up on unmount
 onUnmounted(() => {
-	if (we) we();
+	if (we)
+		we();
 });
 
 
@@ -148,9 +151,10 @@ function buildSocketStyle(){
 		cornerStyle.value = generateCornerStyle(props.socketStyle, themeColor, props.field.isArray);
 
 	} else if (socketFormat.value === 'svg') {
-		if (!validateSvgPath(props.socketStyle)) {
+
+		if (!validateSvgPath(props.socketStyle))
 			console.warn(`Invalid SVG path for socket ${props.field.name}: ${props.socketStyle}`);
-		}
+		
 	} else {
 		console.warn(`Unknown style format for socket ${props.field.name}: ${props.socketStyle}`);
 	}
@@ -164,6 +168,7 @@ function buildSocketStyle(){
  * @returns {boolean} - true if the input is in corner format, false otherwise
  */
 function isCornerFormat(input) {
+
 	// Corner format: 4 numbers 0–10
 	return /^([0-9]|10)(,([0-9]|10)){3}$/.test(input.trim());
 }
@@ -176,6 +181,7 @@ function isCornerFormat(input) {
  * @returns {boolean} - true if the input is in SVG path format, false otherwise
  */
 function isSvgPathFormat(input) {
+
 	// Basic SVG path: Must start with M and end with Z
 	return /^M[\s\d\.\-\,CQLHVSAZT]+Z$/i.test(input.trim());
 }
@@ -361,10 +367,10 @@ function onMouseLeave(event) {
 
 
 		&.socket-input {
-			left: 0px;
+			left: 0em;
 		}
 		&.socket-output {
-			right: 0px;
+			right: -0.5em;
 		}
 
 	}// .socket

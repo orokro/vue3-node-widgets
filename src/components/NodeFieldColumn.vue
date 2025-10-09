@@ -148,7 +148,7 @@ const props = defineProps({
 		// the rows where we spawn the individual fields
 		.node-field-row {
 
-			padding: 6em 8em 0em 6em;
+			padding: 6em 8em 0em 8em;
 
 
 			&:last-child {

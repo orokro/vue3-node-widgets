@@ -10,7 +10,6 @@
 		class="n-enum-widget"		
 		:style="{ 'text-align': align }"
 	>
-
 		<div class="input-wrapper">
 
 			<div class="enum-value-row">
@@ -47,7 +46,6 @@
 		</div>
 	</div>
 </template>
-
 <script setup>
 
 // vue
@@ -105,6 +103,8 @@ function selectItem(index) {
 	itemIndex.value = index;
 	isOpen.value = false;
 }
+
+
 </script>
 <style lang="scss" scoped>
 
