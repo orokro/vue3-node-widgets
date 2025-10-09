@@ -149,7 +149,8 @@ const props = defineProps({
 		.node-field-row {
 
 			padding: 6em 8em 0em 8em;
-
+			
+			color: var(--nw-node-field-text-color);
 
 			&:last-child {
 				padding-bottom: 6em;

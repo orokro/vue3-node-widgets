@@ -141,7 +141,7 @@ function updateModel(newVal) {
 		// the text value (if not input enabled)
 		.toggle-track {
 
-			background: gray;
+			background: var(--nw-node-input-b-g-color);
 			text-align: center;
 			color: white;
 			padding: 2em;
@@ -163,7 +163,7 @@ function updateModel(newVal) {
 
 				border-radius: 20em;
 
-				background: #595959;
+				background: var(--nw-node-input-accent1);
 
 				transition: 
 					left 0.2s ease-in-out,
@@ -171,7 +171,7 @@ function updateModel(newVal) {
 
 				&.on {
 					left: 50%;
-					background-color: white;
+					background-color: var(--nw-node-input-accent2);
 				}
 			}// .toggle-slider
 

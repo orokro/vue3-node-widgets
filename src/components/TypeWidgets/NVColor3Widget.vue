@@ -360,7 +360,7 @@ function validateHex(v) {
 				.color-rgb-wrapper {
 					width: 100%;
 					height: calc(18em + 1px);
-					border-bottom: 2px solid black;
+					border-bottom: 2px solid var(--nw-node-input-separator-color);
 					overflow: clip;
 
 					display: flex;
@@ -390,7 +390,7 @@ function validateHex(v) {
 
 						width: 50%;
 						background: black;
-						border-left: 2px solid black;
+						border-left: 2px solid var(--nw-node-input-separator-color);
 						border-radius: 0em 0em 10em 0em;
 
 						overflow: clip;

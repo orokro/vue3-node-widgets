@@ -377,9 +377,9 @@ defineExpose({
 		// the text value (if not input enabled)
 		.text-value {
 
-			background: gray;
+			background: var(--nw-node-input-b-g-color);
 			text-align: center;
-			color: white;
+			color: var(--nw-node-input-text-color);
 			padding: 2em;
 
 			cursor: text;
@@ -399,7 +399,11 @@ defineExpose({
 			text-align: center;
 			font-size: 12em;
 			border: 0px none;
-			outline: none
+			outline: none;
+
+			background: var(--nw-node-input-b-g-color-active);
+			color: var(--nw-node-input-text-color-active);
+
 		};
 
 		// override styles for read-only mode

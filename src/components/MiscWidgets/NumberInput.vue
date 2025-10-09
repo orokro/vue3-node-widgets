@@ -19,7 +19,6 @@
 		:style="{
 			'border-width': props.border,
 			'border-style': 'solid',
-			'border-color': 'black',
 		}"
 	>	
 		<!-- just show the value if we don't have input enabled -->
@@ -451,6 +450,9 @@ defineExpose({
 		// so we can position children abso-lutely
 		position: relative;
 
+		// border styles from our theme
+		border-color: var(--nw-node-input-separator-color);
+
 		// border rounding
 		// NOTE: as I described in the computed function above, this got out of hand
 		// so I should probably refactor this at some point
@@ -508,9 +510,9 @@ defineExpose({
 
 		// the text value (if not input enabled)
 		.number-value {
-			background: gray;
+			background: var(--nw-node-input-b-g-color);
 			text-align: center;
-			color: white;
+			color: var(--nw-node-input-text-color);
 			padding: 2em;
 
 			cursor: ew-resize;
@@ -530,14 +532,17 @@ defineExpose({
 			text-align: center;
 			font-size: 12em;
 			border: 0px none;
-			outline: none
+			outline: none;
+
+			background-color: var(--nw-node-input-b-g-color-active);
+			color: var(--nw-node-input-text-color-active);
 		};
 
 		// the bar that fills the bg when it has a min/max
 		.slider-bg-bar {
 			position: absolute;
 			inset: 0px auto 0px 0px;
-			background: rgba(0, 0, 0, 0.3);
+			background: var(--nw-node-input-accent1);
 		}
 
 		// the increment/decrement buttons
@@ -547,6 +552,8 @@ defineExpose({
 			top: 0em;
 			bottom: 0px;
 			width: 15em;
+
+			color: var(--nw-node-input-accent2);
 
 			/* border: 1px solid red; */
 			&.decrement {

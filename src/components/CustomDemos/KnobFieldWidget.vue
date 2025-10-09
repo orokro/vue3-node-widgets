@@ -230,9 +230,9 @@ const validate = (value)=>{
 					// nice circle
 					width: 60em;
 					height: 60em;
-					border: 2em solid black;
+					border: 2em solid var(--nw-node-input-separator-color);
 					border-radius: 50%;
-					background: lightgray;
+					background: var(--nw-node-input-accent1);
 					margin: 4em;
 
 					// look draggable
@@ -253,10 +253,10 @@ const validate = (value)=>{
 						span { font-size: 14em; }
 						font-weight: bolder;
 						font-family: monospace;
-						color: lightgray;
+						color: var(--nw-node-input-text-color);
 
 						// nice bg
-						background: rgba(0, 0, 0, 0.6);
+						background: var(--nw-node-input-b-g-color);
 						padding: 0em 4em 1em;
 						border-radius: 3em;
 
@@ -274,7 +274,7 @@ const validate = (value)=>{
 						// small line sticking out of the knob
 						width: 6em;
 						height: 16em;
-						background: black;
+						background: var(--nw-node-input-separator-color);
 						border-radius: 5em;
 
 						// position it in the center top of the knob

@@ -13,47 +13,51 @@
 	<!-- main outermost wrapper for the entire node-graph system -->
 	<div class="NWEditorGraph">
 
-		<!-- wrapper used to reset the relative/absolute positioning for the component
-		  (the user might style our outer .NWEditorGraph element via style attrs/props and/or css, etc )-->
-		<div 
-			v-if="ctxRef != null"
-			class="positioning-reset"			
-		>
-			<!-- always show our contexts root graph -->
-			<NodeGraphRenderer
-				:editor="ctxRef"
-				:graph="ctxRef.rootGraphRef.value"
-				:backgroundScale="backgroundScale"
-				@showAddMenu="handleShowAddMenu"
-			/>
-		</div>
-
-		<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
-		<div class="ui-container fill-parent">
-
-			<!-- The breadcrumb list, only shown if we're in a sub-graph -->
-			<BreadcrumbList 
-				v-if="ctxRef != null"
-				:editor="ctxRef"
-			/>
-
-			<!-- if the user wants to see dev errors, they can enable this component -->
-			<DevErrors 
-				v-if="ctxRef != null && showDevErrors" 
-				:nwSystem="ctxRef"
-			/>
+		<NWStyle :theme="theme">
 			
-		</div>
+			<!-- wrapper used to reset the relative/absolute positioning for the component
+			(the user might style our outer .NWEditorGraph element via style attrs/props and/or css, etc )-->
+			<div 
+				v-if="ctxRef != null"
+				class="positioning-reset"			
+			>
+				<!-- always show our contexts root graph -->
+				<NodeGraphRenderer
+					:editor="ctxRef"
+					:graph="ctxRef.rootGraphRef.value"
+					:backgroundScale="backgroundScale"
+					@showAddMenu="handleShowAddMenu"
+				/>
+			</div>
 
-		<!-- tool tip for errors when wiring up sockets -->
-		<CursorPopup 
-			ref="cursorPopupEl"
-		/>
+			<!-- this wrapper does not scroll, and allows for overflow. Misc UI, such as errors, toasts, menus, etc should mount here -->
+			<div class="ui-container fill-parent">
 
-		<!-- Auto-mount AddNodeMenu globally if no user-mounted instance exists -->
-		<Teleport v-if="isCurrentHost(hostId)" :to="menuMountEl">
-			<AddNodeMenu :internalMount="true" />
-		</Teleport>
+				<!-- The breadcrumb list, only shown if we're in a sub-graph -->
+				<BreadcrumbList 
+					v-if="ctxRef != null"
+					:editor="ctxRef"
+				/>
+
+				<!-- if the user wants to see dev errors, they can enable this component -->
+				<DevErrors 
+					v-if="ctxRef != null && showDevErrors" 
+					:nwSystem="ctxRef"
+				/>
+				
+			</div>
+
+			<!-- tool tip for errors when wiring up sockets -->
+			<CursorPopup 
+				ref="cursorPopupEl"
+			/>
+
+			<!-- Auto-mount AddNodeMenu globally if no user-mounted instance exists -->
+			<Teleport v-if="isCurrentHost(hostId)" :to="menuMountEl">
+				<AddNodeMenu :internalMount="true" />
+			</Teleport>
+
+		</NWStyle>
 
 	</div>
 </template>
@@ -68,6 +72,7 @@ import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import CursorPopup from '@Components/CursorPopup.vue';
 import BreadcrumbList from './BreadcrumbList.vue';
+import NWStyle from './NWStyle.vue';
 
 // our app
 import NWEditor from '@src/classes/NWEditor.js';
@@ -104,6 +109,12 @@ const props = defineProps({
 		type: [Object, String],
 		default: 'body'
 	},
+
+	// optional theme object
+	theme: {
+		type: Object,
+		default: () => ({})
+	}
 
 });
 

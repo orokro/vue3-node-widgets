@@ -273,7 +273,12 @@ const SVGDetails = computed(()=>{
 				opacity 0.17s linear,
 				transform 0.17s linear;
 			
-
+			// css styles for the wire path
+			path {
+				stroke: var(--nw-wire-color);
+				stroke-width: calc(var(--nw-wire-width) * 0.1em);
+			}
+			
 		}// .wire-svg
 
 		&.destroyed-fade-out {

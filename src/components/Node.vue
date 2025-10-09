@@ -546,17 +546,16 @@ onUnmounted(()=>{
 
 		// minimum box size
 		min-width: 160em;
-		// min-height: 100em;
 
 		// nice rounded border
-		border-radius: 10em;
-		border: 2em solid black;
+		border-radius: var(--nw-node-border-radius);
+		border: 2em solid var(--nw-node-outline-color);
 
 		// padding on top for the title bar
 		padding-top: 22em;
 
 		&.selected {
-			border-color: #00ABAE;
+			border-color: var(--nw-node-outline-color-selected);
 		}
 
 		// the title bar for the node that has the close button
@@ -570,7 +569,7 @@ onUnmounted(()=>{
 			box-sizing: border-box;
 
 			// background color
-			background: #1E1E1E;
+			background: var(--nw-node-title-b-g-color);
 
 			// same rounded corners at the top
 			border-top-left-radius: 7em;
@@ -587,7 +586,7 @@ onUnmounted(()=>{
 
 			span {
 				font-size: 12em;
-				color: white;
+				color: var(--nw-node-title-text-color);
 				font-weight: bold;
 			}
 
@@ -599,14 +598,15 @@ onUnmounted(()=>{
 			.collapse-arrow {
 
 				// red round circle
-				background	: rgba(0, 0, 0, 0.55);
+				background: var(--nw-node-title-collapse-button-b-g-color);
 				border-radius: 50%;
 				width: 16em;
 				height: 16em;
 				transform-origin: center;
+
 				// light up on hover
 				&:hover {
-					background: rgba(255, 145, 0, 0.55);
+					background: var(--nw-node-title-collapse-button-open-hover-color);
 				}
 
 				// position the close button
@@ -615,14 +615,14 @@ onUnmounted(()=>{
 
 				// make it look like a button
 				cursor: pointer;
-				color: white;
+				color: var(--nw-node-title-collapse-button-f-g-color);
 
 				// rotate when collapsed
 				&.collapsed {
 					transform: rotate(-90deg);
 
 					&:hover {
-						background:rgba(60, 255, 0, 0.55);
+						background:var(--nw-node-title-collapse-button-closed-color);
 					}
 				}
 
@@ -632,7 +632,7 @@ onUnmounted(()=>{
 					top: 60%;
 					left: 50%;
 					transform: translate(-50%, -50%);
-
+					color: var(--nw-node-title-collapse-button-f-g-color);
 					i{
 						font-size: 1.7em;
 					}
@@ -644,14 +644,14 @@ onUnmounted(()=>{
 			.delete-button {
 				
 				// red round circle
-				background	: rgba(0, 0, 0, 0.55);
+				background	: var(--nw-node-title-delete-button-color);
 				border-radius: 50%;
 				width: 16em;
 				height: 16em;
 
 				// light up on hover
 				&:hover {
-					background: rgba(255, 0, 0, 0.55);
+					background: var(--nw-node-title-delete-button-color-hover);
 				}
 
 				// position the close button
@@ -660,10 +660,10 @@ onUnmounted(()=>{
 
 				// make it look like a button
 				cursor: pointer;
-				color: white;
+				color: var(--nw-node-title-delete-button-f-g-color);
 
 				i {
-					color: white;
+					color: var(--nw-node-title-delete-button-f-g-color);
 					font-size: 14em;
 					font-weight: bolder;;
 					position: absolute;
@@ -711,10 +711,13 @@ onUnmounted(()=>{
 			}// .collapsed
 
 			// background color
-			background: rgb(175, 175, 175);
+			background: var(--nw-node-body-b-g-color);
+
+			// text color
+			color: var(--nw-node-text-color);
 
 			// ground out the bottom corners & allow nothing to escape
-			border-radius: 0em 0em 7em 7em;
+			border-radius: var(--nw-node-border-radius-inner);
 
 			span {
 				display: block;

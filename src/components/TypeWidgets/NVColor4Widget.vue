@@ -440,7 +440,7 @@ function validateHex(v) {
 				.color-rgb-wrapper {
 					width: 100%;
 					height: calc(18em + 1px);
-					border-bottom: 2px solid black;
+					border-bottom: 2px solid var(--nw-node-input-separator-color);
 					overflow: clip;
 
 					display: flex;
@@ -467,7 +467,7 @@ function validateHex(v) {
  							repeating-conic-gradient(#808080 0 25%, #0000 0 50%) 
       						50% / 20px 20px;
 
-						border-left: 2px solid black;
+						border-left: 2px solid var(--nw-node-input-separator-color);
 						border-radius: 0em 0em 10em 0em;
 
 						overflow: clip;

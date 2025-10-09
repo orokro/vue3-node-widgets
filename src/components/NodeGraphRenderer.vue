@@ -312,7 +312,6 @@ function handleKeyDown(event) {
 			viewport
 		});	
 	}
-
 }
 
 
@@ -338,37 +337,14 @@ function handleMouseMove(event) {
 		overflow: hidden;
 
 		// default styles
-		background: rgb(133, 126, 151);
-		background: rgb(60, 60, 60);
-		background-image: url(/img/grid_bg.png);
+		background: var(--nw-graph-b-g-color);
+		background-image: var(--nw-graph-b-g-image);
 		background-repeat: repeat;
 
 		// this is the box that actually translates it's x/y to pan stuff
 		.pan-container {	
 
 			position: absolute;
-
-			// for debug
-			/* min-width: 640em;
-			min-height: 480em;
-			border: 1px solid red; */
-
-			// test boxes
-			.a-test-box {
-				width: 100em;
-				height: 100em;
-				background: lightblue;
-
-				&.b {
-					position: relative;
-
-					left: 500em;
-				}
-
-				span {
-					font-size: 20em;;
-				}
-			}//.a-test-box
 
 		}// .pan-container
 

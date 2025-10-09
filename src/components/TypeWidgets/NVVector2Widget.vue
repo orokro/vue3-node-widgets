@@ -103,6 +103,8 @@ const xValue = computed({
 		valueRef.value = { ...valueRef.value, x: newVal,}
 	}
 });
+
+
 const yValue = computed({
 	get() { return valueRef.value.y; },
 	set(newVal) {
@@ -169,6 +171,7 @@ const validateFloat = (value)=>{
 					.y {
 						width: 50%;
 					}
+
 				}// .vector-wrapper
 
 			}// .number-value-row
