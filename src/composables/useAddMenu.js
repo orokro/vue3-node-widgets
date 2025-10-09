@@ -76,6 +76,7 @@ function unregisterHost(id) {
  * Returns true if successful, false otherwise.
  */
 function claimMenuHost(id) {
+
 	// if no current host, or previous host no longer exists, claim
 	if (!activeHostId.value || !activeHosts.has(activeHostId.value)) {
 		activeHostId.value = id;
@@ -126,8 +127,11 @@ function clearMountedMenu() {
 // ------------------------------------------------------------
 
 function showAddMenu(options = {}) {
-	menuOptions.value = options;
-	menuIsOpen.value = true;
+	menuIsOpen.value = false;
+	nextTick(() => {
+		menuOptions.value = options;
+		menuIsOpen.value = true;
+	});
 }
 
 function closeMenu() {
