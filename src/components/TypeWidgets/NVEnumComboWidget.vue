@@ -122,7 +122,7 @@ function selectItem(index) {
 					position: relative;
 					border-radius: 10em;
 					padding: 0em;
-					padding-bottom: 3em;
+					padding-bottom: 2em;
 
 					// drop down element (previously was a select box)
 					.dropdown {
@@ -166,6 +166,9 @@ function selectItem(index) {
 
 					// when open, change border radius of box & dropdown
 					&.is-open {
+
+						padding-bottom: 0em;
+
 						/* display: none; */
 						.dropdown {
 							border-radius: 10em 10em 0em 0em !important;
