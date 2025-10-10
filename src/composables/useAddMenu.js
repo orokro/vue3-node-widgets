@@ -8,7 +8,7 @@ import { ref, shallowRef, nextTick } from 'vue';
 
 
 // ------------------------------------------------------------
-// 🔸 Reactive shared state
+// Reactive shared state
 // ------------------------------------------------------------
 const menuIsMounted = ref(false);      // whether a menu component exists
 const menuIsOpen = ref(false);         // visibility (shown/hidden)
@@ -28,7 +28,7 @@ const menuOptions = shallowRef(
 
 
 // ------------------------------------------------------------
-// 🔸 Internal helpers
+// Internal helpers
 // ------------------------------------------------------------
 
 // Generate unique IDs for each claiming host
@@ -41,7 +41,7 @@ function nextUid() {
 const activeHosts = new Set();
 
 // ------------------------------------------------------------
-// 🔸 Lifecycle: claiming and releasing host responsibility
+// Lifecycle: claiming and releasing host responsibility
 // ------------------------------------------------------------
 
 
@@ -101,7 +101,7 @@ function isCurrentHost(id) {
 
 
 // ------------------------------------------------------------
-// 🔸 AddNodeMenu component lifecycle
+// AddNodeMenu component lifecycle
 // ------------------------------------------------------------
 
 /**
@@ -123,7 +123,7 @@ function clearMountedMenu() {
 
 
 // ------------------------------------------------------------
-// 🔸 Menu visibility control
+// Menu visibility control
 // ------------------------------------------------------------
 
 function showAddMenu(options = {}) {
@@ -141,7 +141,7 @@ function closeMenu() {
 
 
 // ------------------------------------------------------------
-// 🔸 Public composable API
+// Public composable API
 // ------------------------------------------------------------
 
 export function useAddMenu() {

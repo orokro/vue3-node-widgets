@@ -56,6 +56,14 @@
 			/>
 
 		</div>
+
+		<!-- add menu button if enabled -->
+		<AddButton 
+			v-if="showAddButton" 
+			class="add-menu-button" 
+			@showAddMenu="handleAddMenuButton"
+		/>
+
 	</div>
 
 </template>
@@ -71,6 +79,7 @@ import { useAddMenu } from '@/composables/useAddMenu';
 import Node from '@Components/Node.vue';
 import WireRenderer from '@Components/WireRenderer.vue';
 import SelectBox from './SelectBox.vue';
+import AddButton from './TypeWidgets/AddButton.vue';
 
 // props
 const props = defineProps({
@@ -93,6 +102,11 @@ const props = defineProps({
 		default: 20
 	},
 
+	// show add menu
+	showAddButton: {
+		type: Boolean,
+		default: false
+	},
 });
 
 const {
@@ -148,16 +162,19 @@ const MIN_ZOOM = 0.1;
  * @param {WheelEvent} e - the wheel event
  */
  function handleWheelZoom(e) {
+	
 	e.preventDefault();
 
-	if (e.shiftKey) return;
+	if (e.shiftKey)
+		return;
 
 	const delta = e.deltaY < 0 ? 1 : -1;
 	const oldZoom = zoomScale.value;
 	const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, oldZoom + delta * 0.1));
 
 	// No change? Skip
-	if (newZoom === oldZoom) return;
+	if (newZoom === oldZoom)
+		return;
 
 	// Get bounding box of container
 	const container = e.currentTarget.getBoundingClientRect();
@@ -282,6 +299,22 @@ function startPanDrag(e){
 	// prevent default context menu
 	event.preventDefault();
 
+	emits('showAddMenu', {
+		event, 
+		graph: props.graph,
+		viewport
+	});	
+}
+
+
+/**
+ * Handle click on the add menu button, emit event to show add menu
+ * 
+ * @param event - the mouse event
+ */
+function handleAddMenuButton(event){
+
+	// prevent default context menu
 	emits('showAddMenu', {
 		event, 
 		graph: props.graph,

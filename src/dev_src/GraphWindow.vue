@@ -14,6 +14,7 @@
 			:graph="app.currentGraph.value"
 			:showDevErrors="true"
 			:theme="emptyTheme"
+			:showAddButton="true"
 		/>
 	</div>
 

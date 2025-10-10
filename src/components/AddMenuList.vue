@@ -224,8 +224,8 @@ const isOpenedMenu = (itemID) => {
 
 				position: absolute;
 				right: 0em;
-
 				top: 0em;
+				
 				// width: 200px; // fixed width for sub-menus
 				width: max-content;
 				transform: translateX(100%);
