@@ -116,10 +116,10 @@ onMounted(() => {
 					cursor: pointer;
 
 					// text styling
-					color: var(--button-color, white);
+					color: var(--nw-node-input-text-color);
 
 					// animated bg
-					background-color: var(--button-bg, #616161);
+					background-color: var(--nw-node-input-accent1);
 					transition: background-color 0.3s ease;
 
 					&:hover {
@@ -127,7 +127,7 @@ onMounted(() => {
 					}
 
 					&:disabled {
-						background-color: var(--button-disabled-bg, #cccccc);
+						background-color: var(--nw-node-input-accent2);
 						cursor: not-allowed;
 					}
 					font-size: 12em;
