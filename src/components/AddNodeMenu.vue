@@ -15,48 +15,51 @@
 		:class="{ 'right-aligned': isRightAligned }"
 		@keydown="handleKeyDown"
 	>
-		<div 
-			ref="containerPopupEl"
-			class="menu-container" 
-			@click.stop 
-			:style="{
-				left: `${menuX}px`,
-				top: `${menuY}px`,
-			}"
-		>	
-			<!-- search box -->
-			<div class="search-box">
+		<NWStyle :theme="theme">
+			<div 
+				ref="containerPopupEl"
+				class="menu-container" 
+				@click.stop 
+				:style="{
+					left: `${menuX}px`,
+					top: `${menuY}px`,
+				}"
+			>	
+				<!-- search box -->
+				<div class="search-box">
 
-				<div class="icon-box">
-					<i class="material-icons">search</i>
+					<div class="icon-box">
+						<i class="material-icons">search</i>
+					</div>
+
+					<div class="search-input-wrapper">
+						<input 
+							ref="searchBoxEl"
+							type="text"
+							placeholder="Search for a node..."
+							v-model="searchQuery"
+							@blur="closeAndReset"
+						/>
+					</div>
+
 				</div>
 
-				<div class="search-input-wrapper">
-					<input 
-						ref="searchBoxEl"
-						type="text"
-						placeholder="Search for a node..."
-						v-model="searchQuery"
-						@blur="closeAndReset"
-					/>
-				</div>
-
+				<!-- this will spawn the list of menu items and sub-menu items -->
+				<AddMenuList
+					v-if="graphCtx != null && nwSystem != null"
+					:nwSystem="nwSystem"
+					:graphCtx="graphCtx"
+					:listItems="rootMenuItems"
+					:containerEl="menuEl"
+					:right-aligned="isRightAligned"
+					:selectedItemId="selectedItemId"
+					:openedSubMenus="openedSubMenus"
+					@item-hover="handleItemHover"
+				/>
+				
 			</div>
 
-			<!-- this will spawn the list of menu items and sub-menu items -->
-			<AddMenuList
-				v-if="graphCtx != null && nwSystem != null"
-				:nwSystem="nwSystem"
-				:graphCtx="graphCtx"
-				:listItems="rootMenuItems"
-				:containerEl="menuEl"
-				:right-aligned="isRightAligned"
-				:selectedItemId="selectedItemId"
-				:openedSubMenus="openedSubMenus"
-				@item-hover="handleItemHover"
-			/>
-			
-		</div>
+		</NWStyle>
 	</div>
 
 </template>
@@ -68,6 +71,7 @@ import { ref, shallowRef, watch, computed, onMounted, onUnmounted, nextTick } fr
 // components
 import AddMenuList from '@Components/AddMenuList.vue';
 import { NODE_TYPE } from '@/classes/NWNode';
+import NWStyle from './NWStyle.vue';
 
 // our app / composables
 import { useAddMenu } from '@/composables/useAddMenu';
@@ -80,7 +84,13 @@ const props = defineProps({
 	internalMount: {
 		type: Boolean,
 		default: false
-	}
+	},
+
+	// theme
+	theme: {
+		type: Object,
+		default: () => ({})
+	},
 });
 
 // import our global menu manager
@@ -690,7 +700,8 @@ function handleItemHover(item){
 			.search-box {
 
 				position: relative;
-				background: rgba(0, 0, 0, 0.85);
+				background: var(--nw-add-menu-b-g-color);
+				backdrop-filter: var(--nw-add-menu-b-g-blur);
 				padding: 8em;
 				border-radius: 8em;
 				height: 30em;
@@ -703,7 +714,7 @@ function handleItemHover(item){
 					position: absolute;
 					inset: 0em auto 0em 0em;
 					width: 45em;
-					color: white;
+					color: var(--nw-add-menu-text-color);
 					
 					i {
 						position: absolute;
@@ -737,8 +748,8 @@ function handleItemHover(item){
 
 						outline: none;
 						border: 0px none;
-						background: rgba(255, 255, 255, 0.8);
-
+						background: var(--nw-add-menu-search-box-b-g-color);
+						color: var(--nw-add-menu-search-box-text-color);
 						font-size: 15em;
 					}// input
 

@@ -43,8 +43,10 @@ const props = defineProps({
 		z-index: 1000;
 
 		// box settings
-		border: 1px dashed #aaa;
-		background-color: rgba(100, 100, 100, 0.2);
+		border-color: var(--nw-select-box-border-color);
+		border-style: dashed;
+		border-width: var(--nw-select-box-border-width);
+		background-color: var(--nw-select-box-b-g-color);
 		
 		// don't interact with mouse events
 		pointer-events: none;

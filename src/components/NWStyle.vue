@@ -11,6 +11,7 @@
 	5. Keeps all styling encapsulated within the component's DOM.
 -->
 <template>
+	
 	<!--
 		Wrapper for slot content.
 		The style tag is inserted inside this component,
@@ -19,6 +20,7 @@
 	<div ref="mountPoint" :data-theme-id="themeId" style="display: contents;">
 		<slot/>
 	</div>
+
 </template>
 <script setup>
 
@@ -138,7 +140,73 @@ const defaultTheme = {
 	wireColor: '#FFFFFF',
 
 	// thiccness for wires
-	wireWidth: '2'
+	wireWidth: '15',
+
+	// bread crumb bar settings
+
+	// background color for breadcrumb bar
+	breadcrumbBarBGColor: 'rgba(20,20,20,0.6)',
+
+	// bread crumb button background color
+	breadcrumbButtonBGColor: 'rgba(255, 255, 255, 0.3)',
+
+	// bread crumb button background color on hover
+	breadcrumbButtonBGColorHover: 'rgba(255, 255, 255, 0.5)',
+
+	// bread crumb button text color
+	breadcrumbButtonTextColor: 'white',
+
+	// bread crumb button text color on hover
+	breadcrumbButtonTextColorHover: 'white',
+
+	// bread crumb close button background color
+	breadcrumbCloseButtonBGColor: 'rgba(255, 0, 0, 0.6)',
+
+	// bread crumb close button background color on hover
+	breadcrumbCloseButtonBGColorHover: 'rgba(255, 0, 0, 0.9)',
+
+	// bread crumb close button icon color
+	breadcrumbCloseButtonIconColor: 'white',
+
+	// add node menu settings
+
+	// entire menu background color
+	addMenuBGColor: 'rgba(0, 0, 0, 0.85)',
+
+	// menu bg blur
+	addMenuBGBlur: 'blur(5px)',
+
+	// default text color for menu
+	addMenuTextColor: 'white',
+
+	// bg color for active items in the menu
+	addMenuItemBGColorActive: '#f0f0f0FF',
+
+	// bg color for active item's parent in the menu
+	addMenuItemBGColorParentActive: '#c0c0c0ff',
+
+	// text color for active items in the menu
+	addMenuItemTextColorActive: 'black',
+
+	// text color for active item's parent in the menu
+	addMenuItemTextColorParentActive: 'black',
+
+	// background color for the search box
+	addMenuSearchBoxBGColor: 'rgba(255, 255, 255, 0.8)',
+
+	// text color for the search box
+	addMenuSearchBoxTextColor: 'black',
+
+	// selection box settings
+
+	// background color for the selection box
+	selectBoxBGColor: 'rgba(100, 100, 100, 0.2)',
+
+	// border color for the selection box
+	selectBoxBorderColor: '#AAAAAA',
+
+	// border width for the selection box
+	selectBoxBorderWidth: '2px',
 };
 
 
@@ -236,6 +304,18 @@ function generateCSS() {
 				return `${innerNum}em`;
 			});
 			cssVars += `\t--nw-${toKebab(key)}-inner: ${innerParts.join(' ')};\n`;
+		}
+
+		// strip units from addMenuCornerRadius and make sure all four corners are the same em value
+		// if more than one value is provided, ignore the latter ones)
+		if (key === 'addMenuCornerRadius' && typeof value === 'string') {
+			const parts = value.split(' ').map(v => v.trim().replace(/[^\d.-]/g, ''));
+			if (parts.length >= 1) {
+				const num = parseFloat(parts[0]);
+				if (!isNaN(num) && num >= 0) {
+					cssVars += `\t--nw-${toKebab(key)}: ${num}em;\n`;
+				}
+			}
 		}
 
 	}// next [key, value]

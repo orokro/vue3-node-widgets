@@ -176,15 +176,15 @@ const isOpenedMenu = (itemID) => {
 			position: relative;
 
 			// nice bg styles
-			background: rgba(0, 0, 0, 0.85);
+			background: var(--nw-add-menu-b-g-color);
 
 			.item-name {
 				font-size: 14em;
 			}
 
-			backdrop-filter: blur(5px);
+			backdrop-filter: var(--nw-add-menu-b-g-blur);
 
-			color: white;
+			color: var(--nw-add-menu-text-color);
 			font-weight: bolder;
 
 			padding: 5em 45em 5em 40em;
@@ -234,8 +234,8 @@ const isOpenedMenu = (itemID) => {
 
 			&:hover, &.opened, &.selected {
 
-				background-color: #f0f0f0FF;
-				color: black;
+				background-color: var(--nw-add-menu-item-b-g-color-active);
+				color: var(--nw-add-menu-item-text-color-active);
 				backdrop-filter: blur(5px) !important;
 
 				&>.sub-menu {
@@ -244,13 +244,14 @@ const isOpenedMenu = (itemID) => {
 			}
 
 			&.opened {
-				background-color: #c0c0c0ff;
+				background-color: var(--nw-add-menu-item-b-g-color-parent-active);
+				color: var(--nw-add-menu-item-text-color-parent-active);
 			}
 
 			&:active {
-				background-color: #d0d0d0ff;
+				background-color: var(--nw-add-menu-item-b-g-color-active);
 				backdrop-filter: blur(5px);
-				color: black;
+				color: var(--nw-add-menu-item-text-color-active);
 			}
 
 		}// .list-item

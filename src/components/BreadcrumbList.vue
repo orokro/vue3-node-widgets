@@ -115,7 +115,7 @@ function clickCrumb(idx, e){
 		justify-content: flex-end;
 
 		// nice dark bg
-		background: rgba(20,20,20,0.6);
+		background: var(--nw-breadcrumb-bar-b-g-color);
 		backdrop-filter: blur(3px);
 
 		// fixed row on top
@@ -143,19 +143,20 @@ function clickCrumb(idx, e){
 				border-radius: 4px;
 				padding: 4px 8px;
 				margin-right: 6px;
-				background: rgba(255, 255, 255, 0.3);
+				background: var(--nw-breadcrumb-button-b-g-color);
+
+				// text settings
+				color: var(--nw-breadcrumb-button-text-color);
+				font-size: 14px;
+				white-space: nowrap;
 
 				// look clickable & light up on hover
 				cursor: pointer;
 				transition: background-color 0.3s ease;
 				&:hover {
-					background: rgba(255, 255, 255, 0.5);
+					background: var(--nw-breadcrumb-button-b-g-color-hover);
+					color: var(--nw-breadcrumb-button-text-color-hover);
 				}
-
-				// text settings
-				color: white;
-				font-size: 14px;
-				white-space: nowrap;
 
 				// only show delete button when the last button is overed
 				.close-button {
@@ -167,19 +168,21 @@ function clickCrumb(idx, e){
 					margin-left: 8px;
 					cursor: pointer;
 
+					color: var(--nw-breadcrumb-close-button-icon-color);
+
 					// hidden till hover
 					display: none;
 
 					// red circle bg
-					background: rgba(255, 0, 0, 0.6);
+					background: var(--nw-breadcrumb-close-button-b-g-color);
 					width: 20px;
 					height: 20px;
 					border-radius: 50%;
-
+					
 					// look clickable & light up on hover
 					transition: background-color 0.3s ease;
 					&:hover {
-						background: rgba(255, 0, 0, 0.9);
+						background: var(--nw-breadcrumb-close-button-b-g-color-hover);
 					}
 
 					// force text to center

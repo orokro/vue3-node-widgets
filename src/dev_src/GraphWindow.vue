@@ -13,7 +13,7 @@
 			class="my-graph" 
 			:graph="app.currentGraph.value"
 			:showDevErrors="true"
-			:theme="customTheme"
+			:theme="emptyTheme"
 		/>
 	</div>
 
@@ -42,6 +42,8 @@ onMounted(() => {
 	ctx = myGraph.value.getContext();
 	ctxRef.value = ctx;
 });
+
+const emptyTheme = {};
 
 const customTheme = {
 	
