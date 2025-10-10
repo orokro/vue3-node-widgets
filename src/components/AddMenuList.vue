@@ -9,7 +9,10 @@
 
 	<div
 		class="list-container"
-		:class="{ 'right-aligned': rightAligned }"
+		:class="{ 
+			'right-aligned': rightAligned,
+			'bottom-aligned': bottomAligned
+		}"
 	>
 
 		<div class="list-items">
@@ -94,6 +97,12 @@ const props = defineProps({
 
 	// true if this menu is right-aligned
 	rightAligned: {
+		type: Boolean,
+		default: false
+	},
+
+	// true if this menu is bottom-aligned
+	bottomAligned: {
 		type: Boolean,
 		default: false
 	},
@@ -287,6 +296,36 @@ const isOpenedMenu = (itemID) => {
 			}// .list-item
 
 		}// &.right-aligned
+
+		// if we're bottom-aligned, we need to adjust some styles
+		&.bottom-aligned {
+
+			.list-item {
+
+				.sub-menu {
+
+					transform: translate(100%, calc(-100% + 28em));
+
+				}// .sub-menu 
+
+			}// .list-item
+
+		}// &.bottom-aligned
+
+		&.right-aligned.bottom-aligned {
+
+			.list-item {
+
+				.sub-menu {
+
+					transform: translate(-100%, calc(-100% + 28em));
+
+				}// .sub-menu 
+
+			}// .list-item
+
+		}// &.right-aligned.bottom-aligned
+
 
 	}// .list-container
 

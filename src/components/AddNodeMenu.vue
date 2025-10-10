@@ -12,7 +12,10 @@
 		v-show="menuIsOpen"
 		ref="menuEl"
 		class="add-node-menu-layer"
-		:class="{ 'right-aligned': isRightAligned }"
+		:class="{ 
+			'right-aligned': isRightAligned,
+			'bottom-aligned': isBottomAligned
+		}"
 		@keydown="handleKeyDown"
 	>
 		<NWStyle :theme="theme">
@@ -52,6 +55,7 @@
 					:listItems="rootMenuItems"
 					:containerEl="menuEl"
 					:right-aligned="isRightAligned"
+					:bottom-aligned="isBottomAligned"
 					:selectedItemId="selectedItemId"
 					:openedSubMenus="openedSubMenus"
 					@item-hover="handleItemHover"
@@ -123,6 +127,7 @@ const searchBoxEl = ref(null);
 
 // true if we are right-aligned
 const isRightAligned = ref(false);
+const isBottomAligned = ref(false);
 
 // compute either the results of a search query, or the full menu hierarchy
 const rootMenuItems = computed(() => {
@@ -174,12 +179,13 @@ onUnmounted(() => {
 
 /**
  * Ensures the menu fits within the viewport
- * and updates the isRightAligned ref accordingly
+ * and updates the isRightAligned / isBottomAligned  ref accordingly
  */
 async function fitMenu(){
 	
 	const fitResults = await ensureFit(containerPopupEl, menuEl, 8);
 	isRightAligned.value = fitResults.x < 0;	
+	isBottomAligned.value = fitResults.y < 0;
 }
 
 
