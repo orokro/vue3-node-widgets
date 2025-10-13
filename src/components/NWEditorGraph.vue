@@ -74,7 +74,6 @@ import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import CursorPopup from '@Components/CursorPopup.vue';
 import BreadcrumbList from './BreadcrumbList.vue';
 import NWStyle from './NWStyle.vue';
-import AddButton from './TypeWidgets/AddButton.vue';
 
 // our app
 import NWEditor from '@src/classes/NWEditor.js';

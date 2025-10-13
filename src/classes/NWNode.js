@@ -196,7 +196,10 @@
 // vue
 import { ref, shallowRef, watchEffect, watch} from 'vue';
 import { Connection } from './Connection';
+
+// our app
 import VType from './VType';
+import { Serializer } from './Serializer';
 
 // the kind of nodes
 export const NODE_TYPE = {
@@ -281,6 +284,9 @@ export default class NWNode {
 
 	// true when user collapses the node
 	collapsed = ref(false);
+
+	// we'll instantiate once we construct
+	serializer = null;
 
 
 	// resets the static properties of the class for subclasses
@@ -564,6 +570,9 @@ export default class NWNode {
 
 		// optional slug used for finding the node
 		this.slug = '';
+
+		// make a new serializer for this node
+		this.serializer = new Serializer(this.id);
 
 		// when we constructor a new instance of this node,
 		// we need to init the state for all the fields

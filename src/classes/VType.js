@@ -59,35 +59,42 @@ export default class VType {
 		this.fromCoalescers.set(sourceType, (val) => new this(fn(val)));
 	}
 
+
 	/** Add a to-coalescer */
 	static addToCoalescer(targetType, fn) {
 		this.toCoalescers.set(targetType, (val) => new targetType(fn(val)));
 	}
+
 
 	/** Retrieve a coalescer from another type to this one */
 	static getFromCoalescer(sourceType) {
 		return this.fromCoalescers.get(sourceType);
 	}
 
+
 	/** Retrieve a coalescer from this type to another */
 	static getToCoalescer(targetType) {
 		return this.toCoalescers.get(targetType);
 	}
 
+	
 	/** Validate a value against this type */
 	static validate(value) {
 		return this.validateFn(value);
 	}
+
 
 	/** Lint a value */
 	static lint(value) {
 		return this.lintFn(value);
 	}
 
+
 	/** Compare two values */
 	static compare(a, b) {
 		return this.compareFn(a, b);
 	}
+
 
 	static init() {
 
@@ -104,6 +111,7 @@ export default class VType {
 		this.description = '';
 		this.static = this.constructor;
 	}
+
 
 	// so we can do some kind of "currying" with the types
 	static addConstructorParam(param) {
@@ -122,6 +130,7 @@ export default class VType {
 		return Subclass;
 	}
 
+
 	/** Default constructor */
 	constructor(value) {
 
@@ -132,10 +141,12 @@ export default class VType {
 		this.value = value || this.constructor.defaultValue;
 	}
 
+
 	/** get the value */
 	get() {
 		return this.value;
 	}
+
 
 	/** Custom string representation */
 	toString() {
