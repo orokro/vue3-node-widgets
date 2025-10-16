@@ -865,4 +865,9 @@ export default class NWNode {
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 	}
 
+	serialize(outerSerializer=null){
+
+		
+	}
+
 }
