@@ -35,7 +35,6 @@ import {
 	VBoolean,
 	VText,
 	VCharacter,
-	VType
 } from '@Types/index.js';
 
 // import all default nodes

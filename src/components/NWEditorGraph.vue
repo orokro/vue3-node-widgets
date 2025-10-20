@@ -38,14 +38,7 @@
 				<BreadcrumbList 
 					v-if="ctxRef != null"
 					:editor="ctxRef"
-				/>
-
-				<!-- if the user wants to see dev errors, they can enable this component -->
-				<DevErrors 
-					v-if="ctxRef != null && showDevErrors" 
-					:nwSystem="ctxRef"
-				/>
-				
+				/>				
 			</div>
 
 			<!-- tool tip for errors when wiring up sockets -->
@@ -69,7 +62,6 @@ import { ref, shallowRef, onMounted, provide, watch, computed, onUnmounted } fro
 
 // components
 import NodeGraphRenderer from '@Components/NodeGraphRenderer.vue';
-import DevErrors from '@Components/DevErrors.vue';
 import AddNodeMenu from '@Components/AddNodeMenu.vue';
 import CursorPopup from '@Components/CursorPopup.vue';
 import BreadcrumbList from './BreadcrumbList.vue';
@@ -91,12 +83,6 @@ const props = defineProps({
 	graph: {
 		type: Object,
 		default: null
-	},
-
-	// show the dev errors component
-	showDevErrors: {
-		type: Boolean,
-		default: false
 	},
 
 	// allow the background to have some auto-scale applied by component

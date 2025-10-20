@@ -231,7 +231,7 @@ clsNode = function(id, x, y, width, height){
 
 	}//showUpdate()
 
-	//this method adds a new attirbute to a node.
+	//this method adds a new attribute to a node.
 	//an attribute consists of a node row, with a nodeControl, and optionally an input and output
 	clsNode.prototype.addAttribute = function(props){
 
@@ -244,7 +244,7 @@ clsNode = function(id, x, y, width, height){
 		//the parameter 'props' should be a JSON object with various properties.
 		//since ALL properties are optional, we shall check what was passed and set some defaults.
 
-		//technically even props is optional, so we'llr eplace it with a empty object if it wasn't set.
+		//technically even props is optional, so we'll replace it with a empty object if it wasn't set.
 		//this way, the rest of the checks wont get undefined errors
 		props = (typeof props === "undefined") ? {} : props;
 

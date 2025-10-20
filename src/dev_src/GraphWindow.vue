@@ -12,7 +12,6 @@
 			ref="myGraph" 
 			class="my-graph" 
 			:graph="app.currentGraph.value"
-			:showDevErrors="true"
 			:theme="emptyTheme"
 			:showAddButton="true"
 		/>
