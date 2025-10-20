@@ -15,7 +15,6 @@ import { ref, shallowRef, reactive } from 'vue';
 
 // our app
 import NodeWidget from './NWNode';
-import DevErrors from './DevErrors';
 import { VTypeRegistry } from './VTypeRegistry';
 import { NWGraph } from './NWGraph';
 
@@ -79,10 +78,7 @@ export default class NWEditor {
 
 		// true once we have at least one available node
 		this.isReady = ref(false);
-
-		// make a new error tracking system, in case the developer using our library has errors turned on for debugging
-		this.devErrors = new DevErrors(this);
-
+		
 		// our list of available nodes, as a shallow array
 		this.availableNodes = shallowRef([]);
 
