@@ -199,7 +199,7 @@ import { Connection } from './Connection';
 
 // our app
 import VType from './VType';
-import { Serializer } from './Serializer';
+import { Serializer } from './Serializer_Old';
 
 // the kind of nodes
 export const NODE_TYPE = {
