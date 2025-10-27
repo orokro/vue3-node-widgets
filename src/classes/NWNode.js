@@ -199,7 +199,6 @@ import { Connection } from './Connection';
 
 // our app
 import VType from './VType';
-import { Serializer } from './Serializer_Old';
 
 // the kind of nodes
 export const NODE_TYPE = {
@@ -288,6 +287,7 @@ export default class NWNode {
 	// we'll instantiate once we construct
 	serializer = null;
 
+	// #region static stuffs
 
 	// resets the static properties of the class for subclasses
 	static init(){
@@ -501,7 +501,7 @@ export default class NWNode {
 	 * 
 	 * @param {Function} fn - a function that takes an object of inputs & returns an object of outputs.
 	 */
-	setEvalFunction(fn) {
+	static setEvalFunction(fn) {
 
 		// error if we already have an eval function set
 		if (this.evalFn)
@@ -537,7 +537,7 @@ export default class NWNode {
 		this.evalFn = fn;
 	}
 
-
+	
 	/**
 	 * Generates a unique id for this node instance.
 	 * 
@@ -549,6 +549,9 @@ export default class NWNode {
 		// don't use the counter, use a random string
 		return `${prefix}_${Math.random().toString(36).substr(2, 9)}`;
 	}
+
+
+	// #endregion
 
 
 	/**
@@ -572,7 +575,7 @@ export default class NWNode {
 		this.slug = '';
 
 		// make a new serializer for this node
-		this.serializer = new Serializer(this.id);
+		// this.serializer = new Serializer(this.id);
 
 		// when we constructor a new instance of this node,
 		// we need to init the state for all the fields
@@ -865,7 +868,11 @@ export default class NWNode {
 		this.fieldsList.value = [...this.static.fields, ...this.dynamicFields];
 	}
 
-	serialize(outerSerializer=null){
+
+	/**
+	 * Serializes this node to a JSON object.
+	 */
+	serialize(){
 
 		
 	}

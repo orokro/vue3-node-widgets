@@ -16,6 +16,28 @@ import { watch } from 'vue';
 // main export
 export class Serializer {
 
+	/**
+	 * Static utility to check if a value is serializable (i.e., has a serialize() method).
+	 * 
+	 * @param {Any} value - value to check for presence of .serialize method, if applicable
+	 * @returns {boolean} True if the value has a serialize() method
+	 */
+	static isSerializable(value) {
+		return value != null && typeof value.serialize === 'function';
+	}
+
+	
+	/**
+	 * Constructs a new Serializer instance.
+	 * 
+	 * @param {Object} owner - The object this serializer is attached to
+	 * @param {String} ownerName - Debug name for the owner object
+	 * @param {Function} serializeFn - User-provided serialization function
+	 * @param {Function} deserializeFn - User-provided deserialization function
+	 * @param {Ref[]} watches - Array of Vue refs to watch for invalidation
+	 * @param {Constructor[]} typePool - Array of types that may be encountered during serialization
+	 * @param {Array[[]]} hooks - Array of hook pairs [testFn, callbackFn] for special cases
+	 */
 	constructor(
 		owner,
 		ownerName = "unknown",
@@ -44,7 +66,7 @@ export class Serializer {
 
 		// once we serialize we'll store a cache here
 		this._cache = null;
-		
+
 		// true when the cache is invalidated
 		this._dirty = true;
 
