@@ -587,7 +587,7 @@ export default class NWNode {
 				this.fieldState[field.name] = this.wrapFieldValue(
 					field.name, 
 					field.id,
-					new field.valueType()
+					new field.valueType(undefined, this.graph?.typeRegistry)
 				);
 			}
 		}
@@ -856,6 +856,42 @@ export default class NWNode {
 
 
 	/**
+	 * Evaluates this node's logic.
+	 * 
+	 * @returns {Object} - the results of the evaluation
+	 */
+	evaluate() {
+		// Prepare inputs from current field state
+		const inputs = {};
+		for (const key in this.constructor.inputs) {
+			inputs[key] = this.fieldState[key].val;
+		}
+
+		// Prepare dynamic inputs
+		this.dynamicFields.forEach(f => {
+			if (f.fieldType === FIELD_TYPE.INPUT) {
+				inputs[f.name] = this.fieldState[f.name].val;
+			}
+		});
+
+		// Call the static eval function if it exists
+		if (typeof this.constructor.evalFn === 'function') {
+			const outputs = this.constructor.evalFn(inputs);
+			
+			// Update output field states
+			for (const key in outputs) {
+				if (this.fieldState[key]) {
+					this.fieldState[key].val = outputs[key];
+				}
+			}
+			return outputs;
+		}
+
+		return {};
+	}
+
+
+	/**
 	 * Helper to get the static properties of the class
 	 *
 	 * @param {Object} field - the field object to move
@@ -874,7 +910,110 @@ export default class NWNode {
 	 */
 	serialize(){
 
-		
+		// we'll serialize the node's state
+		const data = {
+			id: this.id,
+			class: this.constructor.name,
+			x: this.x.value,
+			y: this.y.value,
+			slug: this.slug,
+			collapsed: this.collapsed.value,
+			width: this.width.value,
+			height: this.height.value,
+			fieldState: {},
+			dynamicFields: this.dynamicFields.map(f => ({
+				id: f.id,
+				fieldType: f.fieldType,
+				typeName: f.valueType.typeName,
+				name: f.name,
+				title: f.title,
+				description: f.description,
+				isArray: f.isArray,
+				for: f.for,
+			})),
+		};
+
+		// serialize the field state
+		for (const key in this.fieldState) {
+			const field = this.fieldState[key];
+			const val = field.val;
+
+			// If the value is serializable, call its serialize method
+			if (val && typeof val.serialize === 'function') {
+				data.fieldState[key] = val.serialize();
+			} else {
+				data.fieldState[key] = val;
+			}
+		}
+
+		return data;
+	}
+
+	/**
+	 * Deserializes a JSON object into this node instance.
+	 * 
+	 * @param {Object} data - the JSON object to deserialize
+	 */
+	deserialize(data){
+
+		// set the node's state
+		this.id = data.id || this.id;
+		this.x.value = data.x || 0;
+		this.y.value = data.y || 0;
+		this.slug = data.slug || '';
+		this.collapsed.value = data.collapsed || false;
+		this.width.value = data.width || null;
+		this.height.value = data.height || null;
+
+		// 1. Reconstruct dynamic fields
+		if(data.dynamicFields){
+			this.dynamicFields = [];
+			data.dynamicFields.forEach(fData => {
+				
+				// We need to find the type class by name. 
+				// The NWEditor has the typeRegistry, and NWNode has a reference to the graph.
+				// But NWGraph doesn't directly have the typeRegistry.
+				// However, in NWEditor.constructor, we pass the types to the registry.
+				// For now, let's try to get it from a global list if possible, 
+				// or just use a placeholder if not found.
+				
+				// NOTE: This is a bit of a hack, we should probably have a better way to look up types.
+				const typeClass = this.graph?.typeRegistry?.types.find(t => t.typeName === fData.typeName);
+				
+				if(typeClass){
+					this._addDynamicField(fData.fieldType, {
+						type: typeClass,
+						name: fData.name,
+						title: fData.title,
+						description: fData.description,
+						isArray: fData.isArray,
+						for: fData.for,
+					});
+					// _addDynamicField generated a new UUID, but we want the original one
+					const field = this.dynamicFields[this.dynamicFields.length - 1];
+					field.id = fData.id;
+				}
+			});
+		}
+
+		// 2. set the field state
+		if(data.fieldState){
+			for(const key in data.fieldState){
+				if(this.fieldState[key]){
+					const field = this.fieldState[key];
+					const currentVal = field.val;
+
+					// if current value is an object with deserialize method, use it
+					if(currentVal && typeof currentVal.deserialize === 'function'){
+						currentVal.deserialize(data.fieldState[key]);
+					} else {
+						field.val = data.fieldState[key];
+					}
+				}
+			}
+		}
+
+		return this;
 	}
 
 }

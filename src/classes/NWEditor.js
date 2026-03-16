@@ -97,20 +97,7 @@ export default class NWEditor {
 			NOTE: we will use shallowRefs for these, because they will be arrays of instantiated JS classes,
 			and they will have their own Vue Refs and reactivity that we don't want to "unwrap"
 		*/
-		this.rootGraph = graph ? graph : new NWGraph();
-
-		// dynamic version
-		this.rootGraphRef = shallowRef(this.rootGraph);
-
-		// name for current graph
-		this.graphName = ref('Root Graph');
-
-		// whenever the user changes the graph, we can build a single functional "compute" function
-		// that represents the entire graph, and can be called with inputs to get outputs
-		// this function will be stored here
-		// NOTE: this is a stub, and will be built later
-		this.compiledComputeFN = ()=>{};
-
+		
 		// use or build a default VTypeRegistry
 		if(t.isDefined(typeRegistry) && t.isInstanceOf(typeRegistry, VTypeRegistry)){
 			this.typeRegistry = typeRegistry;
@@ -118,6 +105,11 @@ export default class NWEditor {
 		else {
 			this.typeRegistry = new VTypeRegistry(types);
 		}
+
+		this.rootGraph = graph ? graph : new NWGraph(this.typeRegistry);
+
+		// dynamic version
+		this.rootGraphRef = shallowRef(this.rootGraph);
 
 		// if we were passed in a list of nodes, add them to our available nodes list
 		if(t.isDefined(nodesList))

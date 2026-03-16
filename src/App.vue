@@ -32,6 +32,7 @@ import { ref, onMounted, provide } from 'vue';
 import NWEditor from './classes/NWEditor.js';
 import WindowManager from 'vue-win-mgr';
 import GraphWindow from './dev_src/GraphWindow.vue';
+import SerializationWindow from './dev_src/SerializationWindow.vue';
 import HeaderBar from './dev_src/HeaderBar.vue';
 import { DevApp } from './dev_src/DevApp.js';
 import AddNodeMenu from './components/AddNodeMenu.vue';
@@ -48,6 +49,11 @@ const availableWindows = [
 		title: 'Graph Window',
 		window: GraphWindow,
 		slug: 'graph',
+	},
+	{
+		title: 'Serialization',
+		window: SerializationWindow,
+		slug: 'serialization',
 	}
 ];
 

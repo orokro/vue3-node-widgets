@@ -45,10 +45,10 @@ export class VGraph extends VType {
 	static compareFn = (a, b) => a === b;
 
 	/** Default constructor */
-	constructor(value) {
-		super(value);
+	constructor(value, typeRegistry = null) {
+		super(value, typeRegistry);
 
-		this.value = new NWGraph(true);
+		this.value = new NWGraph(typeRegistry, true);
 	}
 
 }

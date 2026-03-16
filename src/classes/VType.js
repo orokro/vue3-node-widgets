@@ -132,13 +132,16 @@ export default class VType {
 
 
 	/** Default constructor */
-	constructor(value) {
+	constructor(value, typeRegistry = null) {
 
 		this.static = this.constructor;
 		if(value)
 			value = this.static.lintFn(value);
 		
 		this.value = value || this.constructor.defaultValue;
+
+		// save the type registry if provided
+		this.typeRegistry = typeRegistry;
 	}
 
 

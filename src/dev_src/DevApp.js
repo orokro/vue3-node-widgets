@@ -18,6 +18,26 @@ import { ref, shallowRef, reactive, nextTick } from 'vue';
 
 // our app
 import { NWGraph } from '@/classes/NWGraph';
+import { VTypeRegistry } from '@/classes/VTypeRegistry';
+import {
+	VNumber,
+	VAngle,
+	VInteger,
+	VVector2,
+	VVector3,
+	VAngles,
+	VColor3,
+	VColor4,
+	VBoolean,
+	VText,
+	VCharacter,
+} from '@Types/index.js';
+
+const types = [
+	VNumber, VAngle, VInteger, VVector2, VVector3,
+	VAngles, VColor3, VColor4, VBoolean, VText, VCharacter
+];
+
 import { 
 	addBuildInNodesBatch01,
 	addBuildInNodesBatch02,
@@ -31,6 +51,9 @@ export class DevApp {
 	 * Constructs a new DevApp instance.
 	 */
 	constructor(){
+
+		// we'll need a type registry for our graphs
+		this.typeRegistry = new VTypeRegistry(types);
 
 		// array of graphs
 		this.graphs = shallowRef([]);
@@ -54,7 +77,7 @@ export class DevApp {
 
 		// if not provided, make new one
 		if(!graph)
-			graph = new NWGraph();
+			graph = new NWGraph(this.typeRegistry);
 		
 		// if this is the first graph, also select it
 		if(this.graphs.value.length === 0)
@@ -95,12 +118,12 @@ export class DevApp {
 		await nextTick();
 		
 		// make one first new app
-		const nlGraph = new NWGraph();
+		const nlGraph = new NWGraph(this.typeRegistry);
 		buildNaturalLayout01(nlGraph);
 		this.addGraph(nlGraph);
 
 		// make a second one as well
-		const batch01Graph = new NWGraph();
+		const batch01Graph = new NWGraph(this.typeRegistry);
 		addBuildInNodesBatch01(batch01Graph);
 		this.addGraph(batch01Graph);
 	}

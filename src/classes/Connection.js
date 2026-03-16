@@ -237,4 +237,33 @@ export class Connection {
 		}, 210);
 	}
 
+
+	/**
+	 * Serializes this connection to a JSON object.
+	 */
+	serialize(){
+
+		return {
+			id: this.id,
+			inputNodeId: this.inputNode?.id || null,
+			inputFieldId: this.inputField?.id || null,
+			outputNodeId: this.outputNode?.id || null,
+			outputFieldId: this.outputField?.id || null,
+		};
+	}
+
+
+	/**
+	 * Deserializes a JSON object into this connection instance.
+	 * 
+	 * @param {Object} data - the JSON object to deserialize
+	 */
+	deserialize(data){
+
+		this.id = data.id || this.id;
+		// The actual linking to nodes and fields will be handled by NWGraph.deserialize
+		// because we need the full list of nodes already instantiated.
+		return this;
+	}
+
 }

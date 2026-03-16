@@ -27,15 +27,22 @@ import { SelectionManager } from './SelectionManager';
 import t from 'typical';
 import NWNode, { NODE_TYPE } from './NWNode';
 
+// import all default nodes
+import { defaultNodeList } from './Nodes/index.js';
+
 // main export
 export class NWGraph {
 
 	/**
 	 * Constructs a new NWGraph instance.
 	 * 
+	 * @param {VTypeRegistry} typeRegistry - The type registry to use for this graph.
 	 * @param {Boolean} subGraph - Whether this graph is a subgraph (for node groups). Default is false.
 	 */
-	constructor(subGraph = false) {
+	constructor(typeRegistry, subGraph = false) {
+
+		// save the type registry
+		this.typeRegistry = typeRegistry;
 
 		// save whether this is a subgraph
 		this.subGraph = subGraph;
@@ -201,6 +208,114 @@ export class NWGraph {
 
 
 	/**
+	 * Returns the nodes in topological order.
+	 * 
+	 * @returns {NWNode[]} - the nodes in topological order
+	 */
+	getTopologicalOrder() {
+		const nodes = this.nodes.value;
+		const order = [];
+		const visited = new Set();
+		const visiting = new Set();
+
+		const visit = (node) => {
+			if (visiting.has(node.id)) {
+				throw new Error('Cycle detected in graph');
+			}
+			if (!visited.has(node.id)) {
+				visiting.add(node.id);
+				
+				// Get all downstream nodes
+				// Downstream means nodes that take THIS node's outputs as THEIR inputs.
+				// So we look for wires where fromNode is this node.
+				const downstreamConnections = this.connMgr.getConnectionsByNode(node, false);
+				downstreamConnections.forEach(conn => {
+					if (conn.inputNode) {
+						visit(conn.inputNode);
+					}
+				});
+
+				visiting.delete(node.id);
+				visited.add(node.id);
+				order.push(node);
+			}
+		};
+
+		// We want to start from output nodes and walk backwards, 
+		// but standard topo sort often starts from "roots" (nodes with no inputs).
+		// Let's just visit all nodes.
+		nodes.forEach(node => visit(node));
+
+		return order.reverse(); // Standard topo sort returns in dependency order
+	}
+
+
+	/**
+	 * Evaluates the entire graph.
+	 * 
+	 * @param {Object} inputs - the global inputs for the graph
+	 * @returns {Object} - the global outputs of the graph
+	 */
+	evaluate(inputs = {}) {
+		
+		// 1. Set global inputs on the graph's input nodes
+		const inputNodes = this.getNodesByKind(NODE_TYPE.INPUT);
+		inputNodes.forEach(node => {
+			for (const key in node.fieldState) {
+				if (inputs[key] !== undefined) {
+					node.fieldState[key].val = inputs[key];
+				}
+			}
+		});
+
+		// 2. Get topological order
+		const order = this.getTopologicalOrder();
+
+		// 3. Evaluate each node in order
+		order.forEach(node => {
+			
+			// A: Pull values from upstream connections before evaluating
+			node.fieldsList.value.forEach(field => {
+				if (field.fieldType === 'input') {
+					const connections = this.connMgr.getConnectionsBySocket(node, field);
+					if (connections.length > 0) {
+						// For now, take the first connection. 
+						// (Array sockets would need different logic here)
+						const conn = connections[0];
+						if (conn.outputNode && conn.outputField) {
+							const upstreamVal = conn.outputNode.fieldState[conn.outputField.name].val;
+							
+							// If there's a coalescer, we should use it!
+							// conn.coalescer is available if types matched via registry.
+							let finalVal = upstreamVal;
+							if (conn.coalescer) {
+								finalVal = conn.coalescer(upstreamVal);
+							}
+
+							node.fieldState[field.name].val = finalVal;
+						}
+					}
+				}
+			});
+
+			// B: Actually evaluate the node
+			node.evaluate();
+		});
+
+		// 4. Collect results from output nodes
+		const results = {};
+		const outputNodes = this.getNodesByKind(NODE_TYPE.OUTPUT);
+		outputNodes.forEach(node => {
+			for (const key in node.fieldState) {
+				results[key] = node.fieldState[key].val;
+			}
+		});
+
+		return results;
+	}
+
+
+	/**
 	 * Updates the input and output nodes of the graph.
 	 */
 	updateIO(){
@@ -272,6 +387,87 @@ export class NWGraph {
 		// update our state with the new lists
 		this.inputs.value = newInputsList;
 		this.outputs.value = newOutputsList;
+	}
+
+
+	/**
+	 * Serializes this graph to a JSON object.
+	 */
+	serialize(){
+
+		return {
+			name: this.name.value,
+			subGraph: this.subGraph,
+			nodes: this.nodes.value.map(n => n.serialize()),
+			wires: this.wires.value.map(w => w.serialize()),
+		};
+	}
+
+
+	/**
+	 * Deserializes a JSON object into this graph instance.
+	 * 
+	 * @param {Object} data - the JSON object to deserialize
+	 */
+	deserialize(data){
+
+		this.name.value = data.name || 'Root Graph';
+		this.subGraph = data.subGraph || false;
+
+		// 1. Clear current state
+		this.nodes.value = [];
+		this.wires.value = [];
+
+		// 2. Instantiate nodes
+		const nodeMap = new Map();
+		if(data.nodes){
+			data.nodes.forEach(nodeData => {
+				
+				// find the node class by name
+				const nodeDetails = defaultNodeList.find(n => n.class.name === nodeData.class);
+				if(nodeDetails){
+					const newNode = new nodeDetails.class(this);
+					newNode.deserialize(nodeData);
+					this.nodes.value = [...this.nodes.value, newNode];
+					nodeMap.set(newNode.id, newNode);
+				} else {
+					console.warn(`Could not find node class: ${nodeData.class}`);
+				}
+			});
+		}
+
+		// 3. Instantiate wires and link them
+		if(data.wires){
+			data.wires.forEach(wireData => {
+
+				const conn = this.connMgr.addConnectionBasic();
+				conn.deserialize(wireData);
+
+				const inputNode = nodeMap.get(wireData.inputNodeId);
+				const outputNode = nodeMap.get(wireData.outputNodeId);
+
+				if(inputNode && outputNode){
+					// find fields by ID
+					// We need to check both static and dynamic fields
+					const inputField = inputNode.fieldsList.value.find(f => f.id === wireData.inputFieldId);
+					const outputField = outputNode.fieldsList.value.find(f => f.id === wireData.outputFieldId);
+
+					if(inputField && outputField){
+						conn.setInput(inputNode, inputField);
+						conn.setOutput(outputNode, outputField);
+					} else {
+						console.warn(`Could not find fields for wire: ${wireData.id}`);
+						conn.destroy();
+					}
+				} else {
+					console.warn(`Could not find nodes for wire: ${wireData.id}`);
+					conn.destroy();
+				}
+			});
+		}
+
+		this.updateIO();
+		return this;
 	}
 
 }
