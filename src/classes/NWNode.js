@@ -913,7 +913,10 @@ export default class NWNode {
 		// we'll serialize the node's state
 		const data = {
 			id: this.id,
-			class: this.constructor.name,
+			// serializeKey is the stable production-safe lookup string (set by addNode via the registry).
+			// Falls back to constructor.name, which works in dev and with keepNames builds.
+			serializeKey: this._serializeKey || this.constructor.name,
+			class: this.constructor.name, // kept for human readability in the JSON
 			x: this.x.value,
 			y: this.y.value,
 			slug: this.slug,

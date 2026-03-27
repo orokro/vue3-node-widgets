@@ -71,95 +71,102 @@ import TexLayer from './TexLayerNode';
 // import Input
 
 // make a reusable list of default nodes
+// key: stable string used for serialization - never changes even if class is renamed.
+// Each class must appear only once; menu visibility is controlled by menuPath alone.
 const defaultNodeList = [
 
-	// test
-	{ class: GroupNode, menuPath: '/' },
+	// special / group nodes
+	{ class: GroupNode,        menuPath: '/Special',        key: 'GroupNode' },
+	{ class: GroupInputNode,   menuPath: '/Special/',       key: 'GroupInputNode' },
+	{ class: GroupOutputNode,  menuPath: '/Special/',       key: 'GroupOutputNode' },
 
-	// special nodes
-	{ class: GroupNode, menuPath: '/Special' },
-	{ class: GroupInputNode, menuPath: '/Special/' },
-	{ class: GroupOutputNode, menuPath: '/Special/' },
-	
 	// debug nodes
-	{ class: AllTypesNode, menuPath: '/Debug' },
-	{ class: AllTypesOutNode, menuPath: '/Debug/' },
-	{ class: ABMathKnobNode, menuPath: '/Debug/' },
-	{ class: SuperWaveNode, menuPath: '/Debug/' },
-
-	// special nodes
-	{ class: V2ScaleNode, menuPath: '/Debug/Special/' },
-	{ class: GroupInputNode, menuPath: '/Debug/Special/' },
-	{ class: GroupOutputNode, menuPath: '/Debug/Special/' },
-
-	// also broken
-	{ class: GroupNode, menuPath: '/Debug/Other' },
+	{ class: AllTypesNode,     menuPath: '/Debug',          key: 'AllTypesNode' },
+	{ class: AllTypesOutNode,  menuPath: '/Debug/',         key: 'AllTypesOutNode' },
+	{ class: ABMathKnobNode,   menuPath: '/Debug/',         key: 'ABMathKnobNode' },
+	{ class: SuperWaveNode,    menuPath: '/Debug/',         key: 'SuperWaveNode' },
 
 	// mathematical nodes
-	{ class: ABMathNode, menuPath: '/Math (Scalar)' },
-	{ class: ABCompareNode, menuPath: '/Math (Scalar)' },
-	{ class: RoundNode, menuPath: '/Math (Scalar)' },
-	{ class: AverageNode, menuPath: '/Math (Scalar)' },
-	{ class: ClampValueNode, menuPath: '/Math (Scalar)' },
-	{ class: LerpValueNode, menuPath: '/Math (Scalar)' },
-	{ class: MapRangeNode, menuPath: '/Math (Scalar)' },	
-	{ class: TrigNode, menuPath: '/Math (Scalar)' },
+	{ class: ABMathNode,       menuPath: '/Math (Scalar)',  key: 'ABMathNode' },
+	{ class: ABCompareNode,    menuPath: '/Math (Scalar)',  key: 'ABCompareNode' },
+	{ class: RoundNode,        menuPath: '/Math (Scalar)',  key: 'RoundNode' },
+	{ class: AverageNode,      menuPath: '/Math (Scalar)',  key: 'AverageNode' },
+	{ class: ClampValueNode,   menuPath: '/Math (Scalar)',  key: 'ClampValueNode' },
+	{ class: LerpValueNode,    menuPath: '/Math (Scalar)',  key: 'LerpValueNode' },
+	{ class: MapRangeNode,     menuPath: '/Math (Scalar)',  key: 'MapRangeNode' },
+	{ class: TrigNode,         menuPath: '/Math (Scalar)',  key: 'TrigNode' },
 
 	// vector2 nodes
-	{ class: V2ScaleNode, menuPath: '/Math (Vector2)' },
-	{ class: V2AddNode, menuPath: '/Math (Vector2)' },
-	{ class: V2SubNode, menuPath: '/Math (Vector2)' },
-	{ class: V2DotNode, menuPath: '/Math (Vector2)' },
-	{ class: V2LerpNode, menuPath: '/Math (Vector2)' },
-	{ class: V2SeparateXYNode, menuPath: '/Math (Vector2)' },
-	{ class: V2CombineXYNode, menuPath: '/Math (Vector2)' },
+	{ class: V2ScaleNode,      menuPath: '/Math (Vector2)', key: 'V2ScaleNode' },
+	{ class: V2AddNode,        menuPath: '/Math (Vector2)', key: 'V2AddNode' },
+	{ class: V2SubNode,        menuPath: '/Math (Vector2)', key: 'V2SubNode' },
+	{ class: V2DotNode,        menuPath: '/Math (Vector2)', key: 'V2DotNode' },
+	{ class: V2LerpNode,       menuPath: '/Math (Vector2)', key: 'V2LerpNode' },
+	{ class: V2SeparateXYNode, menuPath: '/Math (Vector2)', key: 'V2SeparateXYNode' },
+	{ class: V2CombineXYNode,  menuPath: '/Math (Vector2)', key: 'V2CombineXYNode' },
 
 	// vector3 nodes
-	{ class: V3ScaleNode, menuPath: '/Math (Vector3)' },
-	{ class: V3AddNode, menuPath: '/Math (Vector3)' },
-	{ class: V3SubNode, menuPath: '/Math (Vector3)' },
-	{ class: V3DotNode, menuPath: '/Math (Vector3)' },
-	{ class: V3LerpNode, menuPath: '/Math (Vector3)' },
-	{ class: V3SeparateXYZNode, menuPath: '/Math (Vector3)' },
-	{ class: V3CombineXYZNode, menuPath: '/Math (Vector3)' },
+	{ class: V3ScaleNode,      menuPath: '/Math (Vector3)', key: 'V3ScaleNode' },
+	{ class: V3AddNode,        menuPath: '/Math (Vector3)', key: 'V3AddNode' },
+	{ class: V3SubNode,        menuPath: '/Math (Vector3)', key: 'V3SubNode' },
+	{ class: V3DotNode,        menuPath: '/Math (Vector3)', key: 'V3DotNode' },
+	{ class: V3LerpNode,       menuPath: '/Math (Vector3)', key: 'V3LerpNode' },
+	{ class: V3SeparateXYZNode,menuPath: '/Math (Vector3)', key: 'V3SeparateXYZNode' },
+	{ class: V3CombineXYZNode, menuPath: '/Math (Vector3)', key: 'V3CombineXYZNode' },
 
 	// color nodes
-	{ class: ColorMixNode, menuPath: '/Color' },
-	{ class: ColorBlendNode, menuPath: '/Color' },
-	{ class: SeparateRGBNode, menuPath: '/Color' },
-	{ class: SeparateAlpha, menuPath: '/Color' },
-	{ class: SeparateHSVNode, menuPath: '/Color' },
-	{ class: CombineRGBNode, menuPath: '/Color' },
-	{ class: CombineRGBANode, menuPath: '/Color' },
-	{ class: CombineHSVNode, menuPath: '/Color' },
+	{ class: ColorMixNode,     menuPath: '/Color',          key: 'ColorMixNode' },
+	{ class: ColorBlendNode,   menuPath: '/Color',          key: 'ColorBlendNode' },
+	{ class: SeparateRGBNode,  menuPath: '/Color',          key: 'SeparateRGBNode' },
+	{ class: SeparateAlpha,    menuPath: '/Color',          key: 'SeparateAlphaNode' },
+	{ class: SeparateHSVNode,  menuPath: '/Color',          key: 'SeparateHSVNode' },
+	{ class: CombineRGBNode,   menuPath: '/Color',          key: 'CombineRGBNode' },
+	{ class: CombineRGBANode,  menuPath: '/Color',          key: 'CombineRGBANode' },
+	{ class: CombineHSVNode,   menuPath: '/Color',          key: 'CombineHSVNode' },
 
 	// random nodes
-	{ class: RandomColorNode, menuPath: '/Random/' },
-	{ class: RandomNumberNode, menuPath: 'Random/' },
-	{ class: RandomV2Node, menuPath: '/Random/' },
-	{ class: RandomV3Node, menuPath: '/Random/' },
-	{ class: RandomBoolNode, menuPath: '/Random/' },
+	{ class: RandomColorNode,  menuPath: '/Random/',        key: 'RandomColorNode' },
+	{ class: RandomNumberNode, menuPath: '/Random/',        key: 'RandomNumberNode' },
+	{ class: RandomV2Node,     menuPath: '/Random/',        key: 'RandomV2Node' },
+	{ class: RandomV3Node,     menuPath: '/Random/',        key: 'RandomV3Node' },
+	{ class: RandomBoolNode,   menuPath: '/Random/',        key: 'RandomBoolNode' },
 
 	// input nodes
-	{ class: InputCanvasInfo, menuPath: '/Input' },
-	{ class: InputCartesianCoords, menuPath: '/Input' },
-	{ class: InputPolarCoords, menuPath: '/Input' },
+	{ class: InputCanvasInfo,       menuPath: '/Input',     key: 'InputCanvasInfoNode' },
+	{ class: InputCartesianCoords,  menuPath: '/Input',     key: 'InputCartesianCoordsNode' },
+	{ class: InputPolarCoords,      menuPath: '/Input',     key: 'InputPolarCoordsNode' },
 
 	// output node
-	{ class: OutputColor, menuPath: '/Output' },
+	{ class: OutputColor,      menuPath: '/Output',         key: 'OutputColorNode' },
 
 	// texture nodes
-	{ class: TexChecker, menuPath: '/Texture' },
-	{ class: TexDiamonds, menuPath: '/Texture' },
-	{ class: TexNoise, menuPath: '/Texture' },
-	{ class: TexImage, menuPath: '/Texture' },
-	{ class: TexLayer, menuPath: '/Texture' },
+	{ class: TexChecker,       menuPath: '/Texture',        key: 'TexCheckerNode' },
+	{ class: TexDiamonds,      menuPath: '/Texture',        key: 'TexDiamondsNode' },
+	{ class: TexNoise,         menuPath: '/Texture',        key: 'TexNoiseNode' },
+	{ class: TexImage,         menuPath: '/Texture',        key: 'TexImageNode' },
+	{ class: TexLayer,         menuPath: '/Texture',        key: 'TexLayerNode' },
 
 ];
 
+// Build a stable registry Map for serialization lookups.
+// Keyed by the explicit `key` string (primary) and also by constructor.name (fallback).
+// Built once at module-load time so deserialize() is O(1) per node.
+const nodeClassRegistry = new Map();
+for (const entry of defaultNodeList) {
+	// primary: explicit key string (survives minification)
+	if (entry.key && !nodeClassRegistry.has(entry.key)) {
+		nodeClassRegistry.set(entry.key, entry);
+	}
+	// fallback: constructor.name (works in dev and with keepNames in prod)
+	if (!nodeClassRegistry.has(entry.class.name)) {
+		nodeClassRegistry.set(entry.class.name, entry);
+	}
+}
+
 // export all the things
-export { 
+export {
 	defaultNodeList,
+	nodeClassRegistry,
 	
 	ABMathNode,
 	ABCompareNode,

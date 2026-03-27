@@ -247,8 +247,10 @@ export class Connection {
 			id: this.id,
 			inputNodeId: this.inputNode?.id || null,
 			inputFieldId: this.inputField?.id || null,
+			inputFieldName: this.inputField?.name || null,
 			outputNodeId: this.outputNode?.id || null,
 			outputFieldId: this.outputField?.id || null,
+			outputFieldName: this.outputField?.name || null,
 		};
 	}
 

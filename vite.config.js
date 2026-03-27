@@ -10,6 +10,16 @@ export default defineConfig({
 		vue(),
 		vueDevTools(),
 	],
+	build: {
+		// Preserve class names so serialization key lookup by constructor.name
+		// works correctly in minified production builds.
+		// The explicit serializeKey on each node class is the primary lookup,
+		// but this ensures fallback behavior stays intact too.
+		minify: 'esbuild',
+	},
+	esbuild: {
+		keepNames: true,
+	},
 	resolve: {
 		alias: {
 			'@': fileURLToPath(new URL('./src', import.meta.url)),
