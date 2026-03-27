@@ -15,6 +15,8 @@ import { VCharacter } from './VCharacter.js';
 import { VEnum } from './VEnum.js';
 import { VGraph } from './VGraph.js';
 import { VGroupAny } from './VGroupAny.js';
+import { VImage } from './VImage.js';
+import { VFile } from './VFile.js';
 import VType from '../VType.js';
 
 // Register cross-type coalescers
@@ -138,5 +140,7 @@ export {
 	VEnum,
 	VGraph,
 	VGroupAny,
-	VType,	
+	VImage,
+	VFile,
+	VType,
 };

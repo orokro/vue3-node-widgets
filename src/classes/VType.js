@@ -126,6 +126,11 @@ export default class VType {
 		// Merge in params
 		Subclass.params = {...(this.params || {}), ...param };
 
+		// Track the canonical base type so parameterized subclasses can always
+		// be identified for type-registry lookups and evaluation.
+		// e.g. VNumber.Min(5).Max(20).baseType === VNumber
+		Subclass.baseType = this.baseType || this;
+
 		// return the subclass
 		return Subclass;
 	}

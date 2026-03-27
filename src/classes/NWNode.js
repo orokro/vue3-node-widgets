@@ -940,10 +940,13 @@ export default class NWNode {
 		for (const key in this.fieldState) {
 			const field = this.fieldState[key];
 			const val = field.val;
+			const typeInst = field._valueObj;
 
-			// If the value is serializable, call its serialize method
+			// Priority: value.serialize() → typeInst.serializeValue(val) → raw value
 			if (val && typeof val.serialize === 'function') {
 				data.fieldState[key] = val.serialize();
+			} else if (typeInst && typeof typeInst.serializeValue === 'function') {
+				data.fieldState[key] = typeInst.serializeValue(val);
 			} else {
 				data.fieldState[key] = val;
 			}
@@ -1005,10 +1008,13 @@ export default class NWNode {
 				if(this.fieldState[key]){
 					const field = this.fieldState[key];
 					const currentVal = field.val;
+					const typeInst = field._valueObj;
 
-					// if current value is an object with deserialize method, use it
+					// Priority: currentVal.deserialize() → typeInst.deserializeValue() → raw assign
 					if(currentVal && typeof currentVal.deserialize === 'function'){
 						currentVal.deserialize(data.fieldState[key]);
+					} else if (typeInst && typeof typeInst.deserializeValue === 'function') {
+						field.val = typeInst.deserializeValue(data.fieldState[key]);
 					} else {
 						field.val = data.fieldState[key];
 					}

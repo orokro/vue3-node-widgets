@@ -34,6 +34,8 @@ import {
 	VBoolean,
 	VText,
 	VCharacter,
+	VImage,
+	VFile,
 } from '@Types/index.js';
 
 // import all default nodes
@@ -42,7 +44,8 @@ import { defaultNodeList } from '@Nodes/index.js';
 // all defaults
 const types = [
 	VNumber, VAngle, VInteger, VVector2, VVector3,
-	VAngles, VColor3, VColor4, VBoolean, VText, VCharacter
+	VAngles, VColor3, VColor4, VBoolean, VText, VCharacter,
+	VImage, VFile,
 ];
 
 // external libs/misc

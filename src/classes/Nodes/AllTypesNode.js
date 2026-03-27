@@ -8,7 +8,7 @@
 
 import NWNode from '../NWNode.js';
 import { NODE_TYPE, FIELD_TYPE } from '../NWNode.js';
-import { 
+import {
 	VAngle,
 	VAngles,
 	VBoolean,
@@ -21,6 +21,8 @@ import {
 	VVector2,
 	VVector3,
 	VEnum,
+	VImage,
+	VFile,
  } from '../Types/index.js';
  
 // main export
@@ -148,11 +150,45 @@ export default class AllTypesNode extends NWNode {
 		});
 
 		// enumeration
-		this.addField(FIELD_TYPE.PROP, { 
+		this.addField(FIELD_TYPE.PROP, {
 			name: 'enumInput',
 			title: 'Enum Input',
 			description: "Tests enumeration widget",
 			type: VEnum.With(['Option 1', 'Option 2', 'Option 3']),
+		});
+
+		// image
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'imageInput',
+			title: 'Image (path)',
+			description: 'Tests image widget — serializes path only',
+			type: VImage,
+		});
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'imageBase64Input',
+			title: 'Image (base64)',
+			description: 'Tests image widget — serializes full base64 data',
+			type: VImage.AsBase64(),
+		});
+
+		// file
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'fileInput',
+			title: 'Single File',
+			description: 'Tests file widget — single file, path only',
+			type: VFile,
+		});
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'fileMultiInput',
+			title: 'Multi File (.txt/.json)',
+			description: 'Tests file widget — multiple files, filtered',
+			type: VFile.Multiple().Accept('.txt,.json'),
+		});
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'fileBinaryInput',
+			title: 'File (binary)',
+			description: 'Tests file widget — single file, serializes binary data',
+			type: VFile.AsBinary(),
 		});
 
 	}
