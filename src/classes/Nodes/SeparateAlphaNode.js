@@ -44,13 +44,17 @@ export default class SeparateAlpha extends NWNode {
 			type: VColor4,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'a',
-			title: 'Alpha', 
+			title: 'Alpha',
 			description: "Alpha channel of the color",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const col = inputs.col || { r: 0, g: 0, b: 0, a: 0 };
+			return { a: col.a ?? 0 };
+		});
 	}
 	
 	

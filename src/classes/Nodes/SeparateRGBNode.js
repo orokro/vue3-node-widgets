@@ -58,13 +58,17 @@ export default class SeparateRGBNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'b',
-			title: 'B', 
+			title: 'B',
 			description: "Blue component of the color",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const col = inputs.col || { r: 0, g: 0, b: 0 };
+			return { r: col.r, g: col.g, b: col.b };
+		});
 	}
 	
 	

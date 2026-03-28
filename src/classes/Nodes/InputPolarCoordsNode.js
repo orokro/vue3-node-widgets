@@ -65,11 +65,26 @@ export default class InputPolarCoords extends NWNode {
 			type: VNumber
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'radius',
 			title: 'Radius',
 			description: "Distance from Center",
 			type: VNumber
+		});
+
+		this.setEvalFunction((inputs, ctx) => {
+			const degrees      = inputs.degrees      ?? true;
+			const mouseCentric = inputs.mouseCentric ?? false;
+			const px = ctx?.x ?? 0;
+			const py = ctx?.y ?? 0;
+			const originX = mouseCentric ? (ctx?.mouseX ?? 0) : (ctx?.width  ?? 0) / 2;
+			const originY = mouseCentric ? (ctx?.mouseY ?? 0) : (ctx?.height ?? 0) / 2;
+			const dx = px - originX;
+			const dy = py - originY;
+			const radius = Math.sqrt(dx * dx + dy * dy);
+			let theta = Math.atan2(dy, dx); // radians, -π to π
+			if (degrees) theta = theta * 180 / Math.PI;
+			return { theta, radius };
 		});
 	}
 	

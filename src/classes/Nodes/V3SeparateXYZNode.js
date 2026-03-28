@@ -58,11 +58,16 @@ export default class V3SeparateXYNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'z',
-			title: 'Z', 
+			title: 'Z',
 			description: "Z component of the vector",
 			type: VNumber,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const v = inputs.vecA || { x: 0, y: 0, z: 0 };
+			return { x: v.x, y: v.y, z: v.z };
 		});
 	}
 	

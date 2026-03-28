@@ -68,13 +68,29 @@ export default class ABCompareNode extends NWNode {
 			type: VNumber,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Result', 
+			title: 'Result',
 			description: "Result of comparison",
 			type: VBoolean,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const a = inputs.aValue ?? 0;
+			const b = inputs.bValue ?? 0;
+			const op = inputs.operation ?? 0;
+			let result;
+			switch (op) {
+				case 0:  result = a === b; break;
+				case 1:  result = a !== b; break;
+				case 2:  result = a < b;   break;
+				case 3:  result = a > b;   break;
+				case 4:  result = a <= b;  break;
+				case 5:  result = a >= b;  break;
+				default: result = false;
+			}
+			return { result };
+		});
 	}
 	
 	/**

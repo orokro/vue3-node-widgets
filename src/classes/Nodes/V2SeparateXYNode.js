@@ -51,11 +51,16 @@ export default class V2SeparateXYNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'y',
-			title: 'Y', 
+			title: 'Y',
 			description: "Y component of the vector",
 			type: VNumber,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const v = inputs.vecA || { x: 0, y: 0 };
+			return { x: v.x, y: v.y };
 		});
 	}
 	

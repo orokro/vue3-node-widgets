@@ -51,11 +51,17 @@ export default class V2AddNode extends NWNode {
 			type: VVector2,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Added Vector', 
+			title: 'Added Vector',
 			description: "Added Vector",
 			type: VVector2,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const a = inputs.vecA || { x: 0, y: 0 };
+			const b = inputs.vecB || { x: 0, y: 0 };
+			return { result: { x: a.x + b.x, y: a.y + b.y } };
 		});
 	}
 	

@@ -65,13 +65,16 @@ export default class CombineRGBANode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'col',
-			title: 'Output Color', 
+			title: 'Output Color',
 			description: "Combined RGBA color",
 			type: VColor4,
-		});	
+		});
 
+		this.setEvalFunction((inputs) => {
+			return { col: { r: inputs.r ?? 0, g: inputs.g ?? 0, b: inputs.b ?? 0, a: inputs.a ?? 1 } };
+		});
 	}
 	
 	

@@ -59,13 +59,25 @@ export default class ColorMixNode extends NWNode {
 			type: VNumber,
 		});	
 	
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Result', 
+			title: 'Result',
 			description: "Result of Color Mix operation",
 			type: VColor3,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const a = inputs.aCol   || { r: 0, g: 0, b: 0 };
+			const b = inputs.bCol   || { r: 0, g: 0, b: 0 };
+			const t = inputs.tValue ?? 0;
+			return {
+				result: {
+					r: a.r + (b.r - a.r) * t,
+					g: a.g + (b.g - a.g) * t,
+					b: a.b + (b.b - a.b) * t,
+				}
+			};
+		});
 	}
 	/**
 	 * Constructor

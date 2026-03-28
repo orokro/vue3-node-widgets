@@ -38,11 +38,15 @@ export default class RandomBoolNode extends NWNode {
 		// set this before adding fields
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Random Boolean Result', 
+			title: 'Random Boolean Result',
 			description: "Random Boolean result, either true or false",
 			type: VBoolean,
+		});
+
+		this.setEvalFunction((inputs) => {
+			return { result: Math.random() >= 0.5 };
 		});
 	}
 

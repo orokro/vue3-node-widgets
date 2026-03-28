@@ -52,11 +52,22 @@ export default class RandomV2Node extends NWNode {
 			type: VVector2,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Random Vector2 Result', 
+			title: 'Random Vector2 Result',
 			description: "Random Vector2 result within the specified min and max range",
 			type: VVector2,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const lo = inputs.v2Min || { x: 0, y: 0 };
+			const hi = inputs.v2Max || { x: 1, y: 1 };
+			return {
+				result: {
+					x: lo.x + Math.random() * (hi.x - lo.x),
+					y: lo.y + Math.random() * (hi.y - lo.y),
+				}
+			};
 		});
 	}
 

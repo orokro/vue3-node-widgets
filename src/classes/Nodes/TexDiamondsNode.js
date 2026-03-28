@@ -69,11 +69,25 @@ export default class TexDiamonds extends NWNode {
 			type: VVector2,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'outColor',
 			title: 'Output Color',
 			description: "The output color based on the diamond checker pattern",
 			type: VColor3
+		});
+
+		this.setEvalFunction((inputs) => {
+			const sx = inputs.sizeV2?.x || 30;
+			const sy = inputs.sizeV2?.y || 30;
+			const px = inputs.posV2?.x  || 0;
+			const py = inputs.posV2?.y  || 0;
+			const cA = inputs.colorA || { r: 1, g: 1, b: 1 };
+			const cB = inputs.colorB || { r: 0, g: 0, b: 0 };
+			// Diamond: rotate coordinates 45° then checker
+			const rx = (px + py) / sx;
+			const ry = (px - py) / sy;
+			const isA = (Math.floor(rx) + Math.floor(ry)) % 2 === 0;
+			return { outColor: isA ? cA : cB };
 		});
 	}
 	

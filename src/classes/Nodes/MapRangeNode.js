@@ -72,13 +72,24 @@ export default class MapRangeNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Mapped Value', 
+			title: 'Mapped Value',
 			description: "Mapped value from input range to output range",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const v       = inputs.Value   ?? 0;
+			const fromMin = inputs.fromMin ?? 0;
+			const fromMax = inputs.fromMax ?? 1;
+			const toMin   = inputs.toMin   ?? 0;
+			const toMax   = inputs.toMax   ?? 100;
+			const range   = fromMax - fromMin;
+			if (range === 0) return { result: toMin };
+			const t = (v - fromMin) / range;
+			return { result: toMin + t * (toMax - toMin) };
+		});
 	}
 
 	/**

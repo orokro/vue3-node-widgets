@@ -52,11 +52,17 @@ export default class RandomNumberNode extends NWNode {
 		});
 
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Random Number', 
+			title: 'Random Number',
 			description: "Random number within the specified range",
 			type: VNumber,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const min = inputs.minVale  ?? 0;
+			const max = inputs.maxValue ?? 1;
+			return { result: min + Math.random() * (max - min) };
 		});
 	}
 

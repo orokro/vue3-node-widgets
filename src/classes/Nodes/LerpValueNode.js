@@ -58,13 +58,19 @@ export default class LerpValueNode extends NWNode {
 			type: VNumber,
 		});	
 	
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Result', 
+			title: 'Result',
 			description: "Result of Lerp operation",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const a = inputs.aValue ?? 0;
+			const b = inputs.bValue ?? 1;
+			const t = inputs.tValue ?? 0;
+			return { result: a + (b - a) * t };
+		});
 	}
 	
 	/**

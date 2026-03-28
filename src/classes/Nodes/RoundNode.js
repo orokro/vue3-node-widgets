@@ -59,13 +59,27 @@ export default class RoundNode extends NWNode {
 			type: VNumber,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Rounded Value', 
+			title: 'Rounded Value',
 			description: "Result of rounding operation",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const v      = inputs.aValue    ?? 0;
+			const op     = inputs.operation ?? 0;
+			const places = inputs.places    ?? 0;
+			const factor = Math.pow(10, places);
+			let result;
+			switch (op) {
+				case 0:  result = Math.round(v * factor) / factor; break;
+				case 1:  result = Math.floor(v * factor) / factor; break;
+				case 2:  result = Math.ceil(v  * factor) / factor; break;
+				default: result = v;
+			}
+			return { result };
+		});
 	}
 
 	/**

@@ -58,13 +58,29 @@ export default class SeparateHSVNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'v',
-			title: 'Value', 
+			title: 'Value',
 			description: "Value component of the color",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const col = inputs.col || { r: 0, g: 0, b: 0 };
+			const { r, g, b } = col;
+			const max = Math.max(r, g, b), min = Math.min(r, g, b);
+			const v = max;
+			const d = max - min;
+			const s = max === 0 ? 0 : d / max;
+			let h = 0;
+			if (d > 0) {
+				if (max === r) h = ((g - b) / d) % 6;
+				else if (max === g) h = (b - r) / d + 2;
+				else h = (r - g) / d + 4;
+				h = (h / 6 + 1) % 1;
+			}
+			return { h, s, v };
+		});
 	}
 	
 	

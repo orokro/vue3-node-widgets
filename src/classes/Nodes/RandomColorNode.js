@@ -59,11 +59,24 @@ export default class RandomColorNode extends NWNode {
 			type: VVector2,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Random Color', 
+			title: 'Random Color',
 			description: "Random color generated from the specified ranges",
 			type: VColor3,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const rr = inputs.rMinMax || { x: 0, y: 1 };
+			const gg = inputs.gMinMax || { x: 0, y: 1 };
+			const bb = inputs.bMinMax || { x: 0, y: 1 };
+			return {
+				result: {
+					r: rr.x + Math.random() * (rr.y - rr.x),
+					g: gg.x + Math.random() * (gg.y - gg.x),
+					b: bb.x + Math.random() * (bb.y - bb.x),
+				}
+			};
 		});
 	}
 

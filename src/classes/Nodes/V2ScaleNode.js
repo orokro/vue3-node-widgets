@@ -51,11 +51,17 @@ export default class V2ScaleNode extends NWNode {
 			type: VNumber,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Scaled Vector', 
+			title: 'Scaled Vector',
 			description: "Scaled Vector",
 			type: VVector2,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const v = inputs.vec        || { x: 0, y: 0 };
+			const s = inputs.scaleValue ?? 1;
+			return { result: { x: v.x * s, y: v.y * s } };
 		});
 	}
 

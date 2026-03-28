@@ -52,11 +52,23 @@ export default class RandomV3Node extends NWNode {
 			type: VVector3,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Random VVector3 Result', 
+			title: 'Random VVector3 Result',
 			description: "Random VVector3 result within the specified min and max range",
 			type: VVector3,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const lo = inputs.v3Min || { x: 0, y: 0, z: 0 };
+			const hi = inputs.v3Max || { x: 1, y: 1, z: 1 };
+			return {
+				result: {
+					x: lo.x + Math.random() * (hi.x - lo.x),
+					y: lo.y + Math.random() * (hi.y - lo.y),
+					z: lo.z + Math.random() * (hi.z - lo.z),
+				}
+			};
 		});
 	}
 

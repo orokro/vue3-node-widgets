@@ -58,13 +58,19 @@ export default class ClampValueNode extends NWNode {
 			type: VNumber,
 		});	
 	
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Clamped Value', 
+			title: 'Clamped Value',
 			description: "Clamped value",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const value = inputs.value    ?? 0;
+			const lo    = inputs.minValue ?? 0;
+			const hi    = inputs.maxValue ?? 1;
+			return { result: Math.min(Math.max(value, lo), hi) };
+		});
 	}
 	
 	/**

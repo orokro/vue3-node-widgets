@@ -2,30 +2,24 @@
 	TexImageNode.js
 	---------------
 
-	So this node is a bit more specific than others.
-	Part of this project will be to provide a demo for rendering graphics on a canvas.
-	I will be recreating a project from 2014.
+	Samples pixel colors from a user-picked image file (VImage).
 
-	This will eventually allow the user to pick an image to sample colors from.
+	The image value stores { name, path, dataUrl }. After the user picks a file
+	the NVImageWidget decodes the image and attaches a cached pixel buffer:
+	  { ...imageValue, pixelData: Uint8ClampedArray, pixelWidth, pixelHeight }
+
+	This node tiles the image: coordinates wrap at image boundaries, so the
+	image can be sampled at any integer pixel position.
 */
 
 import NWNode from '../NWNode.js';
 import { NODE_TYPE, FIELD_TYPE } from '../NWNode.js';
-import { 
-	VAngle,
-	VAngles,
-	VBoolean,
-	VCharacter,
+import {
 	VColor3,
-	VColor4,
-	VInteger,
-	VNumber,
-	VText,
 	VVector2,
-	VVector3,
-	VEnum,
- } from '../Types/index.js';
- 
+} from '../Types/index.js';
+import { VImage } from '../Types/VImage.js';
+
 // main export
 export default class TexImage extends NWNode {
 
@@ -37,34 +31,59 @@ export default class TexImage extends NWNode {
 
 		// reset things
 		this.init();
-		
+
 		// set this before adding fields
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
-		// in the future this will be a custom component reading actual images
-		// but for now we'll just use an index from some image list
-		this.addField(FIELD_TYPE.INPUT, { 
-			name: 'imageIndex',
-			title: 'Image Index', 
-			description: "Image Index",
-			type: VInteger,
-		});	
-		
+		// Image picker — uses VImage so the user can browse for a file
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'image',
+			title: 'Image',
+			description: "The image to sample colors from. Tiles at image boundaries.",
+			type: VImage,
+		});
+
 		this.addField(FIELD_TYPE.INPUT, {
 			name: 'posV2',
-			title: 'Pixel X, Y as Vector2', 
-			description: "Pixel X and Y as Vector2",
+			title: 'Pixel X, Y as Vector2',
+			description: "Pixel X and Y position to sample from the image",
 			type: VVector2,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'outColor',
 			title: 'Output Color',
-			description: "The output color based on the checker pattern",
+			description: "The color sampled from the image at the given position",
 			type: VColor3
 		});
+
+		// Evaluation: look up pixel in the pre-cached pixel buffer.
+		// pixelData is attached to the value by NVImageWidget after the user picks a file.
+		// If no image or no pixel cache, output black.
+		this.setEvalFunction((inputs) => {
+			const img = inputs.image;
+			if (!img?.pixelData || !img.pixelWidth || !img.pixelHeight) {
+				return { outColor: { r: 0, g: 0, b: 0 } };
+			}
+
+			const { pixelData, pixelWidth, pixelHeight } = img;
+			const px = inputs.posV2?.x ?? 0;
+			const py = inputs.posV2?.y ?? 0;
+
+			// Wrap (tile) coordinates so the image repeats infinitely
+			const ix = ((Math.floor(px) % pixelWidth)  + pixelWidth)  % pixelWidth;
+			const iy = ((Math.floor(py) % pixelHeight) + pixelHeight) % pixelHeight;
+
+			const i = (iy * pixelWidth + ix) * 4;
+			return {
+				outColor: {
+					r: pixelData[i]     / 255,
+					g: pixelData[i + 1] / 255,
+					b: pixelData[i + 2] / 255,
+				}
+			};
+		});
 	}
-	
 
 	/**
 	 * Constructor

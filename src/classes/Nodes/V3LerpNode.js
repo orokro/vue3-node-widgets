@@ -59,13 +59,19 @@ export default class V3LerpNode extends NWNode {
 			type: VNumber,
 		});	
 	
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Result', 
+			title: 'Result',
 			description: "Result of V3 Lerp operation",
 			type: VVector3,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const a = inputs.a      || { x: 0, y: 0, z: 0 };
+			const b = inputs.b      || { x: 0, y: 0, z: 0 };
+			const t = inputs.tValue ?? 0;
+			return { result: { x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t, z: a.z+(b.z-a.z)*t } };
+		});
 	}
 	/**
 	 * Constructor

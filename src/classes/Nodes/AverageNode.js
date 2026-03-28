@@ -52,11 +52,19 @@ export default class AverageNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'average',
-			title: 'Average Result', 
+			title: 'Average Result',
 			description: "Average of input values",
 			type: VNumber,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const raw = inputs.values;
+			const arr = Array.isArray(raw) ? raw : (raw !== undefined && raw !== null ? [raw] : []);
+			const count   = arr.length;
+			const average = count > 0 ? arr.reduce((s, v) => s + (Number(v) || 0), 0) / count : 0;
+			return { count, average };
 		});
 	}
 	

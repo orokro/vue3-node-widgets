@@ -25,7 +25,122 @@ import {
 	VVector3,
 	VEnum,
  } from '../Types/index.js';
- 
+
+// Module-level Perlin noise function
+// Extracted from getPerlinPixel instance method for use in static eval
+function perlinPixel(x, y, {
+		scale = 50.0,
+		octaves = 4,
+		persistence = 0.5,
+		lacunarity = 2.0,
+		contrast = 1.0,
+		brightness = 0.0,
+		seed = 0
+	} = {})
+{
+	// Internal helper: fade function
+	// Smooth interpolation curve used in Perlin noise
+	function fade(t) {
+		return t * t * t * (t * (t * 6 - 15) + 10);
+	}
+
+	// Internal helper: linear interpolation
+	function lerp(a, b, t) {
+		return a + t * (b - a);
+	}
+
+	// Internal helper: gradient function
+	// Determines dot product of random gradient with distance vector
+	function grad(hash, x, y) {
+		const h = hash & 3;	// pick one of 4 directions
+		const u = h < 2 ? x : y;
+		const v = h < 2 ? y : x;
+		return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+	}
+
+	// Pseudo-random permutation table (seeded)
+	const p = new Uint8Array(512);
+	const perm = new Uint8Array(256);
+
+	function seededRandom(seed) {
+		let t = Math.sin(seed++) * 10000;
+		return t - Math.floor(t);
+	}
+
+	for (let i = 0; i < 256; i++) {
+		perm[i] = i;
+	}
+
+	// Fisher-Yates shuffle based on seed
+	for (let i = 255; i > 0; i--) {
+		const j = Math.floor(seededRandom(seed + i) * (i + 1));
+		[perm[i], perm[j]] = [perm[j], perm[i]];
+	}
+
+	for (let i = 0; i < 512; i++) {
+		p[i] = perm[i & 255];
+	}
+
+	// Core Perlin noise function
+	function perlin2d(x, y) {
+		// Find unit grid cell containing point
+		const X = Math.floor(x) & 255;
+		const Y = Math.floor(y) & 255;
+
+		// Relative x, y within cell
+		x -= Math.floor(x);
+		y -= Math.floor(y);
+
+		// Compute fade curves for x, y
+		const u = fade(x);
+		const v = fade(y);
+
+		// Hash coordinates of the square's corners
+		const aa = p[p[X] + Y];
+		const ab = p[p[X] + Y + 1];
+		const ba = p[p[X + 1] + Y];
+		const bb = p[p[X + 1] + Y + 1];
+
+		// Add blended results from the four corners
+		const res = lerp(
+			lerp(grad(aa, x, y), grad(ba, x - 1, y), u),
+			lerp(grad(ab, x, y - 1), grad(bb, x - 1, y - 1), u),
+			v
+		);
+		return (res + 1) / 2; // map from [-1, 1] to [0, 1]
+	}
+
+	// Fractal sum of octaves
+	let amplitude = 1;
+	let frequency = 1;
+	let noiseValue = 0;
+	let maxAmplitude = 0;
+
+	for (let i = 0; i < octaves; i++) {
+		const sampleX = (x / scale) * frequency;
+		const sampleY = (y / scale) * frequency;
+
+		const n = perlin2d(sampleX, sampleY);
+		noiseValue += n * amplitude;
+		maxAmplitude += amplitude;
+
+		amplitude *= persistence; // reduces contribution of next octave
+		frequency *= lacunarity;  // increases frequency for next octave
+	}
+
+	// Normalize result to 0-1
+	noiseValue /= maxAmplitude;
+
+	// Apply artistic post-processing
+	// Contrast exaggerates differences from 0.5
+	noiseValue = Math.pow(noiseValue - 0.5, contrast) + 0.5;
+
+	// Apply brightness shift
+	noiseValue = Math.min(Math.max(noiseValue + brightness, 0.0), 1.0);
+
+	return noiseValue;
+}
+
 // main export
 export default class TexNoise extends NWNode {
 
@@ -99,9 +214,27 @@ export default class TexNoise extends NWNode {
 
 		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'color',
-			title: 'Color', 
+			title: 'Color',
 			description: "Noise value as color (grayscale)",
 			type: VColor3
+		});
+
+		this.setEvalFunction((inputs, ctx) => {
+			const x = ctx?.x ?? 0;
+			const y = ctx?.y ?? 0;
+			const val = perlinPixel(x, y, {
+				scale:       inputs.scale       ?? 50.0,
+				octaves:     inputs.octaves     ?? 4,
+				persistence: inputs.persistence ?? 0.5,
+				lacunarity:  inputs.lacunarity  ?? 2.0,
+				contrast:    inputs.contrast    ?? 1.0,
+				brightness:  inputs.brightness  ?? 0.0,
+				seed:        inputs.seed        ?? 0,
+			});
+			return {
+				value: val,
+				color: { r: val, g: val, b: val },
+			};
 		});
 	}
 	

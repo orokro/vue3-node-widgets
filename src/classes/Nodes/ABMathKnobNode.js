@@ -67,13 +67,30 @@ export default class ABMathKnobNode extends NWNode {
 			component: KnobFieldWidget,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Result', 
+			title: 'Result',
 			description: "Result of A operation B",
 			type: VNumber,
 		});
 
+		this.setEvalFunction((inputs) => {
+			const a = inputs.aValue ?? 0;
+			const b = inputs.bValue ?? 0;
+			const op = inputs.operation ?? 0;
+			let result;
+			switch (op) {
+				case 0:  result = a + b; break;
+				case 1:  result = a - b; break;
+				case 2:  result = a * b; break;
+				case 3:  result = b !== 0 ? a / b : 0; break;
+				case 4:  result = b !== 0 ? a % b : 0; break;
+				case 5:  result = Math.pow(a, b); break;
+				case 6:  result = a > 0 && b > 0 ? Math.log(a) / Math.log(b) : 0; break;
+				default: result = 0;
+			}
+			return { result };
+		});
 	}
 	
 	/**

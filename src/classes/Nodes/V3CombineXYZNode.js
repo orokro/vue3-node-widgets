@@ -58,13 +58,16 @@ export default class V3CombineXYZNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'vecA',
-			title: 'Output Vector', 
+			title: 'Output Vector',
 			description: "Vector created from X and Y components",
 			type: VVector3,
-		});	
+		});
 
+		this.setEvalFunction((inputs) => {
+			return { vecA: { x: inputs.x ?? 0, y: inputs.y ?? 0, z: inputs.z ?? 0 } };
+		});
 	}
 	
 	

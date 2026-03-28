@@ -51,11 +51,17 @@ export default class V2DotNode extends NWNode {
 			type: VVector2,
 		});	
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'result',
-			title: 'Dot Product', 
+			title: 'Dot Product',
 			description: "Dot product of the two vectors",
 			type: VNumber,
+		});
+
+		this.setEvalFunction((inputs) => {
+			const a = inputs.vecA || { x: 0, y: 0 };
+			const b = inputs.vecB || { x: 0, y: 0 };
+			return { result: a.x * b.x + a.y * b.y };
 		});
 	}
 	

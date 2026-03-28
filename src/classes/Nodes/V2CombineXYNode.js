@@ -51,13 +51,16 @@ export default class V2CombineXYNode extends NWNode {
 			type: VNumber,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'vecA',
-			title: 'Output Vector', 
+			title: 'Output Vector',
 			description: "Vector created from X and Y components",
 			type: VVector2,
-		});	
+		});
 
+		this.setEvalFunction((inputs) => {
+			return { vecA: { x: inputs.x ?? 0, y: inputs.y ?? 0 } };
+		});
 	}
 	
 	

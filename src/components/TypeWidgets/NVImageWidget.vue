@@ -119,16 +119,55 @@ function onFileChange(e) {
 
 	const reader = new FileReader();
 	reader.onload = (evt) => {
-		fieldState.val = {
-			name:    file.name,
-			path:    file.path   || null,
-			dataUrl: evt.target.result,
-		};
+		const dataUrl = evt.target.result;
+
+		// Decode pixel data into a typed array so TexImageNode can sample
+		// it synchronously during getComputeFunction() evaluation.
+		decodeImagePixels(dataUrl).then(cache => {
+			fieldState.val = {
+				name:       file.name,
+				path:       file.path || null,
+				dataUrl,
+				// pixel cache used by TexImageNode evalFn
+				pixelData:   cache?.data   || null,
+				pixelWidth:  cache?.width  || 0,
+				pixelHeight: cache?.height || 0,
+			};
+		});
 	};
 	reader.readAsDataURL(file);
 
 	// Reset so the same file can be re-selected if needed
 	e.target.value = '';
+}
+
+
+/**
+ * Decodes a data-URL image into a flat RGBA Uint8ClampedArray via an
+ * offscreen canvas. Returns { data, width, height } or null on failure.
+ *
+ * @param {string} dataUrl
+ * @returns {Promise<{data: Uint8ClampedArray, width: number, height: number}|null>}
+ */
+function decodeImagePixels(dataUrl) {
+	return new Promise((resolve) => {
+		const img = new Image();
+		img.onload = () => {
+			try {
+				const c = document.createElement('canvas');
+				c.width  = img.naturalWidth;
+				c.height = img.naturalHeight;
+				const ctx = c.getContext('2d');
+				ctx.drawImage(img, 0, 0);
+				const imgData = ctx.getImageData(0, 0, c.width, c.height);
+				resolve({ data: imgData.data, width: c.width, height: c.height });
+			} catch (_e) {
+				resolve(null);
+			}
+		};
+		img.onerror = () => resolve(null);
+		img.src = dataUrl;
+	});
 }
 
 </script>

@@ -59,11 +59,21 @@ export default class InputCanvasInfo extends NWNode {
 			type: VInteger
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'height',
 			title: 'Height',
 			description: "Height",
 			type: VInteger
+		});
+
+		this.setEvalFunction((inputs, ctx) => {
+			const w = ctx?.width  ?? 0;
+			const h = ctx?.height ?? 0;
+			return {
+				sizeV2: { x: w, y: h },
+				width:  Math.round(w),
+				height: Math.round(h),
+			};
 		});
 	}
 	
