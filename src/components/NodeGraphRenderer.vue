@@ -13,16 +13,17 @@
 <template>
 
 	<!-- this is the actual scrollable area where nodes, wires, etc appear and are editable. This clips/clamps overflow -->
-	<div 
+	<div
 		ref="containerEl"
-		class="editor-container fill-parent" 
+		class="editor-container fill-parent"
 		:tabindex="0"
 		:tabstop="0"
-		@mousedown.self="startDragOperation"		
-		@click.right.self="checkAddMenu"		
+		@mousedown.self="startDragOperation"
+		@click.right.self="checkAddMenu"
 		@keyup="handleKeyDown"
 		@wheel="handleWheelZoom"
-		@mousemove.self="handleMouseMove"	
+		@mousemove.self="handleMouseMove"
+		:class="{ 'is-razoring': isRazoring }"
 		:style="{
 			fontSize: `${zoomScale}px`,
 			backgroundSize: `${zoomScale * backgroundScale}px ${zoomScale * backgroundScale}px`,
@@ -50,10 +51,32 @@
 			/>
 
 			<!-- box to show rectangle when box selecting -->
-			<SelectBox 
+			<SelectBox
 				v-if="graph.selMgr.isBoxSelecting.value"
 				:selMgr="graph.selMgr"
 			/>
+
+			<!-- razor line: a zero-size SVG at (0,0) with overflow:visible so it can draw anywhere in graph space -->
+			<svg v-if="isRazoring" class="razor-svg">
+				<defs>
+					<filter id="razor-glow">
+						<feGaussianBlur stdDeviation="2" result="blur"/>
+						<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+					</filter>
+				</defs>
+				<!-- soft glow halo -->
+				<line
+					:x1="razorLinePx.x1" :y1="razorLinePx.y1"
+					:x2="razorLinePx.x2" :y2="razorLinePx.y2"
+					class="razor-glow"
+				/>
+				<!-- sharp blade line -->
+				<line
+					:x1="razorLinePx.x1" :y1="razorLinePx.y1"
+					:x2="razorLinePx.x2" :y2="razorLinePx.y2"
+					class="razor-blade"
+				/>
+			</svg>
 
 		</div>
 
@@ -70,7 +93,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted, provide, inject, reactive } from 'vue';
+import { ref, onMounted, provide, inject, reactive, computed } from 'vue';
 
 // utils
 import { useAddMenu } from '@/composables/useAddMenu';
@@ -131,6 +154,19 @@ const zoomScale = ref(1);
 
 // we'll save the last mouse move even for keyboard shortcuts, etc
 let lastMouseEvent = null;
+
+// razor-cut state
+const isRazoring = ref(false);
+const razorStart = reactive({ x: 0, y: 0 });
+const razorEnd   = reactive({ x: 0, y: 0 });
+
+// razor line positions in SVG-pixel space (graph coords × zoomScale)
+const razorLinePx = computed(() => ({
+	x1: razorStart.x * zoomScale.value,
+	y1: razorStart.y * zoomScale.value,
+	x2: razorEnd.x   * zoomScale.value,
+	y2: razorEnd.y   * zoomScale.value,
+}));
 
 // we'll keep a global map of socket positions
 const socketPositions = reactive(new Map());
@@ -203,10 +239,17 @@ const MIN_ZOOM = 0.1;
 /**
  * If it's left click, we start a box-drag operation to select nodes
  * If it's right click, we start a pan operation
- * 
+ * If it's Alt + left click, we start a razor-cut drag
+ *
  * @param {MouseEvent} e - the mouse event
  */
 function startDragOperation(e){
+
+	// Alt + LMB = razor mode — intercept before any selection logic
+	if (e.button === 0 && e.altKey) {
+		startRazorDrag(e);
+		return;
+	}
 
 	// if left-click && shift is not pressed, de-select everything first
 	if (e.button===0 &&  !e.shiftKey) {
@@ -328,6 +371,16 @@ function handleAddMenuButton(event){
 
 
 /**
+ * Returns true if a text-entry element currently has focus,
+ * meaning we should NOT consume keyboard shortcuts that produce characters.
+ */
+function isEditingText() {
+	const el = document.activeElement;
+	return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+}
+
+
+/**
  * Handle key down events for shortcuts, etc
  *
  * @param {KeyboardEvent} event - The keyboard event
@@ -342,7 +395,7 @@ function handleKeyDown(event) {
 	}
 
 	// shift + A = show add node menu
-	if(event.key.toLowerCase() === 'a' && event.shiftKey) {
+	if(event.key.toLowerCase() === 'a' && event.shiftKey && !isEditingText()) {
 		emits('showAddMenu', {
 			event: lastMouseEvent,
 			graph: props.graph,
@@ -350,14 +403,25 @@ function handleKeyDown(event) {
 		});
 	}
 
-	// Ctrl/Cmd + C = copy selected nodes
-	if(event.key === 'c' && (event.ctrlKey || event.metaKey)) {
+	// Delete / Backspace / x = delete selected nodes (only when graph container has focus)
+	const isDeleteKey = event.key === 'Delete' || event.key === 'Backspace' || event.key === 'x';
+	if(isDeleteKey && !isEditingText()) {
+		const selected = [...props.graph.selMgr.selectedNodes.value];
+		if(selected.length > 0) {
+			props.graph.selMgr.selectNone();
+			selected.forEach(node => props.graph.removeNode(node));
+			event.preventDefault();
+		}
+	}
+
+	// Ctrl/Cmd + C = copy selected nodes (skip when a text input has focus)
+	if(event.key === 'c' && (event.ctrlKey || event.metaKey) && !isEditingText()) {
 		copySelectedNodes();
 		event.preventDefault();
 	}
 
-	// Ctrl/Cmd + V = paste clipboard at cursor
-	if(event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+	// Ctrl/Cmd + V = paste clipboard at cursor (skip when a text input has focus)
+	if(event.key === 'v' && (event.ctrlKey || event.metaKey) && !isEditingText()) {
 		if(_clipboard) {
 			const cursorPos = dh.getCursorPos(); // window page coords
 			const rect = containerEl.value.getBoundingClientRect();
@@ -478,6 +542,164 @@ function pasteFromClipboard(clipboardData, centerX, centerY) {
 }
 
 
+// ─── Razor-cut ────────────────────────────────────────────────────────────────
+
+/**
+ * Begins a razor-cut drag operation (Alt + LMB).
+ * Draws a line overlay; on release, severs any wires the line crosses.
+ *
+ * @param {MouseEvent} e - the initiating mousedown event
+ */
+function startRazorDrag(e) {
+
+	e.preventDefault();
+	e.stopPropagation();
+
+	const rect = containerEl.value.getBoundingClientRect();
+	const toGraph = (cx, cy) => ({
+		x: (cx - rect.left - panX.value) / zoomScale.value,
+		y: (cy - rect.top  - panY.value) / zoomScale.value,
+	});
+
+	const origin = toGraph(e.clientX, e.clientY);
+	razorStart.x = origin.x;
+	razorStart.y = origin.y;
+	razorEnd.x   = origin.x;
+	razorEnd.y   = origin.y;
+	isRazoring.value = true;
+
+	dh.dragStart(
+		() => {
+			// update the end point using the live cursor position
+			const cur = dh.getCursorPos(); // pageX/pageY — same as clientX/Y in a fixed layout
+			const updated = toGraph(cur.x, cur.y);
+			razorEnd.x = updated.x;
+			razorEnd.y = updated.y;
+		},
+		() => {
+			isRazoring.value = false;
+			cutWiresWithRazor(
+				{ x: razorStart.x, y: razorStart.y },
+				{ x: razorEnd.x,   y: razorEnd.y   }
+			);
+		}
+	);
+}
+
+
+/**
+ * Severs all wires whose bezier curve is crossed by the given line segment.
+ * Uses the same bezier control-point formula as Wire.vue.
+ *
+ * @param {{ x: number, y: number }} a - razor line start (graph space)
+ * @param {{ x: number, y: number }} b - razor line end   (graph space)
+ */
+function cutWiresWithRazor(a, b) {
+
+	// guard: only act on actual drags, not accidental clicks
+	const dx = b.x - a.x, dy = b.y - a.y;
+	if(dx * dx + dy * dy < 4) return;
+
+	const wiresToCut = [];
+
+	for(const wire of props.graph.connMgr.wires.value) {
+
+		// get the four bezier control points in graph space
+		const bez = getWireBezierGraphSpace(wire);
+		if(!bez) continue;
+
+		// sample the bezier at sufficient density and test each chord against the razor
+		const pts = sampleCubicBezier(bez, 32);
+		for(let i = 0; i < pts.length - 1; i++) {
+			if(segmentsIntersect(a, b, pts[i], pts[i + 1])) {
+				wiresToCut.push(wire);
+				break;
+			}
+		}
+	}
+
+	wiresToCut.forEach(w => w.destroy());
+}
+
+
+/**
+ * Returns the four cubic-bezier control points for a wire in graph space,
+ * using the same formula as Wire.vue's SVGDetails computed property.
+ *
+ * @param {Connection} wire
+ * @returns {{ p0, p1, p2, p3 } | null}
+ */
+function getWireBezierGraphSpace(wire) {
+
+	// Wire.vue populates lastPositions (in graph space) whenever it renders
+	const lp = wire.lastPositions;
+	const startX = lp?.startX ?? wire.positions?.startX ?? null;
+	const startY = lp?.startY ?? wire.positions?.startY ?? null;
+	const endX   = lp?.endX   ?? wire.positions?.endX   ?? null;
+	const endY   = lp?.endY   ?? wire.positions?.endY   ?? null;
+
+	if(startX === null || endX === null) return null;
+
+	const w = Math.abs(endX - startX);
+	const cpw = (w / 3) * 1.5;
+
+	return {
+		p0: { x: startX,       y: startY },
+		p1: { x: startX + cpw, y: startY },
+		p2: { x: endX   - cpw, y: endY   },
+		p3: { x: endX,         y: endY   },
+	};
+}
+
+
+/**
+ * Samples N+1 evenly-spaced points along a cubic bezier.
+ *
+ * @param {{ p0, p1, p2, p3 }} bez
+ * @param {number} n - number of segments (n+1 points returned)
+ * @returns {{ x: number, y: number }[]}
+ */
+function sampleCubicBezier({ p0, p1, p2, p3 }, n = 32) {
+
+	const pts = [];
+	for(let i = 0; i <= n; i++) {
+		const t  = i / n;
+		const mt = 1 - t;
+		pts.push({
+			x: mt*mt*mt*p0.x + 3*mt*mt*t*p1.x + 3*mt*t*t*p2.x + t*t*t*p3.x,
+			y: mt*mt*mt*p0.y + 3*mt*mt*t*p1.y + 3*mt*t*t*p2.y + t*t*t*p3.y,
+		});
+	}
+	return pts;
+}
+
+
+/**
+ * Returns the signed 2-D cross product of vectors (B-A) × (P-A).
+ */
+function cross2d(ax, ay, bx, by, px, py) {
+	return (bx - ax) * (py - ay) - (by - ay) * (px - ax);
+}
+
+
+/**
+ * Returns true if line-segment AB properly intersects line-segment CD.
+ * Uses the standard cross-product straddle test.
+ */
+function segmentsIntersect(a, b, c, d) {
+
+	const d1 = cross2d(c.x, c.y, d.x, d.y, a.x, a.y);
+	const d2 = cross2d(c.x, c.y, d.x, d.y, b.x, b.y);
+	const d3 = cross2d(a.x, a.y, b.x, b.y, c.x, c.y);
+	const d4 = cross2d(a.x, a.y, b.x, b.y, d.x, d.y);
+
+	return ((d1 > 0 && d2 < 0) || (d1 < 0 && d2 > 0)) &&
+	       ((d3 > 0 && d4 < 0) || (d3 < 0 && d4 > 0));
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+
+
 /**
  * Focus self on mouse move
  * 
@@ -505,11 +727,43 @@ function handleMouseMove(event) {
 		background-repeat: repeat;
 
 		// this is the box that actually translates it's x/y to pan stuff
-		.pan-container {	
+		.pan-container {
 
 			position: absolute;
 
+			// razor line SVG: zero-size, overflow:visible so it can draw anywhere
+			.razor-svg {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 0;
+				height: 0;
+				overflow: visible;
+				pointer-events: none;
+
+				.razor-glow {
+					stroke: rgba(255, 140, 40, 0.35);
+					stroke-width: 8px;
+					stroke-linecap: round;
+					fill: none;
+				}
+
+				.razor-blade {
+					stroke: rgba(255, 200, 80, 0.95);
+					stroke-width: 1.5px;
+					stroke-linecap: round;
+					stroke-dasharray: 6 3;
+					fill: none;
+					filter: drop-shadow(0 0 3px rgba(255, 180, 60, 0.9));
+				}
+			}// .razor-svg
+
 		}// .pan-container
+
+		// crosshair cursor during razor draw
+		&.is-razoring {
+			cursor: crosshair !important;
+		}
 
 	}// .editor-container
 
