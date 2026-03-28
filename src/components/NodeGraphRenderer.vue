@@ -74,6 +74,10 @@ import { ref, onMounted, provide, inject, reactive } from 'vue';
 
 // utils
 import { useAddMenu } from '@/composables/useAddMenu';
+import { nodeClassRegistry } from '@/classes/Nodes/index.js';
+
+// module-level clipboard shared across all NodeGraphRenderer instances (cross-graph paste support)
+let _clipboard = null;
 
 // components
 import Node from '@Components/Node.vue';
@@ -325,7 +329,7 @@ function handleAddMenuButton(event){
 
 /**
  * Handle key down events for shortcuts, etc
- * 
+ *
  * @param {KeyboardEvent} event - The keyboard event
  */
 function handleKeyDown(event) {
@@ -340,11 +344,137 @@ function handleKeyDown(event) {
 	// shift + A = show add node menu
 	if(event.key.toLowerCase() === 'a' && event.shiftKey) {
 		emits('showAddMenu', {
-			event: lastMouseEvent, 
+			event: lastMouseEvent,
 			graph: props.graph,
 			viewport
-		});	
+		});
 	}
+
+	// Ctrl/Cmd + C = copy selected nodes
+	if(event.key === 'c' && (event.ctrlKey || event.metaKey)) {
+		copySelectedNodes();
+		event.preventDefault();
+	}
+
+	// Ctrl/Cmd + V = paste clipboard at cursor
+	if(event.key === 'v' && (event.ctrlKey || event.metaKey)) {
+		if(_clipboard) {
+			const cursorPos = dh.getCursorPos(); // window page coords
+			const rect = containerEl.value.getBoundingClientRect();
+			const pasteX = (cursorPos.x - rect.left - panX.value) / zoomScale.value;
+			const pasteY = (cursorPos.y - rect.top - panY.value) / zoomScale.value;
+			pasteFromClipboard(_clipboard, pasteX, pasteY);
+		}
+		event.preventDefault();
+	}
+}
+
+
+/**
+ * Copies the currently selected nodes (and the wires between them) to the clipboard.
+ */
+function copySelectedNodes() {
+
+	const graph = props.graph;
+	const selected = graph.selMgr.selectedNodes.value;
+	if(selected.length === 0) return;
+
+	const selectedIds = new Set(selected.map(n => n.id));
+
+	// serialize selected nodes
+	const nodes = selected.map(n => n.serialize());
+
+	// only include wires where BOTH endpoints are within the selection
+	const wires = graph.connMgr.wires.value
+		.filter(w =>
+			w.inputNode && w.outputNode &&
+			selectedIds.has(w.inputNode.id) &&
+			selectedIds.has(w.outputNode.id)
+		)
+		.map(w => w.serialize());
+
+	_clipboard = { nodes, wires };
+}
+
+
+/**
+ * Pastes nodes from clipboard into the current graph, centered on the given graph-space point.
+ * New node IDs are generated so pasted nodes are independent of the originals.
+ *
+ * @param {Object} clipboardData - { nodes: [...], wires: [...] } snapshot from copySelectedNodes
+ * @param {Number} centerX - target X position in graph space (center of the pasted group)
+ * @param {Number} centerY - target Y position in graph space (center of the pasted group)
+ */
+function pasteFromClipboard(clipboardData, centerX, centerY) {
+
+	const graph = props.graph;
+	const { nodes: nodeDataList, wires: wireDataList } = clipboardData;
+	if(!nodeDataList?.length) return;
+
+	// 1. Compute centroid of the original positions
+	let sumX = 0, sumY = 0;
+	nodeDataList.forEach(nd => { sumX += nd.x; sumY += nd.y; });
+	const origCenterX = sumX / nodeDataList.length;
+	const origCenterY = sumY / nodeDataList.length;
+	const offsetX = centerX - origCenterX;
+	const offsetY = centerY - origCenterY;
+
+	// 2. Create new node instances, build old-ID → new-ID map
+	const idMap = new Map();
+	const newNodes = [];
+
+	nodeDataList.forEach(nd => {
+		const lookupKey = nd.serializeKey || nd.class;
+		const nodeDetails = nodeClassRegistry.get(lookupKey);
+		if(!nodeDetails) return;
+
+		// Construct fresh node (gets a brand-new ID via the constructor)
+		const newNode = new nodeDetails.class(graph);
+		if(nodeDetails.key) newNode._serializeKey = nodeDetails.key;
+
+		// Record old→new ID mapping before deserialize overwrites the ID
+		const newId = newNode.id;
+		idMap.set(nd.id, newId);
+
+		// Deserialize field values and position, but inject the new ID so the old one isn't restored
+		newNode.deserialize({
+			...nd,
+			id: newId,
+			x: nd.x + offsetX,
+			y: nd.y + offsetY,
+		});
+
+		graph.nodes.value = [...graph.nodes.value, newNode];
+		newNodes.push(newNode);
+	});
+
+	// 3. Re-create wires using the new IDs
+	wireDataList.forEach(wd => {
+		const newInputId  = idMap.get(wd.inputNodeId);
+		const newOutputId = idMap.get(wd.outputNodeId);
+		if(!newInputId || !newOutputId) return;
+
+		const inputNode  = graph.nodes.value.find(n => n.id === newInputId);
+		const outputNode = graph.nodes.value.find(n => n.id === newOutputId);
+		if(!inputNode || !outputNode) return;
+
+		const inputField  = inputNode.fieldsList.value.find(f =>
+			(wd.inputFieldName  && f.name === wd.inputFieldName)  || f.id === wd.inputFieldId
+		);
+		const outputField = outputNode.fieldsList.value.find(f =>
+			(wd.outputFieldName && f.name === wd.outputFieldName) || f.id === wd.outputFieldId
+		);
+		if(!inputField || !outputField) return;
+
+		const conn = graph.connMgr.addConnectionBasic();
+		conn.setInput(inputNode, inputField);
+		conn.setOutput(outputNode, outputField);
+	});
+
+	graph.updateIO();
+
+	// 4. Select the newly pasted nodes
+	graph.selMgr.selectedNodes.value = newNodes;
 }
 
 

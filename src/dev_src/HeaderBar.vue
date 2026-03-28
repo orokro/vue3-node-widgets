@@ -12,14 +12,20 @@
 		<div class="lbl">Graphs:</div>
 
 		<!-- loop to list graphs -->
-		<div 
-			class="graph-item" 
-			v-for="(g, gIdx) in app.graphs.value" 
+		<div
+			class="graph-item"
+			v-for="(g, gIdx) in app.graphs.value"
 			:key="gIdx"
 			:class="{ active: app.currentGraph.value != null && g === app.currentGraph.value }"
 			@click="app.selectGraph(g)"
 		>
-			G_#{{ gIdx }}
+			<span class="graph-label">{{ g.name?.value || ('Graph ' + gIdx) }}</span>
+			<span
+				class="delete-btn"
+				title="Delete this graph"
+				@click.stop="app.deleteGraph(g)"
+				v-if="app.graphs.value.length > 1"
+			>×</span>
 		</div>
 
 		<!-- add graph btn -->
@@ -87,6 +93,47 @@ const app = inject('app');
 
 			// cursor
 			cursor: pointer;
+
+			// layout for label + delete btn
+			display: flex;
+			align-items: center;
+			gap: 6px;
+
+			// the graph name label
+			.graph-label {
+				pointer-events: none;
+			}
+
+			// inline × delete button
+			.delete-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 16px;
+				height: 16px;
+				border-radius: 3px;
+				font-size: 1.1em;
+				line-height: 1;
+				color: #888;
+				opacity: 0;
+				transition: opacity 0.15s, color 0.15s, background 0.15s;
+				cursor: pointer;
+
+				&:hover {
+					color: #FFF;
+					background: rgba(200, 50, 50, 0.7);
+				}
+			}
+
+			// show delete button when hovering the tab
+			&:hover .delete-btn {
+				opacity: 1;
+			}
+
+			// always show × on the active tab
+			&.active .delete-btn {
+				opacity: 0.6;
+			}
 
 			// hover state
 			&:hover {
