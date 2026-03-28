@@ -361,16 +361,40 @@ export class NWGraph {
 		}
 
 		// 3. Snapshot wired connections at compile time.
-		//    Map<consumerId, Map<consumerFieldName, { srcNodeId, srcFieldName }>>
+		//    Map<consumerId, Map<consumerFieldName, { srcNodeId, srcFieldName, convert? }>>
 		//    Consumer = outputNode side; Producer = inputNode side (counter-intuitive naming).
+		//
+		//    If the source and destination field types differ, we bake a compile-time
+		//    raw-value converter using the type registry so the hot loop never has to
+		//    do type lookups.  The converter wraps the raw value in a VType instance,
+		//    runs the registered (possibly composed) coalescer, and returns the inner
+		//    raw value of the result.
 		const wirings = new Map();
 		this.connMgr.wires.value.forEach(conn => {
 			if (!conn.outputNode || !conn.outputField || !conn.inputNode || !conn.inputField) return;
 			const cId = conn.outputNode.id;
 			if (!wirings.has(cId)) wirings.set(cId, new Map());
+
+			// Build a raw-value type converter if src and dst field types differ
+			const srcType = conn.inputField.valueType;
+			const dstType = conn.outputField.valueType;
+			const srcBase = srcType?.baseType || srcType;
+			const dstBase = dstType?.baseType || dstType;
+			let convert = null;
+			if (srcBase && dstBase && srcBase !== dstBase) {
+				const coalescer = this.typeRegistry?.getCoalescer(srcBase, dstBase);
+				if (coalescer) {
+					convert = (rawVal) => {
+						const result = coalescer.apply(new srcBase(rawVal));
+						return result?.value ?? result;
+					};
+				}
+			}
+
 			wirings.get(cId).set(conn.outputField.name, {
-				srcNodeId:   conn.inputNode.id,
+				srcNodeId:    conn.inputNode.id,
 				srcFieldName: conn.inputField.name,
+				convert,
 			});
 		});
 
@@ -408,12 +432,17 @@ export class NWGraph {
 			for (const evalData of nodeEvalData) {
 				const nodeState = state.get(evalData.id);
 
-				// Pull upstream wired values into this node's local state
+				// Pull upstream wired values into this node's local state,
+				// applying any compile-time type coalescer if types don't match.
 				const nodeWirings = wirings.get(evalData.id);
 				if (nodeWirings) {
 					for (const [fieldName, src] of nodeWirings) {
 						const srcState = state.get(src.srcNodeId);
-						if (srcState) nodeState[fieldName] = srcState[src.srcFieldName];
+						if (srcState) {
+							let val = srcState[src.srcFieldName];
+							if (src.convert) val = src.convert(val);
+							nodeState[fieldName] = val;
+						}
 					}
 				}
 
