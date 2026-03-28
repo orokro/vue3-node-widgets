@@ -412,6 +412,9 @@ export class NWGraph {
 		const nodeEvalData = order.map(node => ({
 			id: node.id,
 			evalFn: node.constructor.evalFn || null,
+			// Only INPUT nodes are allowed to receive the canvas context (x, y, width, height).
+			// PROCESSING nodes must be purely functional and context-agnostic.
+			isInputNode: node.constructor.nodeType === NODE_TYPE.INPUT,
 			// The names of fields that should be passed as inputs to evalFn
 			inputFields: node.fieldsList.value
 				.filter(f => f.fieldType === 'input' || f.fieldType === 'prop')
@@ -453,7 +456,7 @@ export class NWGraph {
 						inputs[fname] = nodeState[fname];
 					}
 					try {
-						const outputs = evalData.evalFn(inputs, context);
+						const outputs = evalData.evalFn(inputs, evalData.isInputNode ? context : undefined);
 						if (outputs && typeof outputs === 'object') {
 							for (const [k, v] of Object.entries(outputs)) {
 								nodeState[k] = v;

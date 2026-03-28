@@ -156,12 +156,19 @@ export default class TexNoise extends NWNode {
 		// set this before adding fields
 		this.setNodeType(NODE_TYPE.PROCESSING);
 
-		this.addField(FIELD_TYPE.INPUT, { 
+		this.addField(FIELD_TYPE.INPUT, {
+			name: 'samplePoint',
+			title: 'Pixel X, Y as Vector2',
+			description: "Sample position for the noise lookup. Wire a Cartesian Coords or similar node here.",
+			type: VVector2,
+		});
+
+		this.addField(FIELD_TYPE.INPUT, {
 			name: 'scale',
-			title: 'Scale', 
+			title: 'Scale',
 			description: "X is width, Y is height",
 			type: VNumber.Min(1).Max(500)
-		});	
+		});
 
 		this.addField(FIELD_TYPE.INPUT, {
 			name: 'octaves',
@@ -219,9 +226,9 @@ export default class TexNoise extends NWNode {
 			type: VColor3
 		});
 
-		this.setEvalFunction((inputs, ctx) => {
-			const x = ctx?.x ?? 0;
-			const y = ctx?.y ?? 0;
+		this.setEvalFunction((inputs) => {
+			const x = inputs.samplePoint?.x ?? 0;
+			const y = inputs.samplePoint?.y ?? 0;
 			const val = perlinPixel(x, y, {
 				scale:       inputs.scale       ?? 50.0,
 				octaves:     inputs.octaves     ?? 4,
@@ -245,13 +252,14 @@ export default class TexNoise extends NWNode {
 	constructor(...args) {
 		super(...args);
 
+		this.fieldState.samplePoint.val = { x: 0, y: 0 };
 		this.fieldState.scale.val = 50.0;
 		this.fieldState.octaves.val = 4;
 		this.fieldState.persistence.val = 0.5;
 		this.fieldState.lacunarity.val = 2.0;
 		this.fieldState.contrast.val = 1.0;
 		this.fieldState.brightness.val = 0.0;
-		this.fieldState.seed.val = 0;		
+		this.fieldState.seed.val = 0;
 	}
 
 
