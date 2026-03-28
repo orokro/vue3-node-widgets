@@ -214,9 +214,16 @@ export class NWGraph {
 
 
 	/**
-	 * Returns the nodes in topological order.
+	 * Returns the nodes in topological order (producers before consumers).
 	 *
-	 * @returns {NWNode[]} - the nodes in topological order
+	 * Uses a DFS that visits upstream dependencies before the current node,
+	 * so the result is already in execution order with no reverse needed.
+	 *
+	 * ConnectionManager naming reminder:
+	 *   conn.inputNode  = PRODUCER  (the node whose output is being consumed)
+	 *   conn.outputNode = CONSUMER  (the node whose input receives the value)
+	 *
+	 * @returns {NWNode[]} - the nodes in topological (execution) order
 	 */
 	getTopologicalOrder() {
 		const nodes = this.nodes.value;
@@ -231,28 +238,26 @@ export class NWGraph {
 			if (!visited.has(node.id)) {
 				visiting.add(node.id);
 
-				// Get all downstream nodes
-				// Downstream means nodes that take THIS node's outputs as THEIR inputs.
-				// So we look for wires where fromNode is this node.
-				const downstreamConnections = this.connMgr.getConnectionsByNode(node, false);
-				downstreamConnections.forEach(conn => {
-					if (conn.inputNode) {
-						visit(conn.inputNode);
-					}
+				// Visit all upstream dependencies first.
+				// Upstream connections are those where THIS node is the CONSUMER
+				// (conn.outputNode === node), and the producer is conn.inputNode.
+				const upstreamConnections = this.connMgr.wires.value.filter(
+					conn => conn.outputNode === node
+				);
+				upstreamConnections.forEach(conn => {
+					if (conn.inputNode) visit(conn.inputNode);
 				});
 
 				visiting.delete(node.id);
 				visited.add(node.id);
-				order.push(node);
+				order.push(node); // pushed AFTER all dependencies → correct execution order
 			}
 		};
 
-		// We want to start from output nodes and walk backwards,
-		// but standard topo sort often starts from "roots" (nodes with no inputs).
-		// Let's just visit all nodes.
 		nodes.forEach(node => visit(node));
 
-		return order.reverse(); // Standard topo sort returns in dependency order
+		// No reverse needed: dependencies are added before their dependents.
+		return order;
 	}
 
 
@@ -318,6 +323,122 @@ export class NWGraph {
 		});
 
 		return results;
+	}
+
+
+	/**
+	 * Compiles the graph into a pure, stateless closure for per-pixel evaluation.
+	 *
+	 * The returned function takes a context object:
+	 *   { x, y, width, height, mouseX, mouseY }
+	 * and returns a Color3 value: { r, g, b } in the 0–1 range.
+	 *
+	 * This is the engine for the Node Bucket canvas harness.
+	 * All graph state is snapshotted at compile time; the returned closure
+	 * does NOT mutate any live node field state.
+	 *
+	 * @returns {Function|null} - compiled pixel function, or null if graph is invalid
+	 */
+	getComputeFunction() {
+
+		// 1. Compile-time topological order
+		let order;
+		try {
+			order = this.getTopologicalOrder();
+		} catch (e) {
+			console.error('getComputeFunction: cycle detected', e);
+			return null;
+		}
+
+		// 2. Find the OutputColor node (first OUTPUT node with an outColor field)
+		const outputNode = order.find(n =>
+			n.constructor.nodeType === NODE_TYPE.OUTPUT &&
+			n.fieldState['outColor'] !== undefined
+		);
+		if (!outputNode) {
+			console.warn('getComputeFunction: no OutputColor node found in graph');
+			return null;
+		}
+
+		// 3. Snapshot wired connections at compile time.
+		//    Map<consumerId, Map<consumerFieldName, { srcNodeId, srcFieldName }>>
+		//    Consumer = outputNode side; Producer = inputNode side (counter-intuitive naming).
+		const wirings = new Map();
+		this.connMgr.wires.value.forEach(conn => {
+			if (!conn.outputNode || !conn.outputField || !conn.inputNode || !conn.inputField) return;
+			const cId = conn.outputNode.id;
+			if (!wirings.has(cId)) wirings.set(cId, new Map());
+			wirings.get(cId).set(conn.outputField.name, {
+				srcNodeId:   conn.inputNode.id,
+				srcFieldName: conn.inputField.name,
+			});
+		});
+
+		// 4. Snapshot current field values (non-wired defaults + prop values)
+		const staticValues = new Map();
+		order.forEach(node => {
+			const snap = {};
+			node.fieldsList.value.forEach(field => {
+				if (field.name) snap[field.name] = node.fieldState[field.name]?.val;
+			});
+			staticValues.set(node.id, snap);
+		});
+
+		// 5. Gather per-node eval data (compile-time references, no live state)
+		const nodeEvalData = order.map(node => ({
+			id: node.id,
+			evalFn: node.constructor.evalFn || null,
+			// The names of fields that should be passed as inputs to evalFn
+			inputFields: node.fieldsList.value
+				.filter(f => f.fieldType === 'input' || f.fieldType === 'prop')
+				.map(f => f.name),
+		}));
+
+		const outputNodeId = outputNode.id;
+
+		// 6. Return the compiled per-pixel closure
+		return (context) => {
+
+			// Fresh local state for this evaluation pass — never touches live fieldState
+			const state = new Map();
+			for (const [nodeId, snap] of staticValues) {
+				state.set(nodeId, { ...snap });
+			}
+
+			for (const evalData of nodeEvalData) {
+				const nodeState = state.get(evalData.id);
+
+				// Pull upstream wired values into this node's local state
+				const nodeWirings = wirings.get(evalData.id);
+				if (nodeWirings) {
+					for (const [fieldName, src] of nodeWirings) {
+						const srcState = state.get(src.srcNodeId);
+						if (srcState) nodeState[fieldName] = srcState[src.srcFieldName];
+					}
+				}
+
+				// Run the node's eval function if present
+				if (evalData.evalFn) {
+					const inputs = {};
+					for (const fname of evalData.inputFields) {
+						inputs[fname] = nodeState[fname];
+					}
+					try {
+						const outputs = evalData.evalFn(inputs, context);
+						if (outputs && typeof outputs === 'object') {
+							for (const [k, v] of Object.entries(outputs)) {
+								nodeState[k] = v;
+							}
+						}
+					} catch (_e) {
+						// Swallow per-pixel eval errors silently
+					}
+				}
+			}
+
+			// Return the final output color
+			return state.get(outputNodeId)?.['outColor'] ?? { r: 0, g: 0, b: 0 };
+		};
 	}
 
 

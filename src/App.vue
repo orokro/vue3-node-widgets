@@ -33,6 +33,7 @@ import NWEditor from './classes/NWEditor.js';
 import WindowManager from 'vue-win-mgr';
 import GraphWindow from './dev_src/GraphWindow.vue';
 import SerializationWindow from './dev_src/SerializationWindow.vue';
+import NodeBucketCanvas from './dev_src/NodeBucketCanvas.vue';
 import HeaderBar from './dev_src/HeaderBar.vue';
 import { DevApp } from './dev_src/DevApp.js';
 import AddNodeMenu from './components/AddNodeMenu.vue';
@@ -51,13 +52,18 @@ const availableWindows = [
 		slug: 'graph',
 	},
 	{
+		title: 'Node Bucket',
+		window: NodeBucketCanvas,
+		slug: 'node-bucket',
+	},
+	{
 		title: 'Serialization',
 		window: SerializationWindow,
 		slug: 'serialization',
 	}
 ];
 
-// default layout
+// default layout: graph editor on the left, Node Bucket canvas on the right
 const defaultWindowLayout = [
     {
         "name": "window",
@@ -75,17 +81,17 @@ const defaultWindowLayout = [
         "top": 0,
         "bottom": 937,
         "left": 0,
-        "right": 640
+        "right": 700
     },
     {
         "name": "frame_2",
         "style": 10,
         "windows": [
-            "graph"
+            "node-bucket"
         ],
         "top": 0,
         "bottom": 937,
-        "left": 640,
+        "left": 700,
         "right": 1290
     }
 ];

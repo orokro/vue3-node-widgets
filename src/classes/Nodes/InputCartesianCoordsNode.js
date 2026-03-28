@@ -65,11 +65,29 @@ export default class InputCartesianCoords extends NWNode {
 			type: VInteger
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'yPos',
 			title: 'Y',
 			description: "Y Position",
 			type: VInteger
+		});
+
+		// Evaluation function: converts canvas pixel coordinates into
+		// cartesian coordinates, either canvas-centered or mouse-centered.
+		// ctx = { x, y, width, height, mouseX, mouseY }
+		this.setEvalFunction((inputs, ctx) => {
+			const mouseCentric = inputs.mouseCentric || false;
+			const px = ctx?.x ?? 0;
+			const py = ctx?.y ?? 0;
+			const originX = mouseCentric ? (ctx?.mouseX ?? 0) : (ctx?.width  ?? 0) / 2;
+			const originY = mouseCentric ? (ctx?.mouseY ?? 0) : (ctx?.height ?? 0) / 2;
+			const rx = px - originX;
+			const ry = py - originY;
+			return {
+				posV2: { x: rx, y: ry },
+				xPos:  Math.round(rx),
+				yPos:  Math.round(ry),
+			};
 		});
 	}
 

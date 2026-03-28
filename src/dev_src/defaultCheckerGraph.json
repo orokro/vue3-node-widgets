@@ -1,0 +1,78 @@
+{
+  "name": "Root Graph",
+  "subGraph": false,
+  "nodes": [
+    {
+      "id": "node_c1w3v2azk",
+      "serializeKey": "InputCartesianCoordsNode",
+      "class": "InputCartesianCoords",
+      "x": 20,
+      "y": 20,
+      "slug": "coords",
+      "collapsed": false,
+      "width": null,
+      "height": null,
+      "fieldState": {
+        "mouseCentric": false,
+        "posV2": { "x": 0, "y": 0 },
+        "xPos": 0,
+        "yPos": 0
+      },
+      "dynamicFields": []
+    },
+    {
+      "id": "node_uedbr9ab0",
+      "serializeKey": "OutputColorNode",
+      "class": "OutputColor",
+      "x": 600,
+      "y": 20,
+      "slug": "output",
+      "collapsed": false,
+      "width": null,
+      "height": null,
+      "fieldState": {
+        "outColor": { "r": 0, "g": 0, "b": 0 }
+      },
+      "dynamicFields": []
+    },
+    {
+      "id": "node_zxbgyk9jk",
+      "serializeKey": "TexCheckerNode",
+      "class": "TexChecker",
+      "x": 320,
+      "y": 20,
+      "slug": "checker",
+      "collapsed": false,
+      "width": null,
+      "height": null,
+      "fieldState": {
+        "sizeV2": { "x": 30, "y": 30 },
+        "colorA": { "r": 0, "g": 0.6705882352941176, "b": 0.6823529411764706 },
+        "colorB": { "r": 0.5843137254901961, "g": 0.35294117647058826, "b": 0.6666666666666666 },
+        "posV2": { "x": 0, "y": 0 },
+        "outColor": { "r": 0, "g": 0, "b": 0 }
+      },
+      "dynamicFields": []
+    }
+  ],
+  "wires": [
+    {
+      "id": "wire_53bb273512557",
+      "inputNodeId": "node_c1w3v2azk",
+      "inputFieldId": "field_imysd5qaj",
+      "inputFieldName": "posV2",
+      "outputNodeId": "node_zxbgyk9jk",
+      "outputFieldId": "field_wchrzw7fn",
+      "outputFieldName": "posV2"
+    },
+    {
+      "id": "wire_60c12807095da",
+      "inputNodeId": "node_zxbgyk9jk",
+      "inputFieldId": "field_roughsnpn",
+      "inputFieldName": "outColor",
+      "outputNodeId": "node_uedbr9ab0",
+      "outputFieldId": "field_wvhyvyqgx",
+      "outputFieldName": "outColor"
+    }
+  ]
+}

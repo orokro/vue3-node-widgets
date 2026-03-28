@@ -69,11 +69,27 @@ export default class TexChecker extends NWNode {
 			type: VVector2,
 		});
 
-		this.addField(FIELD_TYPE.OUTPUT, { 
+		this.addField(FIELD_TYPE.OUTPUT, {
 			name: 'outColor',
 			title: 'Output Color',
 			description: "The output color based on the checker pattern",
 			type: VColor3
+		});
+
+		// Evaluation function: produces a checker pattern color from pixel position.
+		// Each cell is sizeV2.x × sizeV2.y pixels; alternates between colorA and colorB.
+		this.setEvalFunction((inputs) => {
+			const sx = inputs.sizeV2?.x || 30;
+			const sy = inputs.sizeV2?.y || 30;
+			const px = inputs.posV2?.x  || 0;
+			const py = inputs.posV2?.y  || 0;
+			const cA = inputs.colorA || { r: 1, g: 1, b: 1 };
+			const cB = inputs.colorB || { r: 0, g: 0, b: 0 };
+			// floor handles negative coords cleanly for centered-origin systems
+			const cellX = Math.floor(px / sx);
+			const cellY = Math.floor(py / sy);
+			const isA   = (cellX + cellY) % 2 === 0;
+			return { outColor: isA ? cA : cB };
 		});
 	}
 	
