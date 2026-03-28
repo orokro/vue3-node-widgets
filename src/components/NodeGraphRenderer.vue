@@ -19,6 +19,7 @@
 		:tabindex="0"
 		:tabstop="0"
 		@mousedown.self="startDragOperation"
+		@mousedown="maybeStartRazor"
 		@click.right.self="checkAddMenu"
 		@keyup="handleKeyDown"
 		@wheel="handleWheelZoom"
@@ -31,20 +32,20 @@
 		}"
 	>
 		<!-- this container will host all the moveable elements, it will move with the pan -->
-		<div 
-			class="pan-container" 
+		<div
+			class="pan-container"
 			:style="{
 				transform: `translate(${panX}px, ${panY}px)`,
 			}"
 		>
 			<!-- spawn all wires here -->
 			<WireRenderer :graph="graph" />
-			
+
 			<!-- loop through all the nodes and render them -->
-			<Node 
+			<Node
 				v-for="(node, index) in graph.nodes.value"
 				class="node-instance"
-				:key="node.id" 
+				:key="node.id"
 				:data-node-id="node.id"
 				:graph="graph"
 				:node="node"
@@ -56,34 +57,33 @@
 				:selMgr="graph.selMgr"
 			/>
 
-			<!-- razor line: a zero-size SVG at (0,0) with overflow:visible so it can draw anywhere in graph space -->
-			<svg v-if="isRazoring" class="razor-svg">
-				<defs>
-					<filter id="razor-glow">
-						<feGaussianBlur stdDeviation="2" result="blur"/>
-						<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-					</filter>
-				</defs>
-				<!-- soft glow halo -->
-				<line
-					:x1="razorLinePx.x1" :y1="razorLinePx.y1"
-					:x2="razorLinePx.x2" :y2="razorLinePx.y2"
-					class="razor-glow"
-				/>
-				<!-- sharp blade line -->
-				<line
-					:x1="razorLinePx.x1" :y1="razorLinePx.y1"
-					:x2="razorLinePx.x2" :y2="razorLinePx.y2"
-					class="razor-blade"
-				/>
-			</svg>
-
 		</div>
 
+		<!-- razor line: lives in editor-container space (not pan-container) so coords are simple screen px -->
+		<svg v-if="isRazoring" class="razor-svg" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;">
+			<defs>
+				<filter id="razor-drop-shadow" x="-50%" y="-50%" width="200%" height="200%">
+					<feDropShadow dx="0" dy="0" stdDeviation="3" flood-color="rgba(255,180,60,0.9)"/>
+				</filter>
+			</defs>
+			<!-- soft glow halo -->
+			<line
+				:x1="razorStartPx.x" :y1="razorStartPx.y"
+				:x2="razorEndPx.x"   :y2="razorEndPx.y"
+				class="razor-glow"
+			/>
+			<!-- sharp blade line -->
+			<line
+				:x1="razorStartPx.x" :y1="razorStartPx.y"
+				:x2="razorEndPx.x"   :y2="razorEndPx.y"
+				class="razor-blade"
+			/>
+		</svg>
+
 		<!-- add menu button if enabled -->
-		<AddButton 
-			v-if="showAddButton" 
-			class="add-menu-button" 
+		<AddButton
+			v-if="showAddButton"
+			class="add-menu-button"
 			@showAddMenu="handleAddMenuButton"
 		/>
 
@@ -93,7 +93,7 @@
 <script setup>
 
 // vue
-import { ref, onMounted, provide, inject, reactive, computed } from 'vue';
+import { ref, onMounted, provide, inject, reactive } from 'vue';
 
 // utils
 import { useAddMenu } from '@/composables/useAddMenu';
@@ -155,18 +155,10 @@ const zoomScale = ref(1);
 // we'll save the last mouse move even for keyboard shortcuts, etc
 let lastMouseEvent = null;
 
-// razor-cut state
-const isRazoring = ref(false);
-const razorStart = reactive({ x: 0, y: 0 });
-const razorEnd   = reactive({ x: 0, y: 0 });
-
-// razor line positions in SVG-pixel space (graph coords × zoomScale)
-const razorLinePx = computed(() => ({
-	x1: razorStart.x * zoomScale.value,
-	y1: razorStart.y * zoomScale.value,
-	x2: razorEnd.x   * zoomScale.value,
-	y2: razorEnd.y   * zoomScale.value,
-}));
+// razor-cut state — positions are in screen px relative to the editor-container
+const isRazoring  = ref(false);
+const razorStartPx = reactive({ x: 0, y: 0 });
+const razorEndPx   = reactive({ x: 0, y: 0 });
 
 // we'll keep a global map of socket positions
 const socketPositions = reactive(new Map());
@@ -237,19 +229,29 @@ const MIN_ZOOM = 0.1;
 
 
 /**
+ * Alt + LMB anywhere on the container (or its children) → razor-cut drag.
+ * This fires on all mousedowns (no .self), so it works even when clicking over nodes.
+ *
+ * @param {MouseEvent} e - the mouse event
+ */
+function maybeStartRazor(e) {
+	if (e.button === 0 && e.altKey) {
+		startRazorDrag(e);
+	}
+}
+
+
+/**
  * If it's left click, we start a box-drag operation to select nodes
  * If it's right click, we start a pan operation
- * If it's Alt + left click, we start a razor-cut drag
+ * (Alt + LMB is handled separately by maybeStartRazor above)
  *
  * @param {MouseEvent} e - the mouse event
  */
 function startDragOperation(e){
 
-	// Alt + LMB = razor mode — intercept before any selection logic
-	if (e.button === 0 && e.altKey) {
-		startRazorDrag(e);
-		return;
-	}
+	// Alt+LMB is handled by maybeStartRazor — skip here
+	if (e.altKey) return;
 
 	// if left-click && shift is not pressed, de-select everything first
 	if (e.button===0 &&  !e.shiftKey) {
@@ -546,7 +548,7 @@ function pasteFromClipboard(clipboardData, centerX, centerY) {
 
 /**
  * Begins a razor-cut drag operation (Alt + LMB).
- * Draws a line overlay; on release, severs any wires the line crosses.
+ * Draws a line overlay in screen space; on release severs any wires the line crosses.
  *
  * @param {MouseEvent} e - the initiating mousedown event
  */
@@ -555,32 +557,37 @@ function startRazorDrag(e) {
 	e.preventDefault();
 	e.stopPropagation();
 
+	// Capture rect once — used to convert screen→graph for wire cutting
 	const rect = containerEl.value.getBoundingClientRect();
-	const toGraph = (cx, cy) => ({
-		x: (cx - rect.left - panX.value) / zoomScale.value,
-		y: (cy - rect.top  - panY.value) / zoomScale.value,
+
+	// Helper: screen px (container-relative) → graph space (em units)
+	const screenToGraph = (sx, sy) => ({
+		x: (sx - panX.value) / zoomScale.value,
+		y: (sy - panY.value) / zoomScale.value,
 	});
 
-	const origin = toGraph(e.clientX, e.clientY);
-	razorStart.x = origin.x;
-	razorStart.y = origin.y;
-	razorEnd.x   = origin.x;
-	razorEnd.y   = origin.y;
+	// Initial position in container-relative screen pixels
+	const startSx = e.clientX - rect.left;
+	const startSy = e.clientY - rect.top;
+
+	razorStartPx.x = startSx;
+	razorStartPx.y = startSy;
+	razorEndPx.x   = startSx;
+	razorEndPx.y   = startSy;
 	isRazoring.value = true;
 
 	dh.dragStart(
 		() => {
-			// update the end point using the live cursor position
-			const cur = dh.getCursorPos(); // pageX/pageY — same as clientX/Y in a fixed layout
-			const updated = toGraph(cur.x, cur.y);
-			razorEnd.x = updated.x;
-			razorEnd.y = updated.y;
+			// getCursorPos() returns pageX/pageY; subtract page offset of the container
+			const cur = dh.getCursorPos();
+			razorEndPx.x = cur.x - (rect.left + window.scrollX);
+			razorEndPx.y = cur.y - (rect.top  + window.scrollY);
 		},
 		() => {
 			isRazoring.value = false;
 			cutWiresWithRazor(
-				{ x: razorStart.x, y: razorStart.y },
-				{ x: razorEnd.x,   y: razorEnd.y   }
+				screenToGraph(razorStartPx.x, razorStartPx.y),
+				screenToGraph(razorEndPx.x,   razorEndPx.y)
 			);
 		}
 	);
@@ -728,37 +735,28 @@ function handleMouseMove(event) {
 
 		// this is the box that actually translates it's x/y to pan stuff
 		.pan-container {
-
 			position: absolute;
-
-			// razor line SVG: zero-size, overflow:visible so it can draw anywhere
-			.razor-svg {
-				position: absolute;
-				left: 0;
-				top: 0;
-				width: 0;
-				height: 0;
-				overflow: visible;
-				pointer-events: none;
-
-				.razor-glow {
-					stroke: rgba(255, 140, 40, 0.35);
-					stroke-width: 8px;
-					stroke-linecap: round;
-					fill: none;
-				}
-
-				.razor-blade {
-					stroke: rgba(255, 200, 80, 0.95);
-					stroke-width: 1.5px;
-					stroke-linecap: round;
-					stroke-dasharray: 6 3;
-					fill: none;
-					filter: drop-shadow(0 0 3px rgba(255, 180, 60, 0.9));
-				}
-			}// .razor-svg
-
 		}// .pan-container
+
+		// razor line SVG: covers the full editor-container in screen space
+		.razor-svg {
+
+			.razor-glow {
+				stroke: rgba(255, 140, 40, 0.45);
+				stroke-width: 8;
+				stroke-linecap: round;
+				fill: none;
+			}
+
+			.razor-blade {
+				stroke: rgba(255, 220, 80, 1);
+				stroke-width: 2;
+				stroke-linecap: round;
+				stroke-dasharray: 8 4;
+				fill: none;
+				filter: url(#razor-drop-shadow);
+			}
+		}// .razor-svg
 
 		// crosshair cursor during razor draw
 		&.is-razoring {
