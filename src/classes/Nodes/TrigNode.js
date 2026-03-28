@@ -91,10 +91,10 @@ export default class TrigNode extends NWNode {
 			const op         = inputs.operation  ?? 0;
 			const degrees    = inputs.degrees    ?? true;
 			const amplitude  = inputs.amplitude  ?? 1;
-			const wavelength = inputs.wavelength ?? 1;
+			const wavelength = inputs.wavelength || 1; // guard against 0
 			let theta = inputs.theta ?? 0;
 			if (degrees) theta = theta * Math.PI / 180;
-			theta = theta * wavelength;
+			theta = theta / wavelength; // divide: larger wavelength = wider/slower wave
 			let raw;
 			switch (op) {
 				case 0:  raw = Math.sin(theta);  break;
