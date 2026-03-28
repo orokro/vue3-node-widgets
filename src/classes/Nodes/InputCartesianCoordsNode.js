@@ -72,6 +72,20 @@ export default class InputCartesianCoords extends NWNode {
 			type: VInteger
 		});
 
+		this.addField(FIELD_TYPE.OUTPUT, {
+			name: 'u',
+			title: 'U (0→1)',
+			description: "Normalized horizontal position: 0 at left edge, 1 at right edge. Ignores centering.",
+			type: VNumber
+		});
+
+		this.addField(FIELD_TYPE.OUTPUT, {
+			name: 'v',
+			title: 'V (0→1)',
+			description: "Normalized vertical position: 0 at top edge, 1 at bottom edge. Ignores centering.",
+			type: VNumber
+		});
+
 		// Evaluation function: converts canvas pixel coordinates into
 		// cartesian coordinates, either canvas-centered or mouse-centered.
 		// ctx = { x, y, width, height, mouseX, mouseY }
@@ -79,14 +93,18 @@ export default class InputCartesianCoords extends NWNode {
 			const mouseCentric = inputs.mouseCentric || false;
 			const px = ctx?.x ?? 0;
 			const py = ctx?.y ?? 0;
-			const originX = mouseCentric ? (ctx?.mouseX ?? 0) : (ctx?.width  ?? 0) / 2;
-			const originY = mouseCentric ? (ctx?.mouseY ?? 0) : (ctx?.height ?? 0) / 2;
+			const w  = ctx?.width  ?? 1;
+			const h  = ctx?.height ?? 1;
+			const originX = mouseCentric ? (ctx?.mouseX ?? 0) : w / 2;
+			const originY = mouseCentric ? (ctx?.mouseY ?? 0) : h / 2;
 			const rx = px - originX;
 			const ry = py - originY;
 			return {
 				posV2: { x: rx, y: ry },
 				xPos:  Math.round(rx),
 				yPos:  Math.round(ry),
+				u: w > 0 ? px / w : 0,
+				v: h > 0 ? py / h : 0,
 			};
 		});
 	}
