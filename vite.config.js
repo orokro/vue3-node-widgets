@@ -30,6 +30,14 @@ export default defineConfig({
 			'@Classes': fileURLToPath(new URL('./src/classes', import.meta.url)),
 			'@Nodes': fileURLToPath(new URL('./src/classes/Nodes', import.meta.url)),
 			'@Types': fileURLToPath(new URL('./src/classes/Types', import.meta.url)),
+
+			// Pre-publish: the test harness imports from 'vue3-node-widgets' so its
+			// integration code reads identically to what consumers will write after
+			// `npm install vue3-node-widgets`. After publish, this alias is irrelevant
+			// for consumers — they hit the package via node_modules. We keep it here
+			// so the harness can be developed against the public-API barrel without
+			// any import-path differences.
+			'vue3-node-widgets': fileURLToPath(new URL('./src/index.js', import.meta.url)),
 		},
 	},
 });
