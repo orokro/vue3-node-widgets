@@ -69,6 +69,7 @@ import NWStyle from './NWStyle.vue';
 
 // our app
 import NWEditor from '@src/classes/NWEditor.js';
+import { createEditorState } from '@src/classes/EditorState.js';
 
 // lib/misc
 import DragHelper from 'gdraghelper';
@@ -76,10 +77,55 @@ import DragHelper from 'gdraghelper';
 // composable
 import { useAddMenu } from '@Composables/useAddMenu.js';
 
+/*
+	Component ownership rules — locked at mount time, no dynamic state-swap in 0.0.1b:
+
+	  EXTERNAL (shared) state:  consumer passes :state (an EditorState created via
+	                            createEditorState). Lifetime owned by consumer; we never
+	                            destroy it on unmount.
+
+	  INTERNAL state:           consumer passes any of :types / :coalescers /
+	                            :available-nodes / :initial-data and NO :state. We build
+	                            an EditorState internally, destroy it on unmount.
+
+	  LEGACY:                   neither :state nor convenience props provided. NWEditor
+	                            falls back to its standalone path (auto-loads built-in
+	                            types + nodes). The :graph prop still works in this mode
+	                            for back-compat with the existing dev app.
+
+	Mutually exclusive: providing :state with any of the convenience props is a
+	consumer error — we honor :state and emit a console.warn.
+*/
+
 // define some props
 const props = defineProps({
 
-	// the initial base graph can be set/changed via this prop
+	// NEW — shared EditorState (controlled mode)
+	state: {
+		type: Object,
+		default: null,
+	},
+
+	// NEW — convenience props for uncontrolled mode (mutually exclusive with :state)
+	types: {
+		type: Array,
+		default: null,
+	},
+	coalescers: {
+		type: Array,
+		default: null,
+	},
+	availableNodes: {
+		type: Array,
+		default: null,
+	},
+	initialData: {
+		type: Object,
+		default: null,
+	},
+
+	// LEGACY — initial base graph (kept for back-compat with existing dev app).
+	// In legacy mode, sets the rootGraph on the per-window NWEditor.
 	graph: {
 		type: Object,
 		default: null
@@ -116,10 +162,20 @@ const props = defineProps({
 const cursorPopupEl = ref(null);
 provide('cursorPopupEl', cursorPopupEl);
 
-// our context will either be passed in via the props, or one we made locally
+// per-window NWEditor (the "view"). When state is provided/created, this editor
+// is constructed in shared-state mode and delegates typeRegistry / availableNodes
+// to the EditorState while keeping its own breadcrumbs and current view.
 let ctx = null;
 const ctxRef = shallowRef(null);
 provide('ctx', ctxRef);
+
+// shared EditorState (if any). Provided to descendants for direct access.
+const stateRef = shallowRef(null);
+provide('state', stateRef);
+
+// true if WE created the EditorState (must destroy on unmount). False if it was
+// passed in via :state (consumer owns its lifecycle).
+let ownsState = false;
 
 // make a new DragHelper instance
 const dh = new DragHelper();
@@ -137,11 +193,63 @@ const {
 
 const hostId = registerHost();
 
+
+/**
+ * Determine ownership mode and build/use the EditorState as appropriate.
+ * Called once at mount time — no dynamic switching after this.
+ */
+function resolveStateOwnership() {
+
+	const hasConvenienceProps = (
+		(props.types && props.types.length > 0) ||
+		(props.coalescers && props.coalescers.length > 0) ||
+		(props.availableNodes && props.availableNodes.length > 0) ||
+		props.initialData
+	);
+
+	// EXTERNAL — :state takes precedence. Warn if convenience props were also passed.
+	if (props.state) {
+		if (hasConvenienceProps) {
+			console.warn(
+				'<NWEditorGraph>: :state and convenience props (:types, :coalescers, ' +
+				':available-nodes, :initial-data) are mutually exclusive. Honoring :state ' +
+				'and ignoring convenience props.'
+			);
+		}
+		stateRef.value = props.state;
+		ownsState = false;
+		return;
+	}
+
+	// INTERNAL — build an EditorState from the convenience props.
+	if (hasConvenienceProps) {
+		stateRef.value = createEditorState({
+			types:          props.types          || [],
+			coalescers:     props.coalescers     || [],
+			availableNodes: props.availableNodes || [],
+			initialData:    props.initialData    || null,
+		});
+		ownsState = true;
+		return;
+	}
+
+	// LEGACY — no state, no convenience props. ctx will be created in standalone mode.
+	stateRef.value = null;
+	ownsState = false;
+}
+
+
 // on mounted, initialize the component and optionally, state
 onMounted(() => {
 
-	// make new context if one wasn't provided
-	ctx = new NWEditor();
+	// 1. Lock state ownership for this component's lifetime.
+	resolveStateOwnership();
+
+	// 2. Create the per-window NWEditor. Shared-state mode if we have an EditorState,
+	//    otherwise legacy standalone (auto-loads built-in types + nodes).
+	ctx = stateRef.value
+		? new NWEditor({ state: stateRef.value })
+		: new NWEditor();
 	ctxRef.value = ctx;
 
 	if (claimMenuHost(hostId)) {
@@ -149,32 +257,122 @@ onMounted(() => {
 		// console.log("NWEditorGraph: claimed menu host", hostId);
 	}
 
-
-	// if we have a graph prop, set it as the root graph
-	if (props.graph)
+	// 3. LEGACY back-compat: if a :graph prop was passed, set it as the rootGraph.
+	//    This is only meaningful in legacy mode — in shared-state mode, the
+	//    EditorState owns the root graph and :graph is ignored.
+	if (props.graph && !stateRef.value)
 		ctxRef.value.setRootGraph(props.graph);
 });
 
+
 onUnmounted(() => {
 	unregisterHost(hostId);
+
+	// If we created the EditorState ourselves, destroy it. External state stays
+	// alive (consumer owns it).
+	if (ownsState && stateRef.value) {
+		stateRef.value.destroy?.();
+	}
+
+	// Future: ctx.destroy() once NWEditor grows lifecycle teardown.
 });
 
-// update root graph if the prop changes
+
+// LEGACY back-compat: update root graph if the :graph prop changes.
+// In shared-state mode this is ignored — :graph isn't part of the shared-state contract.
 watch(() => props.graph, (newVal) => {
-	if (newVal)
-		ctxRef.value.setRootGraph(newVal);
+	if (!ctxRef.value) return;
+	if (stateRef.value) return; // shared-state mode — :graph is legacy-only
+	if (newVal) ctxRef.value.setRootGraph(newVal);
+});
+
+
+// ─── Per-window navigation API (exposed) ─────────────────────────────────────
+
+/**
+ * Reactive ref to the graph this window is currently displaying. Different
+ * <NWEditorGraph> instances pointing at the same EditorState can show
+ * different graphs (root vs. drilled-into-a-sub-graph), so this is per-window.
+ */
+const currentGraph = computed(() => ctxRef.value?.rootGraphRef?.value || null);
+
+
+/**
+ * Reactive ref to the breadcrumb labels for THIS window's currentGraph,
+ * walked from root → leaf via NWGraph.ownerNode back-pointers.
+ *
+ * Distinct from editorState.activeGraphPath, which reflects the path to the
+ * actively-selected graph (last-touched-wins) and may not match this window
+ * if the user just clicked something in a different window.
+ */
+const currentGraphPath = computed(() => {
+	const path = [];
+	const visited = new Set();
+	let g = currentGraph.value;
+	while (g && !visited.has(g)) {
+		visited.add(g);
+		const isRoot = !g.ownerNode;
+		const name = g.name?.value || (isRoot ? 'Root Graph' : 'Group');
+		path.unshift(name);
+		g = g.ownerNode?.graph || null;
+	}
+	return path;
 });
 
 
 /**
- * Public exposed method to get the current state context
+ * Navigate this window back to the root graph (clearing breadcrumbs).
+ * In shared-state mode this means jump to editorState.rootGraph; in legacy
+ * mode it pops the breadcrumb stack to the top.
+ */
+function goToRoot() {
+	if (!ctx) return;
+	if (stateRef.value) {
+		ctx.setRootGraph(stateRef.value.rootGraph);
+	} else if (ctx.parentGraphs?.value?.length > 0) {
+		ctx.selectBreadcrumb(0);
+	}
+	// else: already at root, no-op
+}
+
+
+/**
+ * Drill this window into a sub-graph. Accepts either an NWGraph directly
+ * or a GroupNode whose `graph` field holds the sub-graph.
  *
- * NOTE: this will be like on a <canvas> element
- * Instead of myCanvasEl.getContext('2d'),
- * If the user has reference to our NWEditorGraph component,
- * they can call getContext() to get the current state context.
+ * @param {NWGraph|NWNode} graphOrNode
+ */
+function openSubGraph(graphOrNode) {
+	if (!ctx) return;
+	let target = graphOrNode;
+	// allow passing a GroupNode — extract its sub-graph
+	if (target?.fieldState?.graph?.val) {
+		target = target.fieldState.graph.val;
+	}
+	if (target?.nodes && target?.wires) {
+		ctx.openSubGraph(target);
+	}
+}
+
+
+/**
+ * Returns the EditorState (shared or internally-created), or null in legacy mode.
+ * Useful for consumers who used the convenience-props path and want to grab the
+ * state object that was built for them.
  *
- * With just the context, they can manipulate / evaluate the graph as necessary.
+ * @returns {EditorState|null}
+ */
+function getState() {
+	return stateRef.value;
+}
+
+
+/**
+ * LEGACY: returns the per-window NWEditor instance. Kept for back-compat with
+ * existing consumers (notably the dev app); new consumers should reach for
+ * the EditorState via getState() instead.
+ *
+ * @returns {NWEditor}
  */
 function getContext() {
 	return ctx;
@@ -183,7 +381,14 @@ function getContext() {
 
 // define our public API
 defineExpose({
-	getContext
+	// new API
+	getState,
+	currentGraph,
+	currentGraphPath,
+	goToRoot,
+	openSubGraph,
+	// legacy API
+	getContext,
 });
 
 
