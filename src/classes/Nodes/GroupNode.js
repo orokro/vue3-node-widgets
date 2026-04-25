@@ -88,6 +88,14 @@ export default class GroupNode extends NWNode {
 
 		this.fieldState.groupName.val = 'Group';
 
+		// Wire the back-pointer: the sub-graph stored in our 'graph' field
+		// needs to know which group node owns it. This enables walking up
+		// the graph tree (e.g. for breadcrumb path computation in EditorState).
+		// The sub-graph instance is reused across deserialize, so this pointer
+		// only needs to be set once at construction.
+		const subGraph = this.fieldState.graph.val;
+		if (subGraph) subGraph.ownerNode = this;
+
 		// build our built-in graph (which is just a default input & output node)
 		this.buildDefaultLayout();
 

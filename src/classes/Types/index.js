@@ -144,3 +144,44 @@ export {
 	VFile,
 	VType,
 };
+
+
+/**
+ * defaultTypes
+ * ------------
+ *
+ * Aggregate convenience export — the built-in types appropriate for general use
+ * (matches what NWEditor used to hard-code as its default type universe).
+ *
+ * Consumers building shader-style editors can pass this directly to
+ * createEditorState() to opt into the full built-in type system:
+ *
+ *     import { createEditorState, defaultTypes, defaultNodeList } from 'vue3-node-widgets';
+ *     const editorState = createEditorState({
+ *         types: defaultTypes,
+ *         availableNodes: defaultNodeList,
+ *     });
+ *
+ * Consumers building editors for entirely different domains (e.g. ToneJS)
+ * can ignore this and pass their own custom types.
+ *
+ * Note: VEnum, VGraph, VGroupAny, and VType are intentionally NOT in this list.
+ *   - VEnum is parameterized — define your own enum types per-use-case.
+ *   - VGraph and VGroupAny are special internal types used by the group-node system.
+ *   - VType is the base class consumers extend to define their own types.
+ */
+export const defaultTypes = [
+	VNumber,
+	VAngle,
+	VInteger,
+	VVector2,
+	VVector3,
+	VAngles,
+	VColor3,
+	VColor4,
+	VBoolean,
+	VText,
+	VCharacter,
+	VImage,
+	VFile,
+];

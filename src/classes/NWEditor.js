@@ -76,53 +76,128 @@ export default class NWEditor {
 	 *	@param {Array<NodeWidget|Object>} [options.nodesList] - An array of NodeWidget classes or objects with class and menuPath.
 	 *	@param {VTypeRegistry} [options.typeRegistry] - An instance of VTypeRegistry to use for type management and coalescing.
 	 *	@param {Object} [options.graphToLoad] - An object representing a graph to load into the editor.
+	 *	@param {NWGraph} [options.graph] - An optional pre-built graph to use as the initial view.
+	 *	@param {EditorState} [options.state] - Optional shared EditorState to delegate to.
+	 *		When provided, this NWEditor becomes a per-window VIEW into the shared state:
+	 *		typeRegistry and availableNodes delegate to state, while breadcrumbs and
+	 *		current-graph navigation remain per-window. When NOT provided, legacy
+	 *		standalone mode — NWEditor owns its own type registry, available-nodes list,
+	 *		and root graph (current behavior, used by the dev app).
 	 */
-	constructor({nodesList, typeRegistry, graphToLoad, graph} = {}){
+	constructor({nodesList, typeRegistry, graphToLoad, graph, state} = {}){
 
 		// true once we have at least one available node
 		this.isReady = ref(false);
-		
-		// our list of available nodes, as a shallow array
-		this.availableNodes = shallowRef([]);
 
-		/*
-			Our "graph" will consist of two separate arrays: nodes and wires.
+		// IMPORTANT: set _state FIRST. The getters/setters for typeRegistry and
+		// availableNodes (defined below) dispatch based on whether _state is truthy,
+		// so any property assignment that follows needs this flag in place.
+		this._state = state || null;
 
-			NODES:
-			it's possible to instantiate nodes and have them placed, but not connected to anything
-			so the list of instantiated nodes will be different than the actual graph of wires (see below)
+		if (this._state) {
 
-			WIRES:
-			wires will be classes that have things like type, and positions/handles for moving them around
-			however, they will also be "logical" connections for evaluating the graph
+			// SHARED-STATE MODE
+			// -----------------
+			// typeRegistry and availableNodes are read directly from state via
+			// the getters defined below — we don't own copies. Per-window state
+			// (current view, breadcrumbs, menu UI, drag helper) is still local.
 
-			So, together we'll have a complete graph made out of these separate parts.
-			NOTE: we will use shallowRefs for these, because they will be arrays of instantiated JS classes,
-			and they will have their own Vue Refs and reactivity that we don't want to "unwrap"
-		*/
-		
-		// use or build a default VTypeRegistry
-		if(t.isDefined(typeRegistry) && t.isInstanceOf(typeRegistry, VTypeRegistry)){
-			this.typeRegistry = typeRegistry;
+			// Per-window "currently-shown" graph starts at the state's root graph.
+			// Navigating into sub-graphs via openSubGraph() mutates this without
+			// affecting the shared state's rootGraph.
+			this.rootGraph = this._state.rootGraph;
+			this.rootGraphRef = shallowRef(this.rootGraph);
+
+			// We're "ready" as soon as the shared state has at least one available node.
+			this.isReady.value = (this._state.availableNodes.value.length > 0);
+
+		} else {
+
+			// LEGACY / STANDALONE MODE
+			// ------------------------
+			// Behavior matches pre-EditorState code exactly. The dev app uses this
+			// path because <NWEditorGraph> still does `new NWEditor()` with no state.
+
+			/*
+				Our "graph" will consist of two separate arrays: nodes and wires.
+
+				NODES:
+				it's possible to instantiate nodes and have them placed, but not connected to anything
+				so the list of instantiated nodes will be different than the actual graph of wires (see below)
+
+				WIRES:
+				wires will be classes that have things like type, and positions/handles for moving them around
+				however, they will also be "logical" connections for evaluating the graph
+
+				So, together we'll have a complete graph made out of these separate parts.
+				NOTE: we will use shallowRefs for these, because they will be arrays of instantiated JS classes,
+				and they will have their own Vue Refs and reactivity that we don't want to "unwrap"
+			*/
+
+			// own backing storage for the typeRegistry / availableNodes getters
+			this._ownAvailableNodes = shallowRef([]);
+
+			// use or build a default VTypeRegistry
+			if(t.isDefined(typeRegistry) && t.isInstanceOf(typeRegistry, VTypeRegistry)){
+				this._ownTypeRegistry = typeRegistry;
+			}
+			else {
+				this._ownTypeRegistry = new VTypeRegistry(types);
+			}
+
+			this.rootGraph = graph ? graph : new NWGraph(this.typeRegistry);
+
+			// dynamic version
+			this.rootGraphRef = shallowRef(this.rootGraph);
+
+			// if we were passed in a list of nodes, add them to our available nodes list
+			if(t.isDefined(nodesList))
+				this.addAvailableNodes(nodesList);
+			else
+				this.addAvailableNodes(defaultNodeList);
+
+			// if we were passed in a graph to load, do so
+			if(t.isDefined(graphToLoad))
+				this.loadGraph(graphToLoad);
 		}
-		else {
-			this.typeRegistry = new VTypeRegistry(types);
-		}
+	}
 
-		this.rootGraph = graph ? graph : new NWGraph(this.typeRegistry);
 
-		// dynamic version
-		this.rootGraphRef = shallowRef(this.rootGraph);
+	/**
+	 * The type registry. In shared-state mode, delegates to the EditorState's
+	 * registry; in legacy mode, returns the locally-owned one.
+	 */
+	get typeRegistry() {
+		return this._state ? this._state.typeRegistry : this._ownTypeRegistry;
+	}
+	set typeRegistry(value) {
+		// In shared-state mode, the registry is owned by EditorState — silent no-op.
+		if (this._state) return;
+		this._ownTypeRegistry = value;
+	}
 
-		// if we were passed in a list of nodes, add them to our available nodes list
-		if(t.isDefined(nodesList))
-			this.addAvailableNodes(nodesList);
-		else
-			this.addAvailableNodes(defaultNodeList);
 
-		// if we were passed in a graph to load, do so
-		if(t.isDefined(graphToLoad))
-			this.loadGraph(graphToLoad);
+	/**
+	 * The available nodes list (shallowRef). In shared-state mode, delegates to
+	 * the EditorState's list; in legacy mode, returns the locally-owned one.
+	 */
+	get availableNodes() {
+		return this._state ? this._state.availableNodes : this._ownAvailableNodes;
+	}
+	set availableNodes(value) {
+		// In shared-state mode, the list is owned by EditorState — silent no-op.
+		if (this._state) return;
+		this._ownAvailableNodes = value;
+	}
+
+
+	/**
+	 * The shared EditorState if this NWEditor was constructed with one,
+	 * otherwise null. Internal hook for component code that needs to
+	 * distinguish per-window NWEditor from standalone instances.
+	 */
+	get state() {
+		return this._state;
 	}
 
 

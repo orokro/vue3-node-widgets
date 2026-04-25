@@ -47,6 +47,14 @@ export class NWGraph {
 		// save whether this is a subgraph
 		this.subGraph = subGraph;
 
+		// back-pointer set by the GroupNode that owns this sub-graph
+		// (null for root graphs and free-standing graphs).
+		// Used to walk back up the graph tree for breadcrumb path computation.
+		// Set by the owning GroupNode after instantiation; not stored in serialize()
+		// — it's an implicit relationship that gets re-established whenever a fresh
+		// GroupNode instance is created (e.g. on deserialize).
+		this.ownerNode = null;
+
 		// our dynamic name
 		this.name = ref('Root Graph');
 
