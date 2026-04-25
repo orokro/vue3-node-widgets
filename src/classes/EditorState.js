@@ -75,6 +75,13 @@ export class EditorState {
 		//    Consumers watch this to know when to re-call getModel() / getComputeFn().
 		this.changeVersion = ref(0);
 
+		// 6b. Deserialize version — bumps each time deserialize() runs. Per-window
+		//     NWEditor instances watch this and reset their navigation (breadcrumbs
+		//     + current view) back to the root graph, since their parentGraphs
+		//     stack is referencing sub-graphs from the pre-deserialize data and
+		//     would be semantically stale after a state replacement.
+		this.deserializeVersion = ref(0);
+
 		// 7. Bind callbacks ONCE so we can compare references during lazy re-attach.
 		this._onChangeBound = () => this._handleGraphChange();
 		this._onSelChangeBound = (sm) => this._promoteActiveSelMgr(sm);
@@ -284,18 +291,40 @@ export class EditorState {
 
 
 	/**
-	 * Replace state from serialized data. Resets to root and clears selection.
+	 * Replace state from serialized data. Resets to root and clears selection
+	 * across all attached <NWEditorGraph> windows.
+	 *
+	 * IMPLEMENTATION NOTE: we deliberately mutate the existing rootGraph in
+	 * place rather than swapping in a freshly-constructed one. The reason:
+	 * per-window NWEditor instances hold direct references to the rootGraph
+	 * (in their `rootGraph` field and parentGraphs breadcrumb stack). If we
+	 * replace the instance, those windows are left pointing at an orphaned
+	 * NWGraph — newly-added nodes go to the orphan, while serialize()/getModel()
+	 * read from the fresh root. NWGraph.deserialize already clears+rebuilds in
+	 * place, so reusing the instance keeps every window's references valid.
+	 *
+	 * Window navigation (breadcrumbs + current view) IS still reset by bumping
+	 * `deserializeVersion`, which NWEditor instances watch in shared-state mode.
 	 *
 	 * @param {Object} data - Same shape as serialize() output.
 	 */
 	deserialize(data) {
-		const newGraph = new NWGraph(this.typeRegistry);
-		newGraph.deserialize(data);
-		this.rootGraph = newGraph;
-		this._activeSelMgr.value = newGraph.selMgr;
 
-		// re-attach onChange to the new graph + any sub-graphs it contains
-		this._attachToGraph(newGraph);
+		// Mutate in place — NWGraph.deserialize clears+rebuilds nodes/wires
+		// without replacing the NWGraph instance itself.
+		this.rootGraph.deserialize(data);
+
+		// Active SelMgr stays the same instance (same graph), but the selection
+		// it holds may reference now-removed nodes. Clear it.
+		this.rootGraph.selMgr.selectNone();
+		this._activeSelMgr.value = this.rootGraph.selMgr;
+
+		// Re-attach onChange to capture any new sub-graphs reachable through
+		// freshly-instantiated GroupNodes (idempotent for the root itself).
+		this._attachToGraph(this.rootGraph);
+
+		// Signal per-window NWEditors to reset their navigation stacks.
+		this.deserializeVersion.value++;
 
 		this._bumpVersion();
 		return this;

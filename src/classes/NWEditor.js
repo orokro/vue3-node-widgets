@@ -11,7 +11,7 @@
 */
 
 // vue
-import { ref, shallowRef, reactive } from 'vue';
+import { ref, shallowRef, reactive, watch } from 'vue';
 
 // our app
 import NodeWidget from './NWNode';
@@ -111,6 +111,20 @@ export default class NWEditor {
 			// We're "ready" as soon as the shared state has at least one available node.
 			this.isReady.value = (this._state.availableNodes.value.length > 0);
 
+			// When the EditorState's data is wholesale replaced (deserialize), our
+			// breadcrumb stack and current-view reference may be pointing at
+			// sub-graphs from the pre-deserialize tree. Watch the state's
+			// deserializeVersion ref and reset navigation back to the (in-place
+			// mutated) root when it bumps.
+			this._deserializeWatcher = watch(
+				() => this._state.deserializeVersion.value,
+				() => {
+					this.parentGraphs.value = [];
+					this.rootGraph = this._state.rootGraph;
+					this.rootGraphRef.value = this._state.rootGraph;
+				}
+			);
+
 		} else {
 
 			// LEGACY / STANDALONE MODE
@@ -198,6 +212,18 @@ export default class NWEditor {
 	 */
 	get state() {
 		return this._state;
+	}
+
+
+	/**
+	 * Lifecycle: stop watchers and release references. Called by
+	 * <NWEditorGraph> on unmount. Safe to call multiple times.
+	 */
+	destroy() {
+		if (this._deserializeWatcher) {
+			this._deserializeWatcher();
+			this._deserializeWatcher = null;
+		}
 	}
 
 

@@ -146,8 +146,8 @@ function seedDemoGraph() {
 		return entry?.class || null;
 	};
 
-	const CartCls = findClass('InputCartesianCoords');
-	const OutCls  = findClass('OutputColorNode') || findClass('OutputColor');
+	const CartCls = findClass('InputCartesianCoordsNode');
+	const OutCls  = findClass('OutputColorNode');
 	if (!CartCls || !OutCls) {
 		console.warn('seedDemoGraph: could not find required node classes — skipping seed');
 		return;

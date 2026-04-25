@@ -11,7 +11,13 @@
 <template>
 
 	<!-- main outermost wrapper for the entire node-graph system -->
-	<div class="NWEditorGraph">
+	<!--
+		@contextmenu suppression is library-level: right-click is a meaningful
+		gesture for us (pan + the "show add node menu" trigger), so we don't want
+		the browser's native context menu interfering. Shift+RMB is allowed
+		through so devs can still get the inspector context menu while debugging.
+	-->
+	<div class="NWEditorGraph" @contextmenu="onContextMenu">
 
 		<NWStyle :theme="theme">
 			
@@ -268,13 +274,15 @@ onMounted(() => {
 onUnmounted(() => {
 	unregisterHost(hostId);
 
+	// Tear down the per-window NWEditor's watchers (notably the deserialize
+	// watcher that listens to EditorState.deserializeVersion in shared-state mode).
+	ctx?.destroy?.();
+
 	// If we created the EditorState ourselves, destroy it. External state stays
 	// alive (consumer owns it).
 	if (ownsState && stateRef.value) {
 		stateRef.value.destroy?.();
 	}
-
-	// Future: ctx.destroy() once NWEditor grows lifecycle teardown.
 });
 
 
@@ -390,6 +398,20 @@ defineExpose({
 	// legacy API
 	getContext,
 });
+
+
+/**
+ * Suppress the browser's native context menu over the editor area. Shift+RMB
+ * is allowed through so developers can still reach the inspector context menu
+ * while debugging. This needs to be at the library component level rather
+ * than relying on consumer apps to wire it up — the right-click gesture is
+ * a meaningful interaction for the editor (pan, show-add-menu trigger) and
+ * letting the browser show its menu over our canvas would be a surprise.
+ */
+function onContextMenu(e) {
+	if (e.shiftKey) return;
+	e.preventDefault();
+}
 
 
 /**
