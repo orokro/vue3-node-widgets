@@ -616,16 +616,29 @@ export default class NWNode {
 
 	/**
 	 * Wraps a field value so we can track changes to it.
-	 * 
+	 *
+	 * Two write paths exist for a given field's value, and both must trigger the
+	 * change signal so that EditorState.changeVersion stays accurate:
+	 *
+	 *   1. `wrapped.val = X`         (programmatic / upstream-driven writes)
+	 *   2. `wrapped.valueRef.value = X`  (UI widgets v-modeling the ref directly)
+	 *
+	 * Path (1) writes both _valueObj and valueRef synchronously. Path (2) writes
+	 * only valueRef. We use a single `watch` on valueRef as the unified signaling
+	 * point — it fires for either path, copies the new value into _valueObj if
+	 * needed, and calls requestComputeUpdate exactly once per change. This avoids
+	 * double-signaling that would happen if the val setter ALSO called
+	 * requestComputeUpdate directly.
+	 *
 	 * @param {String} name - the name of the field to wrap
 	 * @param {String} id - the id of the field to wrap
 	 * @param {Value} value - the value to wrap
-	 * @returns {Object} - object with get & set that has side effect of calling requestComputeUpdate()
+	 * @returns {Object} - object with get & set + side effects via the watch below.
 	 */
 	wrapFieldValue(name, id, value) {
 
 		// create base object
-		const wrapped = { 
+		const wrapped = {
 			name,
 			id,
 			_valueObj: value,
@@ -635,21 +648,28 @@ export default class NWNode {
 
 		const node = this;
 
-		// add our val w/ getter & setter + side effect
+		// add our val w/ getter & setter; signaling happens via the watch below
 		Object.defineProperty(wrapped, 'val', {
 			get() {
 				return wrapped._valueObj.value;
 			},
 			set: (newValue) => {
+				// keep _valueObj synchronously in sync so val getter is consistent
 				wrapped._valueObj.value = newValue;
+				// triggers the watch below, which performs the requestComputeUpdate signal
 				wrapped.valueRef.value = newValue;
-				node.requestComputeUpdate(name, newValue);
 			},
 			enumerable: true,
 			configurable: true
 		});
-		wrapped.watch = watchEffect(() => {
-			wrapped._valueObj.value = wrapped.valueRef.value;
+
+		// single source of truth for change signaling — fires for both val= writes
+		// and direct valueRef.value = X writes from UI widgets.
+		wrapped.watch = watch(() => wrapped.valueRef.value, (newVal) => {
+			if (wrapped._valueObj.value !== newVal) {
+				wrapped._valueObj.value = newVal;
+			}
+			node.requestComputeUpdate(name, newVal);
 		});
 
 		return wrapped;
@@ -657,17 +677,19 @@ export default class NWNode {
 
 
 	/**
-	 * When the user changes a value or we get a value from an upstream node,
-	 * we will call this function to update the node's state.
-	 * 
-	 * @param {string} name - optional, name of the field triggering the update
-	 * @param {any} value - optional, the value to set for the field
+	 * Called whenever a field's value changes (either programmatically via
+	 * `wrapped.val = X` or via UI widget binding to `wrapped.valueRef`).
+	 *
+	 * Signals the change up through the owning graph's onChange callback.
+	 * In shared-state mode (EditorState wires the callback), this bumps the
+	 * editor's changeVersion ref so consumers can re-call getModel() / re-codegen.
+	 * In legacy/standalone mode (no callback wired), this is a silent no-op.
+	 *
+	 * @param {string} name - name of the field whose value changed
+	 * @param {any} value - the new value
 	 */
 	requestComputeUpdate(name, value){
-
-		// for now, just print
-		if(false)
-			console.log(`Requesting compute update for node "${this.id}", field "${name}" as`, value);
+		this.graph?._signalChange?.();
 	}
 
 

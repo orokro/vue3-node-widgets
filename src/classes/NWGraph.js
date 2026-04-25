@@ -55,6 +55,12 @@ export class NWGraph {
 		// GroupNode instance is created (e.g. on deserialize).
 		this.ownerNode = null;
 
+		// optional change-notification callback. Wired by EditorState in shared-state
+		// mode so that field edits, node add/remove, and wire add/remove all bump
+		// the editor's reactive changeVersion ref. In legacy/standalone mode this
+		// stays null and _signalChange becomes a silent no-op — preserving prior behavior.
+		this.onChange = null;
+
 		// our dynamic name
 		this.name = ref('Root Graph');
 
@@ -73,6 +79,17 @@ export class NWGraph {
 
 		// make new selection manager for this graph specifically
 		this.selMgr = new SelectionManager(this);
+	}
+
+
+	/**
+	 * Fires the onChange callback if one is wired. Internal helper called from
+	 * any path that mutates the graph's structure or whose nodes' field state
+	 * changes (NWNode.requestComputeUpdate, addNode, removeNode, deserialize,
+	 * ConnectionManager wire add/remove). Safe to call when onChange is null.
+	 */
+	_signalChange(){
+		this.onChange?.();
 	}
 
 
@@ -128,6 +145,9 @@ export class NWGraph {
 
 		// re-evaluate our IO (if this is a group node, it may have changed)
 		this.updateIO();
+
+		// signal structural change to anyone listening
+		this._signalChange();
 
 		return newNode;
 	}
@@ -212,6 +232,9 @@ export class NWGraph {
 			// break any connections this node may have & update io
 			this.connMgr.breakConnectionsByNode(node);
 			this.updateIO();
+
+			// signal structural change
+			this._signalChange();
 
 			return true;
 		}
@@ -643,6 +666,10 @@ export class NWGraph {
 		}
 
 		this.updateIO();
+
+		// signal structural change after the dust settles
+		this._signalChange();
+
 		return this;
 	}
 

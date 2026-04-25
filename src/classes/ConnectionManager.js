@@ -88,6 +88,9 @@ export class ConnectionManager {
 		// tell nodes in the connection to tick their wire versions
 		conn.getNodeWireTickFn()();
 
+		// signal structural change up to any EditorState listening
+		this.graph?._signalChange?.();
+
 		return conn;
 	}
 
@@ -112,6 +115,9 @@ export class ConnectionManager {
 
 		// tell nodes in the connection to tick their wire versions
 		conn.getNodeWireTickFn()();
+
+		// signal structural change up to any EditorState listening
+		this.graph?._signalChange?.();
 	}
 
 
