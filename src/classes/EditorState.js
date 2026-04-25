@@ -21,7 +21,7 @@
 */
 
 // vue
-import { ref, shallowRef } from 'vue';
+import { ref, shallowRef, computed } from 'vue';
 
 // our app
 import { VTypeRegistry } from './VTypeRegistry';
@@ -75,16 +75,34 @@ export class EditorState {
 		//    Consumers watch this to know when to re-call getModel() / getComputeFn().
 		this.changeVersion = ref(0);
 
-		// 7. Bind the onChange handler once so we can compare references during
-		//    lazy re-attach (idempotent attach guard).
+		// 7. Bind callbacks ONCE so we can compare references during lazy re-attach.
 		this._onChangeBound = () => this._handleGraphChange();
+		this._onSelChangeBound = (sm) => this._promoteActiveSelMgr(sm);
 
-		// 8. Wire change-notification onto the root graph and any pre-existing
+		// 8. Reactive computeds that read from the active SelMgr (last-touched-wins).
+		//    Consumers access these via `.value` like any Vue ref.
+		this.selection = computed(() => {
+			return this._activeSelMgr.value?.selectedNodes?.value || [];
+		});
+
+		this.selectionCount = computed(() => {
+			return (this._activeSelMgr.value?.selectedNodes?.value || []).length;
+		});
+
+		this.activeGraph = computed(() => {
+			return this._activeSelMgr.value?.graph || this.rootGraph;
+		});
+
+		this.activeGraphPath = computed(() => {
+			return this._buildGraphPath(this.activeGraph.value);
+		});
+
+		// 9. Wire change-notification onto the root graph and any pre-existing
 		//    sub-graphs reachable through GroupNodes. Subsequent sub-graphs added
 		//    at runtime get attached lazily by _handleGraphChange below.
 		this._attachToGraph(this.rootGraph);
 
-		// 9. Initial data hydration (replaces root graph if provided).
+		// 10. Initial data hydration (replaces root graph if provided).
 		if (initialData) {
 			this.deserialize(initialData);
 		}
@@ -185,21 +203,23 @@ export class EditorState {
 
 	/**
 	 * Recursively walks a graph and any nested sub-graphs (via GroupNodes),
-	 * wiring our onChange handler. Idempotent — if a graph already has our
-	 * handler attached, we skip it (and skip recursing into its children if
-	 * they were already wired during a prior call).
+	 * wiring both the onChange (structural/value-change signal) and the
+	 * SelMgr.onChange (last-touched-wins promotion) handlers. Idempotent
+	 * via reference checks — safe to call repeatedly.
 	 *
 	 * @param {NWGraph} graph
 	 */
 	_attachToGraph(graph) {
 		if (!graph) return;
 
-		// idempotent guard — already attached, no work needed
-		if (graph.onChange === this._onChangeBound) {
-			// still recurse — children may not yet be attached if this graph
-			// was attached before any of its sub-graphs existed
-		} else {
+		// graph-level change signal (idempotent)
+		if (graph.onChange !== this._onChangeBound) {
 			graph.onChange = this._onChangeBound;
+		}
+
+		// per-graph selection-change signal (idempotent) — drives last-touched-wins
+		if (graph.selMgr && graph.selMgr.onChange !== this._onSelChangeBound) {
+			graph.selMgr.onChange = this._onSelChangeBound;
 		}
 
 		// recurse into any GroupNode sub-graphs
@@ -212,6 +232,29 @@ export class EditorState {
 				}
 			}
 		}
+	}
+
+
+	/**
+	 * Walk a graph's ancestry via ownerNode back-pointers, returning an array of
+	 * graph names from root to the given graph (inclusive). Used by the
+	 * activeGraphPath computed; also useful for breadcrumb-style UI.
+	 *
+	 * @param {NWGraph} graph
+	 * @returns {String[]}
+	 */
+	_buildGraphPath(graph) {
+		const path = [];
+		const visited = new Set();
+		let g = graph;
+		while (g && !visited.has(g)) {
+			visited.add(g);
+			const isRoot = !g.ownerNode;
+			const name = g.name?.value || (isRoot ? 'Root Graph' : 'Group');
+			path.unshift(name);
+			g = g.ownerNode?.graph || null;
+		}
+		return path;
 	}
 
 
@@ -257,6 +300,168 @@ export class EditorState {
 		this._bumpVersion();
 		return this;
 	}
+
+
+	// #region Selection
+	// -----------------
+
+	/**
+	 * Replace the current selection with the given nodes. All nodes must
+	 * belong to a single graph (selection is always single-graph). Promotes
+	 * that graph's SelMgr to active (last-touched-wins).
+	 *
+	 * Pass an empty array (or call clearSelection) to clear.
+	 *
+	 * @param {NWNode|NWNode[]} nodes
+	 * @throws {Error} if nodes from multiple graphs are passed.
+	 */
+	setSelection(nodes) {
+
+		const arr = Array.isArray(nodes) ? nodes : (nodes ? [nodes] : []);
+
+		if (arr.length === 0) {
+			this.clearSelection();
+			return;
+		}
+
+		// All nodes must belong to a single graph
+		const graph = arr[0]?.graph || null;
+		if (!graph || !graph.selMgr) {
+			throw new Error('EditorState.setSelection: nodes have no graph reference');
+		}
+		for (const n of arr) {
+			if (!n || n.graph !== graph) {
+				throw new Error('EditorState.setSelection: all nodes must belong to a single graph');
+			}
+		}
+
+		// SelMgr.setSelected fires onChange, which routes to _promoteActiveSelMgr
+		graph.selMgr.setSelected(arr);
+	}
+
+
+	/**
+	 * Clear the active graph's selection. The active graph stays the active
+	 * graph — clearing IS a change, but doesn't move the active context.
+	 */
+	clearSelection() {
+		this._activeSelMgr.value?.selectNone();
+	}
+
+	// #endregion
+
+
+	// #region Inspector helpers
+	// -------------------------
+
+	/**
+	 * Returns a UI-ready summary of a node, suitable for rendering in an
+	 * inspector. Excludes label and custom field rows (UI-only). Field entries
+	 * carry shape metadata (kind, type, title, description) but NOT live values
+	 * — use getFieldBinding(node, fieldName) for reactive value access.
+	 *
+	 * @param {NWNode} node
+	 * @returns {Object|null}
+	 */
+	getNodeInfo(node) {
+		if (!node) return null;
+
+		const fields = (node.fieldsList?.value || [])
+			.filter(f => f.fieldType !== FIELD_TYPE.LABEL && f.fieldType !== FIELD_TYPE.CUSTOM)
+			.map(f => ({
+				name: f.name,
+				kind: f.fieldType,
+				type: f.valueType?.typeName || null,
+				title: f.title || f.name,
+				description: f.description || '',
+				isArray: !!f.isArray,
+			}));
+
+		return {
+			id: node.id,
+			type: node._serializeKey || node.constructor.name,
+			title: node.constructor.nodeName || node.constructor.name,
+			icon: node.constructor.icon || null,
+			kind: node.constructor.nodeType,
+			fields,
+		};
+	}
+
+
+	/**
+	 * Returns a reactive binding for a single field on a node. Inspector UIs
+	 * should use this rather than reaching into node.fieldState directly,
+	 * which is internal.
+	 *
+	 * Returned shape:
+	 *   {
+	 *     value:       ComputedRef — reactive read of the current value
+	 *     setValue:    fn(newValue) — writes through wrapFieldValue's signaling path
+	 *     valueRef:    Ref — direct ref for v-model use in widgets
+	 *     type:        String — typeName (JSON-safe)
+	 *     typeClass:   Function — the VType class (for instanceof / typed widgets)
+	 *     kind:        'input' | 'output' | 'prop'
+	 *     wired:       ComputedRef<Boolean> — true when an input has a wire connected
+	 *     title:       String
+	 *     description: String
+	 *     isArray:     Boolean
+	 *   }
+	 *
+	 * For compound types (VColor3, VVector2 etc.), `value` is the whole
+	 * compound object — render a typed widget against it (color picker,
+	 * vector input). The plan deferred per-channel sub-bindings; revisit
+	 * if a real consumer needs them.
+	 *
+	 * @param {NWNode} node
+	 * @param {String} fieldName
+	 * @returns {Object|null}
+	 */
+	getFieldBinding(node, fieldName) {
+
+		if (!node || !fieldName) return null;
+
+		const field = (node.fieldsList?.value || []).find(f => f.name === fieldName);
+		if (!field) return null;
+
+		const fieldState = node.fieldState?.[fieldName];
+		if (!fieldState) return null;
+
+		const graph = node.graph;
+
+		// 'wired' is meaningful for inputs only; reactive on the wires array
+		const wired = (field.fieldType === FIELD_TYPE.INPUT && graph?.connMgr)
+			? computed(() => graph.connMgr.getConnectionsBySocket(node, field, true).length > 0)
+			: ref(false);
+
+		return {
+			value: computed(() => fieldState.valueRef.value),
+			setValue: (newValue) => { fieldState.val = newValue; },
+			valueRef: fieldState.valueRef,
+			type: field.valueType?.typeName || null,
+			typeClass: field.valueType || null,
+			kind: field.fieldType,
+			wired,
+			title: field.title || field.name,
+			description: field.description || '',
+			isArray: !!field.isArray,
+		};
+	}
+
+
+	/**
+	 * Convenience shortcut: write a value into a node's field. Signaling
+	 * happens via wrapFieldValue's watch (changeVersion bumps once).
+	 *
+	 * @param {NWNode} node
+	 * @param {String} fieldName
+	 * @param {*} value
+	 */
+	setFieldValue(node, fieldName, value) {
+		const fieldState = node?.fieldState?.[fieldName];
+		if (fieldState) fieldState.val = value;
+	}
+
+	// #endregion
 
 
 	// #region Evaluation / export

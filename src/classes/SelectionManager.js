@@ -17,7 +17,7 @@ export class SelectionManager {
 
 	/**
 	 * Constructs a new SelectionManager instance.
-	 * 
+	 *
 	 * @param {NWGraph} graph - The graph that this selection manager belongs to.
 	 */
 	constructor(graph){
@@ -40,12 +40,47 @@ export class SelectionManager {
 			zoom: null,
 			nodes: null,
 		};
+
+		// Optional notify callback wired by EditorState in shared-state mode.
+		// Called whenever the selection mutates (single/multi select, deselect,
+		// box-drag, programmatic). Receives `this` so EditorState can mark this
+		// SelMgr as the active one (last-touched-wins). Stays null in
+		// legacy/standalone mode — _setSelected becomes a silent no-op signaler.
+		this.onChange = null;
+	}
+
+
+	/**
+	 * Internal helper — single mutation point for selectedNodes. Every change
+	 * flows through here so we can fire onChange exactly once per change.
+	 *
+	 * @param {NWNode[]} nodes - The new selection array.
+	 */
+	_setSelected(nodes){
+
+		// always replace the array reference (shallowRef tracks identity)
+		this.selectedNodes.value = Array.isArray(nodes) ? nodes : [];
+
+		// fire change notification (no-op when onChange is null)
+		this.onChange?.(this);
+	}
+
+
+	/**
+	 * Public convenience: replace the selection wholesale, e.g. from a
+	 * programmatic `editorState.setSelection()` call. Fires onChange.
+	 *
+	 * @param {NWNode|NWNode[]} nodes
+	 */
+	setSelected(nodes){
+		const arr = Array.isArray(nodes) ? [...nodes] : (nodes ? [nodes] : []);
+		this._setSelected(arr);
 	}
 
 
 	/**
 	 * Selects a node, with support for multi-selection using Shift/Ctrl keys.
-	 * 
+	 *
 	 * @param {Event} event - The mouse event that triggered the selection.
 	 * @param {NWNode} node - The node to select.
 	 */
@@ -53,15 +88,15 @@ export class SelectionManager {
 
 		// log if shift is held
 		const isMultiSelect = event.shiftKey || event.ctrlKey || event.metaKey;
-		
+
 		// if multi-selecting add it to the list
 		if(isMultiSelect){
 
-			this.selectedNodes.value = [...this.selectedNodes.value, node];
-		
+			this._setSelected([...this.selectedNodes.value, node]);
+
 		}else{
 			// single select, just set it
-			this.selectedNodes.value = [node];
+			this._setSelected([node]);
 		}
 	}
 
@@ -100,12 +135,11 @@ export class SelectionManager {
 
 
 	/**
-	 * Clears all selected nodes.
+	 * Clears all selected nodes. Fires onChange (clearing IS a change — clicking
+	 * empty space in graph A keeps A as the active context with empty selection).
 	 */
 	selectNone(){
-		
-		// clear array
-		this.selectedNodes.value = [];
+		this._setSelected([]);
 	}
 
 
@@ -166,10 +200,12 @@ export class SelectionManager {
 				const idsInBox = this.getSelectionFromBox(viewport);
 				const nodesInBox = this.graph.getNodesById(idsInBox);
 
-				this.selectedNodes.value = [
+				// route through _setSelected so onChange fires per-tick during drag —
+				// keeps last-touched-wins semantics live throughout the box-select gesture
+				this._setSelected([
 					...initialSelection,
 					...nodesInBox,
-				];
+				]);
 
 			},
 

@@ -539,8 +539,9 @@ function pasteFromClipboard(clipboardData, centerX, centerY) {
 
 	graph.updateIO();
 
-	// 4. Select the newly pasted nodes
-	graph.selMgr.selectedNodes.value = newNodes;
+	// 4. Select the newly pasted nodes — route through the SelMgr's helper
+	// so EditorState's last-touched-wins promotion fires on the paste action.
+	graph.selMgr.setSelected(newNodes);
 }
 
 
