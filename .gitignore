@@ -1,6 +1,7 @@
 # directories
 misc/
 other/
+publish.sh
 
 # build output (library)
 dist/
