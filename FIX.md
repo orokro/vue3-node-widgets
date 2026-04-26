@@ -83,3 +83,92 @@ After the patch, build the library, reinstall in a consumer, and type into a `Nu
 - No public-API change. The PROP descriptor gains two functions that the rest of the library already expects.
 - Saved graphs that pre-date the fix continue to load — `validateFn` / `lintFn` are recomputed at construction time, not serialized.
 - If you ship this with the next bump, consumers that were silently dropping their custom `validateFn` / `lintFn` on PROP fields will start getting them honored. That's the intended behaviour but worth noting in the changelog.
+
+
+---
+
+
+# vue3-node-widgets — `nodeClassRegistry` not exported from main entry
+
+## Symptom
+
+Saved graphs that contain consumer-supplied custom node classes (any node passed via `createEditorState({ availableNodes: [...] })` that isn't part of the library's own `defaultNodeList`) lose those nodes when the graph is reloaded from disk. The library logs:
+
+```
+Could not find node class for key: "TimeInputNode"
+Could not find node class for key: "OutputColorAlphaNode"
+...
+Could not find nodes for wire: wire_<id>
+Could not find nodes for wire: wire_<id>
+```
+
+Wires referencing those nodes are dropped too, because the wire-resolution pass runs after node instantiation.
+
+## Why
+
+`NWGraph.deserialize` (around line 618) resolves saved nodes via the module-scoped Map:
+
+```js
+import { defaultNodeList, nodeClassRegistry } from './Nodes/index.js';
+```
+
+That Map is built **once** at library-module-load time from `defaultNodeList`:
+
+```js
+const nodeClassRegistry = new Map();
+for (const entry of defaultNodeList) {
+    if (entry.key && \!nodeClassRegistry.has(entry.key)) {
+        nodeClassRegistry.set(entry.key, entry);
+    }
+    if (\!nodeClassRegistry.has(entry.class.name)) {
+        nodeClassRegistry.set(entry.class.name, entry);
+    }
+}
+```
+
+Custom node classes that consumers pass via `createEditorState({ availableNodes })` go into the editor state's local `availableNodes` field (used for the add-node menu and interactive node construction) but are NEVER visible to this global Map — so they're invisible to the deserialize path.
+
+The library's own `src/index.js` also doesn't re-export `nodeClassRegistry`, so consumers can't even register their custom classes there as a workaround. The only thing that works today is to monkey-patch via the package's deep import path — fragile and bypasses the package's "consumer contract" comment at the top of `src/index.js`.
+
+## Fix
+
+Add a single re-export to `src/index.js` (right next to the existing `defaultNodeList` export):
+
+```js
+// In src/index.js, near the bottom:
+export { nodeClassRegistry } from './classes/Nodes/index.js';
+```
+
+That's the whole library-side change. Build + republish, bump consumers.
+
+Consumers can then register their custom nodes at module-load time:
+
+```js
+// in the consumer's setup file, alongside createEditorState's availableNodes config:
+import { nodeClassRegistry } from 'vue3-node-widgets';
+
+const customNodes = [
+  { class: TimeInputNode,        menuPath: '/Input',  key: 'TimeInputNode' },
+  { class: OutputColorAlphaNode, menuPath: '/Output', key: 'OutputColorAlphaNode' },
+  // ...
+];
+
+for (const entry of customNodes) {
+  if (entry.key && \!nodeClassRegistry.has(entry.key)) {
+    nodeClassRegistry.set(entry.key, entry);
+  }
+  if (entry.class?.name && \!nodeClassRegistry.has(entry.class.name)) {
+    nodeClassRegistry.set(entry.class.name, entry);
+  }
+}
+```
+
+Idempotent guards via `\!has(...)` mean the loop is HMR-safe and tolerates being run more than once.
+
+## Test
+
+After the patch, build the library, reinstall in a consumer that ships custom nodes, save a graph that uses one, reload from disk. Custom nodes should reconstruct alongside library defaults; no "Could not find" warnings; wires connecting customs should resolve.
+
+## Future improvement (not part of this fix)
+
+A cleaner long-term API would let `createEditorState({ availableNodes })` ALSO register those nodes into the global registry (or, even better, into a per-state registry that the deserialize path can fall through to). The global-registry workaround above is what consumers can do today; a future minor version could deprecate it in favor of the per-state form. The patch in this section is purely additive — re-exposing what already exists internally — so it doesn't preclude the better API later.

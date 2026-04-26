@@ -78,3 +78,37 @@ export {
 
 // aggregate convenience export — pass to createEditorState({ availableNodes: defaultNodeList })
 export { defaultNodeList } from './classes/Nodes/index.js';
+
+
+// ─── Node class registry (for custom-node deserialize) ───────────────────────
+//
+// `nodeClassRegistry` is a Map<key, {class, menuPath, key}> built at module-load
+// time from `defaultNodeList`. The deserialize path inside NWGraph looks nodes
+// up here by their saved `serializeKey` (or `class.name` fallback). Consumer-
+// supplied custom node classes only flow into the editor state's local
+// `availableNodes` for the add-node menu — they aren't visible to deserialize
+// unless registered here.
+//
+// Consumers with custom nodes should register them once at module-load time
+// (idempotent guards make this HMR-safe):
+//
+//   import { nodeClassRegistry } from 'vue3-node-widgets';
+//
+//   const myCustomNodes = [
+//       { class: MyTimeInputNode, menuPath: '/Input', key: 'MyTimeInputNode' },
+//       // ...
+//   ];
+//
+//   for (const entry of myCustomNodes) {
+//       if (entry.key && !nodeClassRegistry.has(entry.key)) {
+//           nodeClassRegistry.set(entry.key, entry);
+//       }
+//       if (entry.class?.name && !nodeClassRegistry.has(entry.class.name)) {
+//           nodeClassRegistry.set(entry.class.name, entry);
+//       }
+//   }
+//
+// (A cleaner per-state registry that falls through from createEditorState's
+// availableNodes is on the post-0.1.0 roadmap; the global workaround above is
+// what's available today.)
+export { nodeClassRegistry } from './classes/Nodes/index.js';
