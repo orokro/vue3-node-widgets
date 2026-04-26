@@ -35,6 +35,12 @@ export default defineConfig(({ mode }) => {
 			...(isLib ? [] : [vueDevTools()]),
 		],
 
+		// Skip the `public/` folder copy in lib mode — those assets (favicon,
+		// dev-app images) belong to the dev SPA, not the library. Without this,
+		// they'd be copied into dist/ and end up in the published tarball
+		// (which `files: ["dist"]` ships wholesale).
+		publicDir: isLib ? false : 'public',
+
 		build: isLib ? {
 
 			// ─── LIBRARY BUILD ───────────────────────────────────────────────

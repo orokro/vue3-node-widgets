@@ -1,155 +1,255 @@
 # vue3-node-widgets
 
-A system for customizable Node-graphs that can either run logic or provide a model of the graph.
-Nodes can use built-in widgets, or be completely customizable by adding your own components for the fields or nodes themselves.
+A Vue 3 component library for building **node-graph editors** — think shader-style or blueprint-style canvas tools. Ships the editor component itself, a value-type system with multi-hop type coalescence, and a JSON AST output suitable for codegen targets like GLSL.
+
+> **Status: 0.0.1-beta.0.** First public cut. The shader-graph use case is the load-bearing one for this release; the API is stable enough to integrate against, but expect refinement before 0.1.0.
+
+## Install
+
+```sh
+npm install vue3-node-widgets
+```
+
+Peer dependencies:
+
+- `vue` ^3.5 — required.
+- `material-design-icons-iconfont` ^6.7 — optional, only needed if you want the built-in icons to render. The library uses CSS classes that match the iconfont; without it, icons fall back to text. Install separately and import its CSS in your app's entry.
+
+## Quick start
+
+The shader-graph case in one block:
+
+```js
+import { createApp } from 'vue';
+import {
+    createEditorState,
+    NWEditorGraph,
+    defaultTypes,
+    defaultNodeList,
+} from 'vue3-node-widgets';
+
+import 'vue3-node-widgets/style.css';
+import 'material-design-icons-iconfont/dist/material-design-icons.css'; // optional but pretty
+
+const editorState = createEditorState({
+    types: defaultTypes,            // VNumber, VVector2/3, VColor3/4, etc. — all built-ins
+    availableNodes: defaultNodeList, // ~50 built-in nodes (math, color, vector, random, texture, I/O, group)
+});
+
+createApp({
+    components: { NWEditorGraph },
+    template: `<NWEditorGraph :state="editorState" style="width:100%; height:100vh" />`,
+    setup() { return { editorState }; },
+}).mount('#app');
+```
+
+`createEditorState({})` with no args produces an *empty* editor — no types, no coalescers, no available nodes. Default-off lets you build editors for non-shader domains (audio graphs, dataflow editors) by importing only what you need or supplying entirely custom types.
+
+## What's on `editorState`
+
+Everything goes through the state object — consumers should never need to reach into internal classes.
+
+```js
+// Save / load
+editorState.serialize()             // → JSON-safe object
+editorState.deserialize(data)       // ← replaces state, resets all windows to root, clears selection
+
+// Evaluation / export
+editorState.getComputeFn()          // → per-pixel closure: ({x,y,width,height,mouseX,mouseY}) => {r,g,b}
+editorState.evaluate(inputs)        // → single-shot, returns outputs object
+editorState.getModel(options?)      // → JSON AST — see "The model" below
+
+// Selection (last-touched-wins across all attached windows)
+editorState.selection               // → ComputedRef<NWNode[]>
+editorState.selectionCount          // → ComputedRef<Number>
+editorState.activeGraph             // → ComputedRef<NWGraph>
+editorState.activeGraphPath         // → ComputedRef<String[]>  breadcrumb labels
+editorState.setSelection(nodes)     // throws if nodes are from different graphs
+editorState.clearSelection()
+
+// Change notification
+editorState.changeVersion           // → Ref<Number>  bumps on any structural or value change
+
+// Inspector helpers (so you stay out of node.fieldState)
+editorState.getNodeInfo(node)       // → { id, type, title, icon, kind, fields[] }
+editorState.getFieldBinding(node, fieldName)
+                                    // → { value, setValue, valueRef, type, kind, wired, title, ... }
+editorState.setFieldValue(node, fieldName, value)
+```
+
+## The model — JSON AST for codegen
+
+`editorState.getModel()` returns a JSON-safe representation of the graph in topological order, ready to walk for codegen:
+
+```js
+{
+    nodes: [
+        {
+            id:    'node_xyz',
+            type:  'ABMath',                  // serializeKey
+            kind:  'processing',              // 'input' | 'output' | 'processing' | 'group'
+            fields: [
+                { name: 'aValue', kind: 'input',  type: 'Number', value: 0,    wired: true  },
+                { name: 'bValue', kind: 'input',  type: 'Number', value: 0,    wired: false },
+                { name: 'op',     kind: 'prop',   type: 'Enum',   value: 'add' },
+                { name: 'result', kind: 'output', type: 'Number' },
+            ],
+        },
+        // …
+    ],
+    wires: [
+        {
+            id:    'wire_abc',
+            from:  { nodeId: 'node_a', field: 'posV2',    type: 'Vector2' },
+            to:    { nodeId: 'node_b', field: 'outColor', type: 'Color3'  },
+            coalesce: {                       // null when src and dst types match
+                firstOrder: false,
+                hops: ['Vector2', 'Vector3', 'Color3'],
+            },
+        },
+        // …
+    ],
+    order: ['node_a', 'node_x', 'node_b'],    // topological execution order
+}
+```
+
+`coalesce.hops` is the chain of type-name strings the value passes through when source and destination types differ. For shader codegen, the hops tell you exactly which conversions to emit between node outputs. The hop chain comes from the type registry's pre-computed multi-hop coalescer — composition is automatic when each link defines its own first-order conversions.
+
+> Group nodes are emitted nested in 0.0.1b — each group node carries a `subGraph` field with the recursive model. Flat-mode (inlining group contents and re-routing wires through Group I/O) is on the 0.0.2 roadmap. Pass `{ flattenGroups: false }` to silence the related warning if your graphs contain groups.
+
+## Render-loop / live-preview pattern
+
+Watch `changeVersion` to know when to re-call `getModel()` (or `getComputeFn()`):
 
-Note:
+```js
+import { watch } from 'vue';
 
-If you're reading this, you're in the 'master' branch before this project was converted to a vue3 plugin.
+watch(() => editorState.changeVersion.value, () => {
+    const model = editorState.getModel();
+    const glsl = compileToGLSL(model);   // your codegen
+    rebuildShader(glsl);
+});
+```
+
+Every field edit, node add/remove, and wire add/remove bumps `changeVersion`. UI-driven widget edits flow through the same signaling path as programmatic writes.
+
+## Multi-view sharing
+
+Mount multiple `<NWEditorGraph>` instances against the same state. They share graph data and selection (last-touched-wins) but each has its own pan/zoom and breadcrumb position — drilling into a sub-graph in one window doesn't affect the other:
 
-I'm developing this system in a working vue3 project.
+```vue
+<template>
+    <div class="split-view">
+        <NWEditorGraph :state="state" />
+        <NWEditorGraph :state="state" />
+    </div>
+</template>
+```
 
-Later, I will move this branch to some other name, and extract just the logic for the plugin.
+This is the Blender-style use case — one window stays at root for context, another drills into a sub-graph for editing.
 
-Once the plugin works and is on NPM, this readme will be updated and relevant.
+## Custom nodes
 
-Also note: this is for graphs, not for programming like visual scripting languages. More like shaders.
+Extend `NWNode` to define your own:
 
+```js
+import { NWNode, NODE_TYPE, FIELD_TYPE, VNumber } from 'vue3-node-widgets';
 
-# Notes on Architecture
+export class MyDoubleNode extends NWNode {
 
-## NWEditor and NWEditorGraph
+    static nodeName = 'Double';
+    static icon = 'close';
 
-The fundamental heart of the system is in the `NWEditor` class. This will hold the instance of a node graph that can be displayed on on screen. the `NW` prefix stands for _"Node Widget"_ and will be present in various files and class names throughout the project.
+    static {
+        this.init();
+        this.setNodeType(NODE_TYPE.PROCESSING);
 
-Paired with the `NWEditor`, is the Vue component `NWEditorGraph.vue`. This component is the highest level component for the system, that shows a node graph that is pannable, zoomable, editable, etc.
+        this.addField(FIELD_TYPE.INPUT,  { name: 'x',      title: 'X',      type: VNumber });
+        this.addField(FIELD_TYPE.OUTPUT, { name: 'result', title: 'Result', type: VNumber });
 
-The `NWEditorGraph` will instantiate it's own `NWEditor` context automatically, but one can be provided to it via props if you wish to have multiple views of the same editable graph.
+        this.setEvalFunction((inputs) => ({
+            result: (inputs.x ?? 0) * 2,
+        }));
+    }
+}
+```
 
-The `NWEditor` has a handle of members & methods, but the most notable are:
+Then pass it (alongside the built-ins or alone) when building state:
 
-- `graph`:
-	This is an object like `{ nodes: shallowRef([]), wires: shallowRef([]) }`, and this is the heart of the state - after all an ode graph editor isn't much use without a graph.
+```js
+const state = createEditorState({
+    types: defaultTypes,
+    availableNodes: [
+        ...defaultNodeList,
+        { class: MyDoubleNode, menuPath: '/Custom', key: 'MyDoubleNode' },
+    ],
+});
+```
 
-	In this case, we have two shallowRefs of arrays storing the node instances as well as the wires (connections) between them
+## Custom types
 
-- `connMgr`:
-	The `NWEditor` keeps an instance of `ConnectionManager`, which operates on the `graph.wires` array. The ConnectionManager handles a lot of the state logic around connecting & disconnecting nodes with wires, as well as updating the wires when nodes are moved or destroyed
+Extend `VType` to define your own value type. Supply a default value, a Vue component for the inline widget, and any `fromCoalescers` / `toCoalescers` you want for cross-type conversion:
 
-- `typeRegistry`:
-	The `NWEditor` can be provided a pre-instantiated `VTypeRegistry`, or will create it's own if none is provided.
+```js
+import { VType, VNumber } from 'vue3-node-widgets';
+import MyKelvinWidget from './MyKelvinWidget.vue';
 
-	Because the nodes in the system need data types for their sockets, the `VTypeRegistry` is a critical system making sure that types can be registered into the system & converted between.
+export class VKelvin extends VType {
+    static {
+        this.init();
+        this.addFromCoalescer(VNumber, (val) => val?.value); // VNumber → VKelvin
+        this.addToCoalescer(VNumber,   (val) => val?.value); // VKelvin → VNumber
+    }
+    static typeName = 'Kelvin';
+    static themeColor = '#ff8a4c';
+    static defaultValue = 6500;
+    static nodeWidgetComponent = MyKelvinWidget;
+}
+```
 
-	The section on custom typing below will explain this in more detail.
+Then add it to your state — composed conversion paths through other types appear automatically:
 
-- `availableNodes`:
-	The last, but not least, important member of `NWEditor` is the list of `availableNodes`. This will be a list of class constructors for classes that extend `NodeWidget`
+```js
+const state = createEditorState({
+    types: [...defaultTypes, VKelvin],
+    availableNodes: [...defaultNodeList],
+});
+```
 
-	Note that this member, `availableNodes` works in parallel with the previous item: `typeRegistry`. In order for the wires to wire between the sockets of various on-screen nodes, the types that the nodes use must be present in the `typeRegistry` instance.
+Because `VKelvin ↔ VNumber` is registered, anything reachable from `VNumber` (Integer, Boolean, Text, etc.) also coalesces through it.
 
-	The `availableNotes` list is a `shallowRef([])` and will be the nodes that are listed in the Add Node menu.
+## Theming
 
-	The list of the available nodes to use can be passed into the constructor of `NWEditor`, but nodes can also be added or removed at run time with the method `addAvailableNodes(nodesList)`
+`<NWEditorGraph>` accepts a `:theme` prop — an object whose keys map to CSS variables driving the editor's appearance:
 
+```vue
+<NWEditorGraph :state="state" :theme="{
+    nodeBodyBGColor: '#222',
+    nodeOutlineColor: '#6cf',
+    wireColor: 'orange',
+    /* … */
+}" />
+```
 
-So to recap - the heard of the `vue3-node-widgets` library is the `NWEditor` class, which provides four critical elements: `graph`, `connMgr`, `typeRegistry`, and `availableNodes`. With these four pieces, we can build user-editable node graphs & wire 'em up.
+The full set of theme keys is documented in the source of `NWStyle.vue`.
 
----
+## Reference integration
 
-# Types
+The repository ships a test harness that exercises the public API exactly as a consumer would write it. After cloning:
 
-Let's move onto the subject of types.
+```sh
+npm install
+npm run dev
+```
 
-Types play an important role in node graphs - various nodes can have input sockets and output sockets that can be wired to and from. These sockets can have different value types, similar to any programming language.
+Then visit `http://localhost:5173/harness.html`. The harness mounts two `<NWEditorGraph>` instances against a shared state, has a sidebar inspector that uses `getNodeInfo` / `getFieldBinding`, and toolbar buttons for `getModel` / `evaluate` / serialize-roundtrip. It's the shortest path to seeing how the pieces fit.
 
-However, in addition to primitives like Number, Integer, String, etc, it would be useful for engineers who implement a graph to also define their own types. For example, this library comes with an non primitive type called `Vector2` which holds data in the shape `{x, y}`.
+## Beta notes / known limitations
 
-In order to make a robust system where the node components can use any arbitrary types, we need a formal way to define some things related to types:
+- `getModel({ flattenGroups: true })` (default) emits group nodes nested with a `subGraph` field rather than inlining their contents. Flat-mode is 0.0.2 work.
+- `evaluate(inputs)` and `getComputeFn()` have different I/O shapes by design (single-shot mutating vs. per-pixel pure closure). Unifying them is a 0.0.2 consideration; if you only need one, use the matching one.
+- No undo/redo yet. Undo via Command pattern is on the post-0.1.0 roadmap.
 
-- We need a way to define the types themselves. In this case, they will be JavaScript classes that extend the base class `VType`.
+## License
 
-- Types that extend `VType` need to provide many things such as
-
-  - `typeName` a pretty string name to be used in the UI where this type is concerned
-
-  - `description` another UI focused string for hinting the user on the usage of this type. Note that, these types are not TypeScript types, and meant to be user facing types for a user playing with a node graph. They are meant to be the kinds of wires & sockets available on the nodes. These are not necessarily meant to be consumed by programmers, other than the engineers building the nodes that will use these custom types.
-
-  - `nodeWidgetComponent` a Vue component constructor to build the UI widget for this type when it's added to a Node. Note that this is technically optional, and only used if the node doesn't specify it's own custom UI.
-
-  - `validateFn` - again, optional, but types should specify how to validate themselves
-
-  - `lintFn` - a function to tidy up input data to a preferred format for the type. Up to the engineer
-
-  - `compareFn` - a function to provide truthiness comparisons for this custom type
-
-- There are other useful things to define on a custom type, but the above list is the essentials
-
-- We also need a formal system to specify how these types can convert between each other. The base class `VType` provides a couple useful methods for dealing with type conversion (coalescence):
-
-  - `addToCoalescer(targetType, fn)` this static method can be called on a class that extends `VType`. This will allow the engineer to provide a custom function that will be used when the node graph tries to convert from said type, to `targetType`. Note that this is a "to" Coalescer... see next method for more
-
-  - `addFromCoalescer(sourceType, fn)` this is a sister method to the prior method. Instead of specifying how a type class should convert TO something, we can also give it a preference on how it should convert FROM another type. This way, types can specify preferred methods on how they're converted both from/to. If both types specify, the target type will be authority.
-
-  - `getFromCoalescer(sourceType)` does that it says on the tin: returns the method that was previously specified for this from type conversion
-
-  - `getToCoalescer(targetType)` is the same as above, but for fetching to-type functions.
-
-## Recap
-
-So, custom types can be made by extending the `VType` base class.
-
-Types need to provide some critical things like `typeName`, `description`, `nodeWidgetComponent`, as well as some useful methods like `validateFn`, `lintFn`, `comparefn`.
-
-Once a type class has been defined, static methods on it such as `addToCoalescer` and `addFromCoalescer` can be called to tell it how to convert between different types.
-
-Note that the coalescer step is done via static methods because it needs to happen _after_ all types are defined, otherwise you would end up with a _chicken-before-the-egg_ problem when defining types. How can you specify a "To conversion" to a type that isn't defined yet? If you define that first, how can you specify it's "From conversion" from the other type that's not define yet?
-
-Therefore, the flow would be to:
-
-- Define all types you'll need as classes that extend `VType`
-- In an `index.js` or similar file, import all the types & then build their coalescers.
-
-# VTypeRegistry
-
-The previous section talked about the work needed to define custom types - which will be the kinds of values that can be specified as sockets on nodes.
-
-In order for the `vue3-node-widget` library to use those types, they need to be loaded into a `VTypeRegistry` instance. The constructor takes a list of these type class constructors and does some magic on them.
-
-It will load all the types internally and loop over them. It will build a graph of first-order conversions: i.e. all the ways the types specify themselves how they can be converted to/from other types.
-
-However, it's possible that the engineer designing the types did not provide pathways for all possible 'to' and 'from'. After all, that would be an (potentially) exponentially big problem. If you have 10 types, you could be a mad man and specify 180 conversions:
-
-- For each of the 10 type, specify how to convert it TO the other 9 types
-- For each of the 10 types, specify how to convert it FROM the other 9 types
-- Therefore, each of the 10 type would need 18 functions
-- And therefore 180 total conversions specified
-
-Obviously this is unreasonable and pointless. Therefore, after the `VTypeRegister` "ingests" the type list with their built in coalescers, it will then automatically build a graph of second-order, composed conversions. Consider the following example:
-
-User defines the following types, with example values:
-
-Number: v
-Vector2: {x, y}
-Vector3: {x, y, z}
-Color3: {r, g, b}
-
-Then they add methods to do the following:
-
-Number converts to Vector2 as v => {x: v, y: v}
-Vector2 converts to Vector3 as v => {x: v.x, y: v.y, z: 0}
-Vector3 converts to Color3 as v => {r: v.x, g: v.y, b: b.z }
-
-The user never specified how to convert Number -> Color3
-
-however, because there exists a chain of intermediate steps, the `VTypeRegistry` will automatically detect & cache a route like
-`Number -> Vector2 -> Vector3 -> Color3`
-
-This is the power of the `VTypeRegister` and will allow a user to connect a wire from disparate socket types & automatically convert the data. Of course, the integrity of the data during the conversion is only as good as the type author provided.
-
-But with a well thought out type system for it's purpose, the UI should work well for the user.
-
-# TODO: 
-- Write about custom Nodes, ConnectionManager
-
-
+[Specify a license]
