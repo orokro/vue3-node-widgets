@@ -2,6 +2,8 @@
 misc/
 other/
 publish.sh
+publish_beta.sh
+.publish_beta.sh
 
 # build output (library)
 dist/
