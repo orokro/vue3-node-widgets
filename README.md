@@ -186,6 +186,32 @@ const state = createEditorState({
 });
 ```
 
+### The `availableNodes` list shape
+
+Each entry in the array is either a bare node class or an object describing how the node appears in the add-node menu:
+
+```js
+{
+    class:    MyNodeClass,        // required — the node class itself
+    menuPath: '/Math (Scalar)',   // required — slash-delimited path; controls menu grouping
+    key:      'MyNodeClass',      // recommended — stable serialization key (see below)
+}
+```
+
+`menuPath` controls where the node appears in the right-click add-node menu. Slashes nest submenus. Examples from `defaultNodeList`:
+
+```
+/Special           →  top-level "Special" group
+/Math (Scalar)     →  top-level "Math (Scalar)" group
+/Math (Vector2)    →  top-level "Math (Vector2)" group
+/Random/           →  top-level "Random" group (trailing slash is fine)
+/Examples/         →  top-level "Examples" group (where the custom-UI demos live)
+```
+
+`key` is the stable string used when serializing/deserializing graphs that contain this node. It survives JS minification (which can mangle `class.name`) and stays valid even if the class itself is renamed. Pick one and don't change it after graphs have been saved with it. If you omit `key`, the system falls back to `constructor.name`, which works in dev but is fragile in minified production builds.
+
+If you pass a bare class (no wrapper object), it's treated as `{ class, menuPath: '/' }` and the `key` falls back to `class.name`. Fine for quick prototyping; spell out the full shape for anything you'll ship.
+
 ## Fully custom node UIs
 
 Setting a `customComponent` on a node class replaces its entire body with a Vue component of your choice — useful when the default field-row layout doesn't fit (e.g., a knob+display console, an inline SVG visualization, a hand-painted skin). The library still renders the title bar and socket dots; everything else is yours:
@@ -255,7 +281,7 @@ Because `VKelvin ↔ VNumber` is registered, anything reachable from `VNumber` (
 
 ## Theming
 
-`<NWEditorGraph>` accepts a `:theme` prop — an object whose keys map to CSS variables driving the editor's appearance:
+`<NWEditorGraph>` accepts a `:theme` prop — an object whose keys map to CSS variables driving the editor's appearance. Any subset is fine; missing keys fall through to the defaults.
 
 ```vue
 <NWEditorGraph :state="state" :theme="{
@@ -266,7 +292,95 @@ Because `VKelvin ↔ VNumber` is registered, anything reachable from `VNumber` (
 }" />
 ```
 
-The full set of theme keys is documented in the source of `NWStyle.vue`.
+The full set of theme keys, grouped by what they affect:
+
+### Graph (background)
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `graphBGColor` | `'#3C3C3C'` | Base color of the graph canvas |
+| `graphBGImage` | bundled grid | URL for the canvas background image; pass any string URL or imported asset URL |
+
+### Node body
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `nodeBodyBGColor` | `'#AFAFAF'` | Default body color of nodes |
+| `nodeOutlineColor` | `'#000000'` | Outline of unselected nodes |
+| `nodeOutlineColorSelected` | `'#00ABAE'` | Outline of selected nodes |
+| `nodeBorderRadius` | `'10 10 10 10'` | Per-corner radius (top-left, top-right, bottom-right, bottom-left). Numbers only, no units — internally converted to em. |
+| `nodeTextColor` | `'#000000'` | Default text color inside the node body |
+
+### Node title bar
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `nodeTitleBGColor` | `'#1E1E1E'` | Title-bar background |
+| `nodeTitleTextColor` | `'#FFFFFF'` | Title-bar text |
+| `nodeTitleDeleteButtonColor` | `'#000000'` | Delete button background, idle |
+| `nodeTitleDeleteButtonColorHover` | `'#9A0E0E'` | Delete button background, hover |
+| `nodeTitleDeleteButtonFGColor` | `'#FFFFFF'` | Delete button icon color |
+| `nodeTitleCollapseButtonBGColor` | `'#000000'` | Collapse button background, idle |
+| `nodeTitleCollapseButtonOpenHoverColor` | `'#9A5E0E'` | Collapse button hover (open state) |
+| `nodeTitleCollapseButtonClosedColor` | `'#2F9A0E'` | Collapse button hover (closed state) |
+| `nodeTitleCollapseButtonFGColor` | `'#FFFFFF'` | Collapse button icon color |
+
+### Node fields and inputs
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `nodeFieldTextColor` | `'#000000'` | Text inside field rows |
+| `nodeInputBGColor` | `'#808080'` | Input widget background, idle |
+| `nodeInputBGColorActive` | `'#EFEFEF'` | Input widget background, focus/edit |
+| `nodeInputTextColor` | `'#FFFFFF'` | Input widget text, idle |
+| `nodeInputTextColorActive` | `'#000000'` | Input widget text, focus/edit |
+| `nodeInputAccent1` | `'#595959'` | Accent for sliders, toggles (track) |
+| `nodeInputAccent2` | `'#C0C0C0'` | Accent for sliders, toggles (handle / on-state) |
+| `nodeInputSeparatorColor` | `'#000000'` | Dividers between input rows |
+
+### Wires
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `wireColor` | `'#FFFFFF'` | Wire stroke color (may eventually be derived from socket type) |
+| `wireWidth` | `'15'` | Wire thickness; numeric string |
+
+### Breadcrumb bar
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `breadcrumbBarBGColor` | `'rgba(20,20,20,0.6)'` | Background of the breadcrumb strip |
+| `breadcrumbButtonBGColor` | `'rgba(255,255,255,0.3)'` | Crumb button, idle |
+| `breadcrumbButtonBGColorHover` | `'rgba(255,255,255,0.5)'` | Crumb button, hover |
+| `breadcrumbButtonTextColor` | `'white'` | Crumb button text, idle |
+| `breadcrumbButtonTextColorHover` | `'white'` | Crumb button text, hover |
+| `breadcrumbCloseButtonBGColor` | `'rgba(255,0,0,0.6)'` | Crumb close (×) button, idle |
+| `breadcrumbCloseButtonBGColorHover` | `'rgba(255,0,0,0.9)'` | Crumb close (×) button, hover |
+| `breadcrumbCloseButtonIconColor` | `'white'` | Crumb close (×) icon color |
+
+### Add-node menu
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `addMenuBGColor` | `'rgba(0,0,0,0.85)'` | Menu surface background |
+| `addMenuBGBlur` | `'blur(5px)'` | Backdrop filter applied behind the menu |
+| `addMenuTextColor` | `'white'` | Default menu text |
+| `addMenuItemBGColorActive` | `'#f0f0f0FF'` | Highlighted item background |
+| `addMenuItemTextColorActive` | `'black'` | Highlighted item text |
+| `addMenuItemBGColorParentActive` | `'#c0c0c0ff'` | Parent of the highlighted item (breadcrumb trail in the menu) |
+| `addMenuItemTextColorParentActive` | `'black'` | Parent-of-active item text |
+| `addMenuSearchBoxBGColor` | `'rgba(255,255,255,0.8)'` | Search box background |
+| `addMenuSearchBoxTextColor` | `'black'` | Search box text |
+
+### Selection box (drag-rectangle)
+
+| Key | Default | Purpose |
+| --- | --- | --- |
+| `selectBoxBGColor` | `'rgba(100,100,100,0.2)'` | Marquee fill |
+| `selectBoxBorderColor` | `'#AAAAAA'` | Marquee outline color |
+| `selectBoxBorderWidth` | `'2px'` | Marquee outline width |
+
+Theme keys are converted to CSS custom properties (`--nw-graph-bg-color`, `--nw-node-body-bg-color`, etc.), scoped to a unique data-attribute on each `<NWEditorGraph>` instance — different windows can carry different themes without collision.
 
 ## Reference integration
 
