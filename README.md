@@ -186,6 +186,41 @@ const state = createEditorState({
 });
 ```
 
+## Fully custom node UIs
+
+Setting a `customComponent` on a node class replaces its entire body with a Vue component of your choice — useful when the default field-row layout doesn't fit (e.g., a knob+display console, an inline SVG visualization, a hand-painted skin). The library still renders the title bar and socket dots; everything else is yours:
+
+```js
+import { NWNode, NODE_TYPE, FIELD_TYPE, VNumber } from 'vue3-node-widgets';
+import MyConsoleUI from './MyConsoleUI.vue';
+
+export class MyConsoleNode extends NWNode {
+
+    static nodeName = 'My Console';
+
+    static {
+        this.init();
+        this.setNodeType(NODE_TYPE.PROCESSING);
+
+        // Fields still defined normally — sockets render at the matching rows.
+        // Your custom component can read field state via the `node` prop.
+        this.addField(FIELD_TYPE.INPUT,  { name: 'in',  title: 'In',  type: VNumber });
+        this.addField(FIELD_TYPE.OUTPUT, { name: 'out', title: 'Out', type: VNumber });
+
+        this.setCustomComponent(MyConsoleUI);
+    }
+}
+```
+
+For a per-FIELD custom widget instead of a per-node body, set `nodeWidgetComponent` on the value type — the Kelvin example below shows that pattern.
+
+The two custom-UI demos shipped in `defaultNodeList` are the canonical references:
+
+- **`ABMathKnobNode`** — example of a custom *field widget* (knob input replacing the default number input).
+- **`SuperWaveNode`** — example of a fully custom *node body* (hand-painted skin with a custom oscilloscope display).
+
+Both ship under the `/Examples` menu path and are worth digging into the source of when building your own.
+
 ## Custom types
 
 Extend `VType` to define your own value type. Supply a default value, a Vue component for the inline widget, and any `fromCoalescers` / `toCoalescers` you want for cross-type conversion:
@@ -252,4 +287,4 @@ Then visit `http://localhost:5173/harness.html`. The harness mounts two `<NWEdit
 
 ## License
 
-[Specify a license]
+MIT — see [LICENSE](./LICENSE).

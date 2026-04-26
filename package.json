@@ -2,6 +2,7 @@
   "name": "vue3-node-widgets",
   "version": "0.0.1-beta.0",
   "description": "A Vue 3 component library for building node-graph editors. Ships a graph editor component, a type/coalescer system with multi-hop conversion, and a JSON AST output suitable for shader codegen.",
+  "license": "MIT",
   "type": "module",
   "main": "./dist/vue3-node-widgets.cjs",
   "module": "./dist/vue3-node-widgets.js",
@@ -14,7 +15,8 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "LICENSE"
   ],
   "scripts": {
     "dev": "vite --host",

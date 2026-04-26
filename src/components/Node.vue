@@ -775,7 +775,7 @@ onUnmounted(()=>{
 			height: 16em;
 
 			// background image
-			background-image: url('/img/resize_corners.png');
+			background-image: url('@Assets/img/resize_corners.png');
 			background-size: 200% 200%;
 			background-position: bottom right;
 

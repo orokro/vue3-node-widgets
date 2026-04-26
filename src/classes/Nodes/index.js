@@ -6,6 +6,14 @@
 */
 
 // import all our node types
+//
+// Note: AllTypesNode and AllTypesOutNode are imported and re-exported below so
+// the dev-only BuildDefaultLayout.js can still reach them, but they are NOT
+// listed in `defaultNodeList`. That keeps them out of the published library's
+// shipped node menu (no real consumer would use them — they were dev-time aids
+// for visually mounting every built-in type at once). The lib build's tree-
+// shaking drops them from the published bundle since src/index.js never
+// references the AllTypes exports.
 import AllTypesNode from './AllTypesNode';
 import AllTypesOutNode from './AllTypesOutNode';
 import ABMathKnobNode from './ABMathKnobNode';
@@ -80,11 +88,14 @@ const defaultNodeList = [
 	{ class: GroupInputNode,   menuPath: '/Special/',       key: 'GroupInputNode' },
 	{ class: GroupOutputNode,  menuPath: '/Special/',       key: 'GroupOutputNode' },
 
-	// debug nodes
-	{ class: AllTypesNode,     menuPath: '/Debug',          key: 'AllTypesNode' },
-	{ class: AllTypesOutNode,  menuPath: '/Debug/',         key: 'AllTypesOutNode' },
-	{ class: ABMathKnobNode,   menuPath: '/Debug/',         key: 'ABMathKnobNode' },
-	{ class: SuperWaveNode,    menuPath: '/Debug/',         key: 'SuperWaveNode' },
+	// custom-UI demo nodes — not strictly utility nodes, but kept in
+	// defaultNodeList as working examples of the two custom-UI patterns:
+	//   ABMathKnobNode  — custom WIDGET for individual fields (knob instead of number input)
+	//   SuperWaveNode   — fully CUSTOM NODE BODY (replaces the default field-renderer entirely)
+	// Both demonstrate features that are most useful to consumers building bespoke
+	// node libraries on top of vue3-node-widgets.
+	{ class: ABMathKnobNode,   menuPath: '/Examples/',      key: 'ABMathKnobNode' },
+	{ class: SuperWaveNode,    menuPath: '/Examples/',      key: 'SuperWaveNode' },
 
 	// mathematical nodes
 	{ class: ABMathNode,       menuPath: '/Math (Scalar)',  key: 'ABMathNode' },
@@ -175,7 +186,8 @@ export {
 	LerpValueNode,
 	RoundNode,
 	TrigNode,
-	
+
+	// Dev-only — see import note above. NOT in defaultNodeList; tree-shaken from lib bundle.
 	AllTypesNode,
 	AllTypesOutNode,
 

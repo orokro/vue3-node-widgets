@@ -30,6 +30,13 @@
 // ----------------------------
 import { ref, computed, watch, onMounted, onUnmounted, provide } from 'vue';
 
+// Import the default grid background as an ESM asset so vite/rollup picks it
+// up via the bundler pipeline (hashed filename, emitted to dist/assets/, URL
+// resolved at build time). This lets the library ship a working default
+// background image — referencing `/img/grid_bg.png` directly only worked in
+// the dev app, where vite serves `public/` at the root.
+import gridBgUrl from '@Assets/img/grid_bg.png';
+
 // ----------------------------
 // Props
 // ----------------------------
@@ -58,8 +65,9 @@ const defaultTheme = {
 	// background color of the graph body
 	graphBGColor: '#3C3C3C',
 
-	// url to image note: not CSS "url('asd')" type property. This will be a raw URL string, that should be converted to appropriate CSS
-	graphBGImage: '/img/grid_bg.png',
+	// url to image note: not CSS "url('asd')" type property. This will be a raw URL string, that should be converted to appropriate CSS.
+	// Resolved at build time via vite/rollup so it works in both dev and the published library bundle.
+	graphBGImage: gridBgUrl,
 
 	// node settings
 

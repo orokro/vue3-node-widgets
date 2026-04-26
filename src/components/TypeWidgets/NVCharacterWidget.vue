@@ -111,7 +111,7 @@ const validate = (value)=>{
 					height: 20em;
 
 					// bg image for icon
-					background: url('/img/icons/char.png') no-repeat center center;
+					background: url('@Assets/img/icons/char.png') no-repeat center center;
 					background-size: 100% 100%;
 				}// icon
 

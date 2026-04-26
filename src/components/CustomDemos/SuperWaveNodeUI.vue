@@ -297,7 +297,7 @@ function fieldHasInput(field){
 		height: 245em;
 
 		// background image
-		background: url('/SuperWave/base_image.png');
+		background: url('@Assets/SuperWave/base_image.png');
 		background-size: cover;
 		background-position: center;
 		background-repeat: no-repeat;
@@ -472,7 +472,7 @@ function fieldHasInput(field){
 				inset: -5em 5em 5em 5em;
 
 				// background image
-				background: url('/SuperWave/switch.png');
+				background: url('@Assets/SuperWave/switch.png');
 				background-size: 100% 100%;
 				background-repeat: no-repeat;
 
