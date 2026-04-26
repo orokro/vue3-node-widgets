@@ -391,8 +391,12 @@ function buildMenuHierarchy(availableNodes) {
 // and when the available nodes change
 watch(() => menuOptions, (newVal) => {
 
-	// build the menu hierarchy
-	buildMenuHierarchy(menuOptions.value.availableNodes);
+	// `menuOptions.value` may transiently be null in older builds where
+	// closeMenu() set it to null, or in any future code path that does the
+	// same. Defence-in-depth: treat that as "no nodes to render yet"
+	// rather than letting the immediate-fire crash setup with
+	// `Cannot read properties of null (reading 'availableNodes')`.
+	buildMenuHierarchy(menuOptions.value?.availableNodes ?? []);
 
 }, { immediate: true });
 

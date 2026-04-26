@@ -16,15 +16,24 @@ const menuIsOpen = ref(false);         // visibility (shown/hidden)
 const mountedMenuEl = shallowRef(null);// actual component ref or el
 const activeHostId = ref(null);        // ID of the NWEditorGraph that currently owns the menu
 const manuallyMounted = ref(false);   // if true, menu was mounted manually outside of NWEditorGraph
-const menuOptions = shallowRef(
-	{
-		x: 0,
-		y: 0,
-		graphCtx: null,
-		nwSystem: null,
-		availableNodes: []
-	}
-);
+// Default shape for `menuOptions`. Used both to seed the ref and to
+// reset it from `closeMenu` — keeping the shape consistent across the
+// menu's lifecycle prevents downstream consumers (notably AddNodeMenu's
+// `{ immediate: true }` watcher) from ever observing a null and crashing
+// on `.availableNodes` after the menu has been opened-then-closed once.
+//
+// Factory function rather than a shared object literal so each reset
+// gets a fresh instance — guards against any consumer accidentally
+// mutating the shared default.
+const DEFAULT_MENU_OPTIONS = () => ({
+	x: 0,
+	y: 0,
+	graphCtx: null,
+	nwSystem: null,
+	availableNodes: [],
+});
+
+const menuOptions = shallowRef(DEFAULT_MENU_OPTIONS());
 
 
 // ------------------------------------------------------------
@@ -136,7 +145,11 @@ function showAddMenu(options = {}) {
 
 function closeMenu() {
 	menuIsOpen.value = false;
-	menuOptions.value = null;
+	// Reset to the default shape rather than nulling. A later AddNodeMenu
+	// mount runs an `{ immediate: true }` watcher that reads
+	// menuOptions.value.availableNodes during setup — observing null there
+	// crashed the component on remount after a previous closeMenu() call.
+	menuOptions.value = DEFAULT_MENU_OPTIONS();
 }
 
 
