@@ -472,13 +472,23 @@ export default class NWNode {
 				break;
 
 			case FIELD_TYPE.PROP:
-				
+
+				// PROP fields render the same widgets as INPUT fields, so they
+				// need the same validation hooks. Number / Integer widgets call
+				// `props.field.validateFn(value)` directly during edits — without
+				// these two lines, PROP fields with a numeric type throw
+				// "validateFn is not a function" the first time the user types
+				// into them. Defaults already live on `options` (no-op fns set
+				// at the top of this method) so consumers don't need to supply
+				// them, but consumer-provided fns now flow through correctly.
 				const propDef = {
 					...baseField,
 					valueType: options.type,
 					title: options.title,
 					description: options.description,
 					align: options.align,
+					validateFn: options.validateFn,
+					lintFn: options.lintFn,
 				};
 
 				// add to the fields array & inputs map
