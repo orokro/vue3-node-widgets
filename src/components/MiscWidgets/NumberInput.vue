@@ -41,7 +41,7 @@
 
 			<div
 				v-if="showButtons && !isDragging"
-				class="btn decrement"
+				class="nw-num-step-btn nw-num-step-decrement"
 				:title="`Decrease by ${step}`"
 				@mousedown.stop.prevent
 				@mouseup.stop.prevent="changeValue(localValue - step)"
@@ -50,7 +50,7 @@
 			</div>
 			<div
 				v-if="showButtons && !isDragging"
-				class="btn increment"
+				class="nw-num-step-btn nw-num-step-increment"
 				:title="`Increase by ${step}`"
 				@mousedown.stop.prevent
 				@mouseup.stop.prevent="changeValue(localValue + step)"
@@ -546,7 +546,20 @@ defineExpose({
 		}
 
 		// the increment/decrement buttons
-		.btn {	
+		//
+		// NOTE on the class name: this used to be just `.btn`, which is one of
+		// the most common CSS class names in the wild — Bootstrap, Bulma, and
+		// many custom design systems define `.btn { font-size: 1rem; ... }` at
+		// the global level. Vue's scoped CSS adds a `[data-v-XXX]` attribute
+		// to bump our selector specificity to 0,2,0, but the consumer's `.btn`
+		// at 0,1,0 still inherits font-size onto our element via natural CSS
+		// cascade — and that wrecks our em-based sizing because `.btn span
+		// { font-size: 12em }` then resolves against the consumer's font-size
+		// rather than the editor's 1px anchor. Symptom: ◀ ▶ buttons render
+		// at hundreds of pixels and cover the whole input row.
+		//
+		// Renaming to `nw-num-step-btn` makes structural collision impossible.
+		.nw-num-step-btn {
 
 			position: absolute;
 			top: 0em;
@@ -555,12 +568,11 @@ defineExpose({
 
 			color: var(--nw-node-input-accent2);
 
-			/* border: 1px solid red; */
-			&.decrement {
+			&.nw-num-step-decrement {
 				left: 0em;
 			}
 
-			&.increment {
+			&.nw-num-step-increment {
 				right: 0em;
 			}
 
@@ -581,9 +593,9 @@ defineExpose({
 				font-size: 12em;
 			}
 
-		}// .btn
+		}// .nw-num-step-btn
 
-		&:hover .btn {
+		&:hover .nw-num-step-btn {
 			// show the buttons on hover
 			opacity: 0.5;
 		}
@@ -591,17 +603,17 @@ defineExpose({
 		// override styles for read-only mode
 		&.read-only {
 			opacity: .5;
-			
+
 			.number-value {
 				font-style: italic;
 				cursor: not-allowed !important;
 			}
-			
-			.btn {
+
+			.nw-num-step-btn {
 				pointer-events: none;
 				display: none;
 			}
-			
+
 		}// &.read-only
 
 	}// .number-input-wrapper

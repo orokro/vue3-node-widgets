@@ -18,9 +18,9 @@
 			class="number-box amplitude"
 			:class="{'disabled': fieldHasInput(props.node.fieldState.amplitude)}"
 		>
-			<div class="btn minus" @click="amplitude = Math.max(0, amplitude - 0.1)"><span>-</span></div>
+			<div class="nw-superwave-btn nw-superwave-btn-minus" @click="amplitude = Math.max(0, amplitude - 0.1)"><span>-</span></div>
 			<div class="value" @mousedown="dragAmplitude"><span>{{ amplitude.toFixed(1) }}</span></div>
-			<div class="btn plus" @click="amplitude = Math.min(10, amplitude + 0.1)"><span>+</span></div>
+			<div class="nw-superwave-btn nw-superwave-btn-plus" @click="amplitude = Math.min(10, amplitude + 0.1)"><span>+</span></div>
 		</div>
 
 		<!-- controls for changing wavelength -->
@@ -28,9 +28,9 @@
 			class="number-box wavelength"
 			:class="{'disabled': fieldHasInput(props.node.fieldState.wavelength)}"
 		>
-			<div class="btn minus" @click="wavelength = Math.max(0.01, wavelength - 0.1)"><span>-</span></div>
+			<div class="nw-superwave-btn nw-superwave-btn-minus" @click="wavelength = Math.max(0.01, wavelength - 0.1)"><span>-</span></div>
 			<div class="value" @mousedown="dragWavelength"><span>{{ wavelength.toFixed(1) }}</span></div>
-			<div class="btn plus" @click="wavelength = Math.min(20, wavelength + 0.1)"><span>+</span></div>
+			<div class="nw-superwave-btn nw-superwave-btn-plus" @click="wavelength = Math.min(20, wavelength + 0.1)"><span>+</span></div>
 		</div>
 
 		<!-- LED for when we're in degrees mode -->
@@ -332,8 +332,10 @@ function fieldHasInput(field){
 			align-items: center;
 			padding: 0em 4em 0em 4em;
 
-			// the buttons
-			.btn {
+			// the buttons — namespaced to avoid collisions with consumer-app
+			// `.btn` rules (Bootstrap, Bulma, etc.). See NumberInput.vue for
+			// the full rationale.
+			.nw-superwave-btn {
 				width: 28em;
 				height: 28em;
 				background: #222;
@@ -360,7 +362,7 @@ function fieldHasInput(field){
 				&:hover {
 					background: #444;
 				}
-			}// .btn
+			}// .nw-superwave-btn
 
 			// the value 
 			.value {
