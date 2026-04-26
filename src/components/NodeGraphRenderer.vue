@@ -41,10 +41,32 @@
 			<!-- spawn all wires here -->
 			<WireRenderer :graph="graph" />
 
-			<!-- loop through all the nodes and render them -->
+			<!--
+				Loop through all the nodes and render them.
+
+				NOTE on the inline `font-size` binding:
+				The entire library uses an em-based sizing scheme — every padding,
+				border-radius, button width, icon size, etc. is declared in `em`,
+				with a tiny anchor font-size at the top so 1em ≈ 1px. The anchor
+				is `${zoomScale}px` so zooming the canvas naturally rescales every
+				em value at once.
+
+				The anchor used to live on `.editor-container` only and rely on
+				inheritance to propagate down through `.pan-container` → Node → all
+				the way into deeply-nested input widgets. That long cascade is
+				fragile in consumer apps — any global CSS rule (especially anything
+				with `!important`) along the chain can reset font-size and the
+				whole em system drifts. Symptom: tiny ◀ ▶ buttons inside number
+				inputs render huge enough to cover the entire input row.
+
+				Anchoring the font-size directly on each `.node-instance` makes the
+				cascade one-deep from here to every em-based descendant, so consumer
+				CSS can't defeat it without explicitly targeting our scoped class.
+			-->
 			<Node
 				v-for="(node, index) in graph.nodes.value"
 				class="node-instance"
+				:style="{ fontSize: `${zoomScale}px` }"
 				:key="node.id"
 				:data-node-id="node.id"
 				:graph="graph"
