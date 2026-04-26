@@ -19,7 +19,7 @@
 
 import NWNode from '../NWNode.js';
 import { NODE_TYPE, FIELD_TYPE } from '../NWNode.js';
-import { 
+import {
 	VAngle,
 	VAngles,
 	VBoolean,
@@ -39,10 +39,7 @@ import {
 // we'll always add input output nodes to the group node by default
 import GroupInputNode from './GroupInputNode.js';
 import GroupOutputNode from './GroupOutputNode.js';
-import ABMathNode from './ABMathNode.js';
 import { nextTick, watch, watchEffect } from 'vue';
-import ColorBlendNode from './ColorBlendNode.js';
-import ColorMixNode from './ColorMixNode.js';
 
 // main export
 export default class GroupNode extends NWNode {
@@ -248,7 +245,9 @@ export default class GroupNode extends NWNode {
 
 
 	/**
-	 * Build a default layout for the internal graph
+	 * Build a default layout for the internal graph — every new group node
+	 * starts with a GroupInput and a GroupOutput so the user has somewhere to
+	 * wire inputs and outputs immediately. No other content is pre-populated.
 	 */
 	buildDefaultLayout(){
 
@@ -258,10 +257,6 @@ export default class GroupNode extends NWNode {
 		// add both an input & output node by default
 		ctx.addNode(GroupInputNode, 20, 200);
 		ctx.addNode(GroupOutputNode, 680, 200);
-
-		// for debug we'll also add a math node to the middle
-		ctx.addNode(ABMathNode, 360, 200);
-		ctx.addNode(ColorMixNode, 360, 460);
 	}
 
 

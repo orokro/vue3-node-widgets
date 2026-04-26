@@ -1,5 +1,9 @@
-# diretories
+# directories
 misc/
+other/
+
+# build output (library)
+dist/
 
 # Logs
 logs
